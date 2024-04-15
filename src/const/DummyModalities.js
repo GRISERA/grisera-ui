@@ -1,0 +1,92 @@
+export default [
+  {
+    id: 1,
+    key: 'modalityBodyPosture',
+    name: 'Body posture',
+    description: 'Body posture',
+  },
+  {
+    id: 2,
+    key: 'modalityEyeGaze',
+    name: 'Eye gaze',
+    description: 'Eye gaze',
+  },
+  {
+    id: 3,
+    key: 'modalityFacialExpressions',
+    name: 'Facial expressions',
+    description: 'Facial expressions',
+  },
+  {
+    id: 4,
+    key: 'modalityGestures',
+    name: 'Gestures',
+    description: 'Gestures',
+  },
+  {
+    id: 5,
+    key: 'modalityHeadMovement',
+    name: 'Head movement',
+    description: 'Head movement',
+  },
+  {
+    id: 6,
+    key: 'modalityHeartRate',
+    name: 'Heart rate',
+    description: 'Heart rate',
+  },
+  {
+    id: 7,
+    key: 'modalityHRV',
+    name: 'HRV',
+    description: 'Heart rate variability',
+  },
+  {
+    id: 8,
+    key: 'modalityMotion',
+    name: 'Motion',
+    description: 'Motion (different from motion identifined by other inviduals)',
+  },
+  {
+    id: 9,
+    key: 'modalityMuscleTension',
+    name: 'Muscle tension',
+    description: 'Muscle tension',
+  },
+  {
+    id: 10,
+    key: 'modalityNeuralActivity',
+    name: 'Neural activity',
+    description: 'Neural activity',
+  },
+  {
+    id: 11,
+    key: 'modalityPeripheralTemperature',
+    name: 'Peripheral temperature',
+    description: 'Peripheral temperature',
+  },
+  {
+    id: 12,
+    key: 'modalityProsodyOfSpeech',
+    name: 'Prosody of speech',
+    description: 'Prosody of speech',
+  },
+  {
+    id: 13,
+    key: 'modalityRESPIntesity',
+    name: 'Respiratory rate',
+    description: 'Respiratory rate',
+  },
+  {
+    id: 14,
+    key: 'modalitySkinConductance',
+    name: 'Skin conductance',
+    description: 'Skin conductance',
+  },
+  {
+    id: 15,
+    key: 'modalityVocalization',
+    name: 'Vocalization',
+    description: 'Vocalization',
+  },
+];
