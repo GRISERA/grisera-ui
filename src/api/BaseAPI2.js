@@ -48,6 +48,8 @@ export default class BaseAPI2 {
   }
 
   static store(data) {
+    //console.log('Store: ', data);
+    //console.log('Store after dto: ', this.dTOFrontToAPI(data));
     return apiService.post(`/${this.getBasePath()}?${this.getDatasetName()}`, this.dTOFrontToAPI(data));
   }
 

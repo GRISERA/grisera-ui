@@ -2,17 +2,10 @@ import BaseAPI2 from '@/api/BaseAPI2';
 import DatabaseName from '@/const/relations/DatabaseName';
 import MeasureNamesAPI from './MeasureNamesAPI';
 
-import ModelType from '@/const/relations/ModelType';
-
 export default class extends BaseAPI2 {
   static getBasePath() {
     return DatabaseName.MEASURES;
   }
-
-  static getModelType() {
-    return ModelType.EXPERIMENT;
-  }
-
 
   static dTOFrontToAPI(data){
     return {

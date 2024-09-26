@@ -42,7 +42,7 @@ export default class extends BaseAPI2 {
       description: data.additional_properties.find(param => param.key === 'description').value,
       type: typeMapping[data.activity],
       additionalParameters: data.additional_properties.filter(
-        param => param.key !== 'name' && param.key !== 'description',
+        param => !['name', 'description'].includes(param.key),
       ).map(e => {return { ...e, name: e.key };}),
     };
   }
