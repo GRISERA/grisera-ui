@@ -16,7 +16,7 @@ export default class extends BaseAPI2 {
     return {
       activity: typeMapping[data.type],
       additional_properties: [
-        ...data.additionalParameters,
+        ...data.additionalParameters.map(e => {return { key: e.name, value: e.value };}),
         {
           key: 'name',
           value: data.name,
@@ -43,7 +43,7 @@ export default class extends BaseAPI2 {
       type: typeMapping[data.activity],
       additionalParameters: data.additional_properties.filter(
         param => param.key !== 'name' && param.key !== 'description',
-      ),
+      ).map(e => {return { ...e, name: e.key };}),
     };
   }
 }
