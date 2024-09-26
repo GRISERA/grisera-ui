@@ -28,7 +28,7 @@ export default [
     },
   },
   {
-    path: '/datasets/:id(\\d+)/edit',
+    path: '/datasets/:id([0-9a-fA-F]+)/edit',
     name: 'dataset-edit',
     component: () => import('@/views/datasets/DatasetDetailedView.vue'),
     meta: {

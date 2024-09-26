@@ -30,7 +30,7 @@ export default [
       },
     },
     {
-      path: '/measures/edit/:id(\\d+)',
+      path: '/measures/edit/:id([0-9a-fA-F]+)',
       name: 'measure-edit',
       component: () => import('@/views/CreateEditMeasureView.vue'),
       meta: {

@@ -243,8 +243,8 @@ export default {
   data () {
     return {
       timeSeries: {
-        activityExecutionId: ~~this.$route.params.activityExecution,
-        participantId: ~~this.$route.params.id,
+        activityExecutionId: this.$route.params.activityExecution,
+        participantId: this.$route.params.id,
         link: '',
         type: null,
         spacing: null,
@@ -264,7 +264,7 @@ export default {
         if (!newValue) {
           return;
         }
-        TimeSeriesApi.show(~~newValue)
+        TimeSeriesApi.show(newValue)
           .then(({ data }) => {
             this.timeSeries = data;
             this.isEditMode = true;

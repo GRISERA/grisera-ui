@@ -218,7 +218,7 @@ export default {
           return;
         }
 
-        ActivityExecutionsAPI.show(~~newValue)
+        ActivityExecutionsAPI.show(newValue)
             .then(({ data }) => {
               this.item = data;
               if (this.isIndividualActivity) {
@@ -262,7 +262,7 @@ export default {
 
       const method = this.isEditMode ? 'update' : 'store';
       this.setItemParticipantsAsArray();
-      ActivityExecutionsAPI[method]({ ...this.item, experiment: ~~this.$route.params.experimentId })
+      ActivityExecutionsAPI[method]({ ...this.item, experiment: this.$route.params.experimentId })
           .then(() => {
             this.$router.go(-1);
           });

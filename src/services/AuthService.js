@@ -3,7 +3,7 @@ import config from '../../config.js';
 import LS from '@/storage/LS.js';
 
 const authService = axios.create({
-  baseURL: config.apiUrl,
+  baseURL: config.authUrl,
 });
 
 export default {

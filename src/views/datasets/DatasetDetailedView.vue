@@ -140,7 +140,7 @@ export default {
     '$route.params.id': {
       handler(newValue) {
         if (!newValue) return;
-        const value = this.datasets.find(e => e.id === ~~newValue);
+        const value = this.datasets.find(e => e.id === newValue);
 
         if (value) {
           this.dataset = { ...value };

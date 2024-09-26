@@ -189,34 +189,32 @@ export default {
     },
   },
   created() {
-    MeasuresAPI.index()
+    if(this.$route.params.id){
+      MeasuresAPI.show(this.$route.params.id)
         .then(({ data }) => {
-          var state = data.filter(state => {
-            return state.id === ~~this.$route.params.id;
-          });
-          if (Array.isArray(state) && state.length > 0) {
-            this.id = state[0].id;
-            this.isEditMode = true;
-            this.name = state[0].name;
-            this.type = state[0].type;
-            this.source = state[0].source;
-            if (state[0].hasOwnProperty('datatype')) {
-              this.datatype = state[0].datatype;
-            }
-            if (state[0].hasOwnProperty('rangeStart')) {
-              this.rangeStart = state[0].rangeStart;
-            }
-            if (state[0].hasOwnProperty('rangeEnd')) {
-              this.rangeEnd = state[0].rangeEnd;
-            }
-            if (state[0].hasOwnProperty('unit')) {
-              this.unit = state[0].unit;
-            }
-            if (state[0].hasOwnProperty('definedValue')) {
-              this.definedValueList = state[0].definedValue;
-            }
+          this.id = data.id;
+          this.isEditMode = true;
+          this.name = data.name;
+          this.type = data.type;
+          this.source = data.source;
+          this.measure_name_id = data.measure_name_id;
+          if (data.hasOwnProperty('datatype')) {
+            this.datatype = data.datatype;
+          }
+          if (data.hasOwnProperty('rangeStart')) {
+            this.rangeStart = data.rangeStart;
+          }
+          if (data.hasOwnProperty('rangeEnd')) {
+            this.rangeEnd = data.rangeEnd;
+          }
+          if (data.hasOwnProperty('unit')) {
+            this.unit = data.unit;
+          }
+          if (data.hasOwnProperty('definedValue')) {
+            this.definedValueList = data.definedValue;
           }
         });
+    }
   },
   methods: {
     validateRangeFields() {
@@ -241,7 +239,9 @@ export default {
             name: this.name,
             type: this.type,
             source: 'User defined',
+            datatype: 'string',
             definedValue: this.definedValueList,
+            measure_name_id: this.measure_name_id,
           };
         } else {
           newMeasure = {
@@ -253,6 +253,7 @@ export default {
             rangeEnd: this.rangeEnd,
             unit: this.unit,
             source: 'User defined',
+            measure_name_id: this.measure_name_id,
           };
         }
 

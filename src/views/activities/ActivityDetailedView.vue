@@ -87,7 +87,7 @@ export default {
   },
   methods: {
     getActivity() {
-      ActivitiesAPI.show(~~this.$route.params.id)
+      ActivitiesAPI.show(this.$route.params.id)
           .then(({ data }) => {
             this.activity = data;
             this.chipColor = this.getActivityTypeChipColor(this.activity.type);

@@ -94,7 +94,7 @@ export default {
   },
   methods: {
     getExperiment() {
-      ExperimentsAPI.show(~~this.$route.params.id)
+      ExperimentsAPI.show(this.$route.params.id)
           .then(({ data }) => {
             this.experiment = data;
           });

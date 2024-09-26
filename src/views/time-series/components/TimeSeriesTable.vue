@@ -70,8 +70,8 @@ export default {
       { text: 'Actions', value: 'actions', sortable: false },
     ],
     timeSeries: [],
-    activityExecutionId: ~~this.$route.params.activityExecution,
-    participantId: ~~this.$route.params.id,
+    activityExecutionId: this.$route.params.activityExecution,
+    participantId: this.$route.params.id,
   };
   },
   created() {
@@ -91,7 +91,7 @@ export default {
       this.$router.push({
         name: 'experiment-activity-execution-participant-time-series-edit',
         params: {
-          experiment: ~~this.$route.params.experiment,
+          experiment: this.$route.params.experiment,
           activityExecution: this.activityExecutionId,
           id: this.participantId,
           timeSeriesId: timeSeriesId,

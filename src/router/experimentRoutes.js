@@ -17,7 +17,7 @@ export default [
     },
   },
   {
-    path: '/experiments/:id(\\d+)',
+    path: '/experiments/:id([0-9a-fA-F]+)',
     name: 'experiment-detailed',
     component: () => import('@/views/experiment-details/ExperimentDetailedView.vue'),
     meta: {
@@ -43,7 +43,7 @@ export default [
     },
   },
   {
-    path: '/experiments/:experiment(\\d+)/scenarios/:id(\\d+)',
+    path: '/experiments/:experiment([0-9a-fA-F]+)/scenarios/:id([0-9a-fA-F]+)',
     name: 'experiment-scenario-edit',
     component: () => import('@/views/scenarios/ScenarioAddEditView.vue'),
     meta: {
@@ -58,7 +58,7 @@ export default [
     },
   },
   {
-    path: '/experiments/:experiment(\\d+)/scenarios',
+    path: '/experiments/:experiment([0-9a-fA-F]+)/scenarios',
     name: 'experiment-scenario-add',
     component: () => import('@/views/scenarios/ScenarioAddEditView.vue'),
     meta: {
@@ -73,7 +73,7 @@ export default [
     },
   },
   {
-    path: '/experiments/:experiment(\\d+)/scenarios/:scenario(\\d+)/activities/:id(\\d+)',
+    path: '/experiments/:experiment([0-9a-fA-F]+)/scenarios/:scenario([0-9a-fA-F]+)/activities/:id([0-9a-fA-F]+)',
     name: 'experiment-scenario-activity-edit',
     component: () => import('@/views/activities/ActivityDetailedView.vue'),
     meta: {
@@ -87,7 +87,7 @@ export default [
     },
   },
   {
-    path: '/experiments/:experiment(\\d+)/activity-executions/:id(\\d+)',
+    path: '/experiments/:experiment([0-9a-fA-F]+)/activity-executions/:id([0-9a-fA-F]+)',
     name: 'experiment-activity-execution-edit',
     component: () => import('@/views/ActivityExecutionAddEditView.vue'),
     meta: {
@@ -102,7 +102,7 @@ export default [
     },
   },
   {
-    path: '/experiments/:experiment(\\d+)/activity-executions/:activityExecution(\\d+)/participants/:id(\\d+)',
+    path: '/experiments/:experiment([0-9a-fA-F]+)/activity-executions/:activityExecution([0-9a-fA-F]+)/participants/:id([0-9a-fA-F]+)',
     name: 'experiment-activity-execution-participant-edit',
     component: () => import('@/views/ActivityExecutionParticipantManagement.vue'),
     meta: {
@@ -120,7 +120,7 @@ export default [
     },
   },
   {
-    path: '/experiments/:experiment(\\d+)/activity-executions/:activityExecution(\\d+)/participants/:id(\\d+)/time-series',
+    path: '/experiments/:experiment([0-9a-fA-F]+)/activity-executions/:activityExecution([0-9a-fA-F]+)/participants/:id([0-9a-fA-F]+)/time-series',
     name: 'experiment-activity-execution-participant-time-series',
     component: () => import('@/views/time-series/TimeSeriesView.vue'),
     meta: {
@@ -139,7 +139,7 @@ export default [
     },
   },
   {
-    path: '/experiments/:experiment(\\d+)/activity-executions/:activityExecution(\\d+)/participants/:id(\\d+)/time-series/create',
+    path: '/experiments/:experiment([0-9a-fA-F]+)/activity-executions/:activityExecution([0-9a-fA-F]+)/participants/:id([0-9a-fA-F]+)/time-series/create',
     name: 'experiment-activity-execution-participant-time-series-create',
     component: () => import('@/views/time-series/CreateEditTimeSeriesView.vue'),
     meta: {
@@ -160,7 +160,7 @@ export default [
     },
   },
   {
-    path: '/experiments/:experiment(\\d+)/activity-executions/:activityExecution(\\d+)/participants/:id(\\d+)/time-series/:timeSeriesId(\\d+)',
+    path: '/experiments/:experiment([0-9a-fA-F]+)/activity-executions/:activityExecution([0-9a-fA-F]+)/participants/:id([0-9a-fA-F]+)/time-series/:timeSeriesId([0-9a-fA-F]+)',
     name: 'experiment-activity-execution-participant-time-series-edit',
     component: () => import('@/views/time-series/CreateEditTimeSeriesView.vue'),
     meta: {
@@ -181,7 +181,7 @@ export default [
     },
   },
   {
-    path: '/experiments/:experiment(\\d+)/recordings/:id(\\d+)',
+    path: '/experiments/:experiment([0-9a-fA-F]+)/recordings/:id([0-9a-fA-F]+)',
     name: 'experiment-recording-edit',
     component: () => import('@/views/RecordingsAddEditView.vue'),
     meta: {
@@ -196,7 +196,7 @@ export default [
     },
   },
   {
-    path: '/experiments/:experiment(\\d+)/recordings',
+    path: '/experiments/:experiment([0-9a-fA-F]+)/recordings',
     name: 'experiment-recording-add',
     component: () => import('@/views/RecordingsAddEditView.vue'),
     meta: {

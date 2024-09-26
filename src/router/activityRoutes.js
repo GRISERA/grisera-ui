@@ -17,7 +17,7 @@ export default [
     },
   },
   {
-    path: '/activities/:id(\\d+)',
+    path: '/activities/:id([0-9a-fA-F]+)',
     name: 'activity-detailed',
     component: () => import('@/views/activities/ActivityDetailedView.vue'),
     meta: {

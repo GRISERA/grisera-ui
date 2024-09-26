@@ -248,7 +248,7 @@ export default {
         if (!newValue) {
           return;
         }
-        RecordingsAPI.show(~~newValue)
+        RecordingsAPI.show(newValue)
             .then(({ data }) => {
               this.item = data;
               this.isEditMode = true;
@@ -258,7 +258,7 @@ export default {
     },
   },
   created() {
-    ExperimentsAPI.show(~~this.$route.params.experiment)
+    ExperimentsAPI.show(this.$route.params.experiment)
         .then(async ({ data }) => {
           this.experiment = data;
           this.scenarioExecutions = this.experiment.scenarioExecutions.reverse();

@@ -166,7 +166,7 @@ export default {
           return;
         }
 
-        ScenariosAPI.show(~~newValue)
+        ScenariosAPI.show(newValue)
             .then(({ data }) => {
               this.item = data;
               this.isEditMode = true;
@@ -176,7 +176,7 @@ export default {
     },
     '$route.params.experiment': {
       handler(newValue) {
-        ExperimentsAPI.show(~~newValue)
+        ExperimentsAPI.show(newValue)
             .then(({ data }) => {
               this.experiment = data;
             });
@@ -198,7 +198,7 @@ export default {
 
       const method = this.isEditMode ? 'update' : 'store';
 
-      ScenariosAPI[method]({ ...this.item, experiment: ~~this.$route.params.experiment })
+      ScenariosAPI[method]({ ...this.item, experiment: this.$route.params.experiment })
           .then(() => {
             this.$router.go(-1);
           });

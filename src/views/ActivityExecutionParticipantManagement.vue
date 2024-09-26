@@ -286,7 +286,7 @@ export default {
           return;
         }
 
-        ActivityExecutionsAPI.show(~~newValue)
+        ActivityExecutionsAPI.show(newValue)
             .then(({ data }) => {
               this.item = data;              
             });
@@ -299,7 +299,7 @@ export default {
           return;
         }
 
-        ParticipantsAPI.show(~~newValue)
+        ParticipantsAPI.show(newValue)
             .then(({ data }) => {
               this.participant = data;              
             });      
@@ -316,7 +316,7 @@ export default {
     ParticipantStatesAPI.index()
     .then(({ data }) => {              
         var state = data.filter(state => {        
-          return state.participant === ~~this.$route.params.id && state.activityExecution === ~~this.$route.params.activityExecution;
+          return state.participant === this.$route.params.id && state.activityExecution === is.$route.params.activityExecution;
         });
         if(Array.isArray(state) && state.length > 0){
           this.id = state[0].id;
@@ -344,8 +344,8 @@ export default {
       }
 
       var newParticipantState = {        
-        participant: ~~this.$route.params.id,
-        activityExecution: ~~this.$route.params.activityExecution,
+        participant: this.$route.params.id,
+        activityExecution: this.$route.params.activityExecution,
         ...(this.selected.bigFive && { bigFiveValues: this.bigFiveValues }),
         ...(this.id != undefined && { id: this.id }),
         ...(this.selected.panas && { panasValues: this.panasValues }),

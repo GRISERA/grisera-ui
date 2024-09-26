@@ -2,7 +2,7 @@ import axios from 'axios';
 import config from '../../config.js';
 
 const usersService = axios.create({
-  baseURL: config.apiUrl,
+  baseURL: config.authUrl,
   headers: {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer ' + localStorage.getItem('token'),  
