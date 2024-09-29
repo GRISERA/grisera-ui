@@ -98,11 +98,9 @@
 import DatasetAPI from '@/api/DatasetAPI';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
-import { mapMutations, mapState } from 'vuex';
-import DummyChannels from '@/const/DummyChannels';
-import DummyLifeActivities from '@/const/DummyLifeActivities';
-import DummyModalities from '@/const/DummyModalities';
-import LS from '@/storage/LS';
+import config from '../../../config.js';
+import { mapState } from 'vuex';
+
 import PermissionsService from '@/services/PermissionsService';
 import Roles from '@/const/AccessRoles';
 
@@ -128,70 +126,53 @@ export default {
   },
   computed: {
     ...mapState({
-      data: state => state.data,
-      datasets: state => state.datasets,
       user: state => state.user,
     }),
     buttonText() {
       return this.editMode ? 'update' : 'create';
+    },
+    tokenExpiration() {
+      return new Date().getTime() + config.sessionDurationMinutes * 60000;
     },
   },
   watch: {
     '$route.params.id': {
       handler(newValue) {
         if (!newValue) return;
-        const value = this.datasets.find(e => e.id === newValue);
-
-        if (value) {
-          this.dataset = { ...value };
+        const value = DatasetAPI.show(newValue).then(({ data }) => {
+          this.dataset = { ...data };
           this.editMode = true;
-        }
+        });
       },
       immediate: true,
     },
   },
   methods: {
-    ...mapMutations({
-      setDatasets: 'setDatasets',
-      setData: 'setData',
-    }),
     validate() {
       if (!this.$refs.form.validate()) {
         return;
       }
 
       if (this.editMode) {
-        const element = this.datasets.find(e => e.id === this.dataset.id);
-        const index = this.datasets.indexOf(element);
-        const newDatasets = [...this.datasets];
-        newDatasets[index] = this.dataset;
-        this.setDatasets(newDatasets);
-        this.$router.push({ name: 'datasets' });
+        DatasetAPI.update(this.dataset).then(() => {
+          this.$router.push({ name: 'datasets' });
+        });
       } else {
         DatasetAPI.store(this.dataset)
-            .then(async () => {
-              const { data } = await DatasetAPI.index();
-              this.setDatasets([...data]);
-              const newDataset = data[data.length - 1];
-              const newData = {
-                ...this.data, [newDataset.id]: {
-                  channels: DummyChannels,
-                  lifeActivities: DummyLifeActivities,
-                  modalities: DummyModalities,
-                },
-              };
-              this.setData({ ...newData });
-              LS.setJSON('pards', { ...newData });
-              PermissionsService.add({
-                userId: this.user.userId,
-                datasetId: newDataset.id,
-                role: Roles.OWNER,
-              })
-              .then(async () => {
-                await this.$router.push({ name: 'datasets' });
-              });
+          .then(({ data }) => {
+            PermissionsService.add({
+              userId: this.user.userId,
+              datasetId: data.id,
+              role: Roles.OWNER,
+            }).then(({ data }) => {
+              console.log(data);
+              localStorage.setItem('token', data.token);
+              localStorage.setItem('tokenExpiration', this.tokenExpiration);
+              this.$router.push('/datasets');
             });
+          });
       }
+
     },
   },
 };

@@ -16,7 +16,7 @@ export default class BaseAPI2 {
   }
 
   static getDatasetName() {
-    return `dataset_name=${Vue.prototype.$store.state?.dataset?.name || NaN}`;
+    return `dataset_id=${Vue.prototype.$store.state?.dataset?.id || null}`;
   }
 
   static dTOFrontToAPI(data){

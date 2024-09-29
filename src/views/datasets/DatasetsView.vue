@@ -106,6 +106,7 @@ import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 import AccessRoles from '@/const/AccessRoles';
 import PermissionsService from '@/services/PermissionsService';
+import DatasetAPI from '@/api/DatasetAPI';
 import { mapMutations, mapState, mapGetters } from 'vuex';
 
 export default {
@@ -117,15 +118,13 @@ export default {
   data: () => {
     return {
       permissions: [],
+      datasets: [],
     };
   },
-  computed: {
-    ...mapState({
-      datasets(state) { 
-        return state.datasets.filter(dataset => this.permissions.find(permission => dataset.id == permission.datasetId)); },
-    }),
-  },
   created() {
+    DatasetAPI.index().then(({ data }) => {
+      this.datasets = data;
+    });
     PermissionsService.getUserPermissions(this.getUser().userId).then((response) => {
       this.permissions = response.data;
     });
