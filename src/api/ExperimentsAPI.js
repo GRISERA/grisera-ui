@@ -1,6 +1,9 @@
 import BaseAPI2 from '@/api/BaseAPI2';
 import DatabaseName from '@/const/relations/DatabaseName';
 import ParticipantsAPI from './ParticipantsAPI';
+import ScenariosAPI from './ScenariosAPI';
+import ActivitiesAPI from './ActivitiesAPI';
+import ScenarioExecutionsAPI from './ScenarioExecutionsAPI';
 
 export default class extends BaseAPI2 {
   static getBasePath() {
@@ -36,12 +39,12 @@ export default class extends BaseAPI2 {
   }
 
   static dTOAPIToFront(data){
+    //console.log(data);
     const participants_ids = data.additional_properties.filter(
       param => 'participant_id' === param.key,
     ).map(e => e.value);
     return {
       id: data.id,
-      test: 'akk',
       name: data.experiment_name,
       description: data.additional_properties.find(param => param.key === 'description').value,
       creator: data.additional_properties.find(param => param.key === 'creator').value,
@@ -51,16 +54,31 @@ export default class extends BaseAPI2 {
       additionalParameters: data.additional_properties.filter(
         param => !['creator', 'description', 'created_at', 'footnote', 'participant_id'].includes(param.key),
       ).map(e => {return { ...e, name: e.key };}),
+      scenarios: data.scenarios?.map(e => ScenariosAPI.dTOAPIToFront(e)),
+      scenarioExecutions: data.scenarios?.map(e => ScenarioExecutionsAPI.dTOAPIToFront(e)),
     };
+    
   }
 
-  static show(id, depth = 0) {
+  static show(id, depth = 2) {
     return super.show(id, depth).then(async ({ data }) => {
       var participants = [];
       if (data.participants_ids.length !== 0){
         participants = Promise.all(data.participants_ids?.map( participant_id => {
           return ParticipantsAPI.show(participant_id).then(({ data }) => data);
         }));
+      }
+
+
+      if (data.scenarios){
+        const activities = await ActivitiesAPI.index().then(({ data }) => data);
+        for (const scenario of data.scenarios) {
+          var scenarioActivities = [];
+          for (const activityId of scenario.activity_ids){
+            scenarioActivities.push(activities.find(param => param.id === activityId));
+          }
+          scenario.activities = scenarioActivities;
+        }
       }
       return {
         ...data,

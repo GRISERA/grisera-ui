@@ -1,13 +1,24 @@
-import BaseAPI from '@/api/BaseAPI';
-import ModelType from '@/const/relations/ModelType';
+import BaseAPI2 from '@/api/BaseAPI';
 import DatabaseName from '@/const/relations/DatabaseName';
+import ActivitiesAPI from './ActivitiesAPI';
 
-export default class extends BaseAPI {
+export default class extends BaseAPI2 {
   static getBasePath() {
     return DatabaseName.ACTIVITY_EXECUTIONS;
   }
 
-  static getModelType() {
-    return ModelType.ACTIVITY_EXECUTION;
+  static dTOFrontToAPI(data){
+    return {};
+  }
+
+  static dTOAPIToFront(data){
+    return {
+      id: data.id,
+      name: data.additional_properties?.find(param => param.key === 'name').value,
+      description: data.additional_properties?.find(param => param.key === 'description').value,
+      activity: data.activity?.map(e => ActivitiesAPI.dTOAPIToFront(e)),
+      participations: data.participations,
+      arrangement_id: data.arrangement_id,
+    };
   }
 }

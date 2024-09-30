@@ -38,10 +38,10 @@ export default class extends BaseAPI2 {
 
     return {
       id: data.id,
-      name: data.additional_properties.find(param => param.key === 'name').value,
-      description: data.additional_properties.find(param => param.key === 'description').value,
+      name: data.additional_properties?.find(param => param.key === 'name')?.value,
+      description: data.additional_properties?.find(param => param.key === 'description')?.value,
       type: typeMapping[data.activity],
-      additionalParameters: data.additional_properties.filter(
+      additionalParameters: data.additional_properties?.filter(
         param => !['name', 'description'].includes(param.key),
       ).map(e => {return { ...e, name: e.key };}),
     };
