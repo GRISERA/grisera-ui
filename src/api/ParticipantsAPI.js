@@ -17,7 +17,10 @@ export default class extends BaseAPI2 {
   }
 
   static dTOAPIToFront(data){
-    const nameDivided = data.name.split(' ');
+    if (!data){
+      return;
+    }
+    const nameDivided = data.name?.split(' ');
     return {
       id: data.id,
       name: nameDivided.slice(0, -1).join(' '),
@@ -25,7 +28,7 @@ export default class extends BaseAPI2 {
       birthDate: data.date_of_birth,
       sex: data.sex,
       disorder: data.disorder, //not implemented in frontend
-      additionalParameters: data.additional_properties.map(e => {return { ...e, name: e.key };}),
+      additionalParameters: data.additional_properties?.map(e => {return { ...e, name: e.key };}),
     };
   }
 }

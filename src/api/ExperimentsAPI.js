@@ -12,7 +12,7 @@ export default class extends BaseAPI2 {
 
   static dTOFrontToAPI(data){
     const participants_ids = data.participants?.map(e => ({ key: 'participant_id', value: e.id }));
-    console.log(participants_ids);
+    //console.log(participants_ids);
     return {
       experiment_name: data.name,
       additional_properties: [
@@ -40,9 +40,11 @@ export default class extends BaseAPI2 {
 
   static dTOAPIToFront(data){
     //console.log(data);
-    const participants_ids = data.additional_properties.filter(
-      param => 'participant_id' === param.key,
-    ).map(e => e.value);
+    const scenarioExecutions = data.scenarios?.map(scenario => (
+      scenario.activity_executions?.map(activity_executions => {
+        return ScenarioExecutionsAPI.dTOAPIToFront({ ...scenario, activity_executions: activity_executions });
+      }) || []
+    )).flat();
     return {
       id: data.id,
       name: data.experiment_name,
@@ -50,17 +52,18 @@ export default class extends BaseAPI2 {
       creator: data.additional_properties.find(param => param.key === 'creator').value,
       created_at: data.additional_properties.find(param => param.key === 'created_at').value,
       footnote: data.additional_properties.find(param => param.key === 'footnote').value,
-      participants_ids: participants_ids,
+      participants_ids: data.additional_properties.filter(
+        param => 'participant_id' === param.key,
+      ).map(e => e.value),
       additionalParameters: data.additional_properties.filter(
-        param => !['creator', 'description', 'created_at', 'footnote', 'participant_id'].includes(param.key),
+        param => !['description', 'creator', 'created_at', 'footnote', 'participant_id'].includes(param.key),
       ).map(e => {return { ...e, name: e.key };}),
       scenarios: data.scenarios?.map(e => ScenariosAPI.dTOAPIToFront(e)),
-      scenarioExecutions: data.scenarios?.map(e => ScenarioExecutionsAPI.dTOAPIToFront(e)),
+      scenarioExecutions: scenarioExecutions,
     };
-    
   }
 
-  static show(id, depth = 2) {
+  static show(id, depth = 6) {
     return super.show(id, depth).then(async ({ data }) => {
       var participants = [];
       if (data.participants_ids.length !== 0){
@@ -80,8 +83,10 @@ export default class extends BaseAPI2 {
           scenario.activities = scenarioActivities;
         }
       }
+
+      let { participants_ids, ...filteredData } = data;
       return {
-        ...data,
+        ...filteredData,
         participants: await participants,
       };
     }).then((finalData) => {

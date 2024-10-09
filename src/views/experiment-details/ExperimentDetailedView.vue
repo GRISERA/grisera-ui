@@ -37,6 +37,7 @@
             />
             <scenario-execution-tab
               :scenarios="experiment.scenarios"
+              :scenarioExecutions="experiment.scenarioExecutions"
               :experiment="experiment"
               @scenario-execution:delete="getExperiment"
             />

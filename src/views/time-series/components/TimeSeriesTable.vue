@@ -61,23 +61,24 @@ export default {
   ObservableInformationsTable,
   },
   data() {
-  return {
-    headersTimeSeries: [
-      { text: 'Type', value: 'type' },
-      { text: 'Spacing', value: 'spacing' },
-      { text: 'Measure', value: 'measure' },
-      { text: 'Link', value: 'link' },
-      { text: 'Actions', value: 'actions', sortable: false },
-    ],
-    timeSeries: [],
-    activityExecutionId: this.$route.params.activityExecution,
-    participantId: this.$route.params.id,
-  };
+    return {
+      headersTimeSeries: [
+        { text: 'Type', value: 'type' },
+        { text: 'Spacing', value: 'spacing' },
+        { text: 'Measure', value: 'measure' },
+        { text: 'Link', value: 'link' },
+        { text: 'Actions', value: 'actions', sortable: false },
+      ],
+      timeSeries: [],
+      activityExecutionId: this.$route.params.activityExecution,
+      participantId: this.$route.params.id,
+    };
   },
   created() {
-    TimeSeriesApi.index()
+    TimeSeriesApi.index(this.$route.params.activityExecution, this.$route.params.id)
       .then(({ data }) => {
-        this.timeSeries = data.filter((element) => element.activityExecutionId == this.activityExecutionId && element.participantId == this.participantId);
+        console.log(data);
+        this.timeSeries = data;
       });
   },
   methods: {

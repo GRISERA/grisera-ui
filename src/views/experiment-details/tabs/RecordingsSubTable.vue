@@ -44,6 +44,14 @@ export default {
   },
   created() {
       this.onCreation();
+  },
+  watch: {
+    dataToDisplay: {
+      immediate: true,
+      handler(newValue) {
+        this.onCreation(newValue);
+      },
+    },
   },     
   methods: {
       onCreation() {                
@@ -53,25 +61,6 @@ export default {
           });    
           this.usefulData = filteredData;                 
       },             
-    async loadFileFromIndexedDB(key) {             
-      const fileData = await IndexedDB.readFileFromIndexedDB(key);
-      if (fileData) {
-        return fileData;            
-      } else {
-        console.log('No file found in IndexedDB.');
-      }
-    },
-    async downloadFile(allInfo) {            
-      var id = allInfo.id.toString()+'_';
-      var key = id + allInfo.index.toString();            
-      var fileLoaded = await this.loadFileFromIndexedDB(key);          
-      const fileUrl = URL.createObjectURL(fileLoaded.file);          
-      const link = document.createElement('a');
-      link.href = fileUrl;
-      link.download = '';           
-      link.click();          
-    },
   },      
 };
 </script>
-      

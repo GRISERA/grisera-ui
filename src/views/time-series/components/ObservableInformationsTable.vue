@@ -7,12 +7,12 @@
       >
         <template #[`item.recording`]="{ item }">
           <td>
-            {{ item.file.recordingName }}
+            {{ item.recording.name }}
           </td>
         </template>
-        <template #[`item.file`]="{ item }">
+        <template #[`item.link`]="{ item }">
           <td>
-            {{ item.file.file.name }}
+            {{ item.recording.link }}
           </td>
         </template>
         <template #[`item.channel`]="{ item }">
@@ -52,7 +52,7 @@ export default {
         return {
             headersObservableInformations: [
             { text: 'Recording', value: 'recording' },    
-            { text: 'File', value: 'file' },
+            { text: 'Link', value: 'link' },
             { text: 'Channel', value: 'channel' },
             { text: 'Modality', value: 'modality' },
             { text: 'Life activity', value: 'lifeActivity' },

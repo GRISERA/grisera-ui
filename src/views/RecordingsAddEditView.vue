@@ -77,6 +77,17 @@
                   v => !!v || 'This field is required'
                 ]"
               />
+              <v-text-field
+                v-model="item.link"
+                label="Link"
+                outlined
+                required
+                :rules="[
+                  l => !!l || 'This field is required',
+                  l => isValidHttpUrl(l) || 'Link has to be valid',
+                ]"
+              />
+              <!-- it no longer is a file but source link
               <v-col :flex="5">
                 <v-file-input
                   v-model="item.file"
@@ -85,7 +96,7 @@
                   outlined
                   @change="onFileChange(item)"
                 />
-              </v-col>
+              </v-col> -->
               <horizontal-text-divider
                 text="Channel info"
                 class="mb-2"
@@ -171,7 +182,7 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-snackbar
+    <!-- <v-snackbar
       v-model="fileSnackbar"
       color="error"
       timeout="3000"
@@ -190,7 +201,7 @@
           Close
         </v-btn>
       </v-row>
-    </v-snackbar>
+    </v-snackbar> -->
   </v-container>
 </template>
 
@@ -202,6 +213,7 @@ import HorizontalTextDivider from '@/components/divider/HorizontalTextDivider.vu
 import IndexedDB from '@/storage/IndexedDB';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
+import RegisteredDataAPI from '@/api/RegisteredDataAPI';
 
 export default {
   name: 'RecordingsAddEditView',
@@ -215,14 +227,15 @@ export default {
       experiment: undefined,
       scenarioExecutions: [],
       activityExecutions: [],
-      fileWasUpdated: false,
+      // fileWasUpdated: false,
       item: {
         chosenAE: undefined,
         chosenScenarioExecution: undefined,
         name: undefined,
         description: undefined,
         data: [],
-        file: undefined,
+        link: '',
+//        file: undefined,
       },
       dataProtoType: {
         channel: undefined,
@@ -230,7 +243,7 @@ export default {
       },
       isEditMode: false,
       channels: [],
-      fileSnackbar: false,
+//      fileSnackbar: false,
       participants: [],
     };
   },
@@ -248,36 +261,44 @@ export default {
         if (!newValue) {
           return;
         }
-        RecordingsAPI.show(newValue)
-            .then(({ data }) => {
-              this.item = data;
-              this.isEditMode = true;
-            });
+        this.onCreation().then(() => {
+          for(const scenarioExecution of this.experiment.scenarioExecutions){
+            for(const activityExecution of scenarioExecution.activityExecutions){
+              const recording = activityExecution.recordings.find(recording => recording.registeredDataId === newValue);
+              if(recording){
+                this.item = recording;
+                this.item.chosenScenarioExecution = scenarioExecution;
+                this.activityExecutions = this.item.chosenScenarioExecution.activityExecutions;
+                this.item.chosenAE = activityExecution;
+                this.participants = activityExecution.participants;
+                this.isEditMode = true;
+                break;
+              }
+            }
+            if(this.item.chosenAE)
+              break;
+          }
+          console.log(this.item);
+
+          // RecordingsAPI.show(newValue, 3)
+          //   .then(({ data }) => {
+          //     //console.log(data);
+          //     this.item = data;
+          //     //console.log(this.scenarioExecutions);
+          //     this.item.chosenScenarioExecution = this.scenarioExecutions.find(scenarioExecution => scenarioExecution.activityExecutions.some(activityExecution => activityExecution.id === data.chosenAE.id));
+          //     if (this.item.chosenScenarioExecution)
+          //       this.activityExecutions = this.item.chosenScenarioExecution.activityExecutions;
+          //     if (this.item.chosenAE)
+          //       this.participants = this.item.chosenAE.participants;
+          //     this.isEditMode = true;
+          //   });
+        });
       },
       immediate: true,
     },
   },
   created() {
-    ExperimentsAPI.show(this.$route.params.experiment)
-        .then(async ({ data }) => {
-          this.experiment = data;
-          this.scenarioExecutions = this.experiment.scenarioExecutions.reverse();
-          if (this.item.chosenScenarioExecution)
-            this.activityExecutions = this.item.chosenScenarioExecution.activityExecutions;
-          if (this.item.chosenAE)
-            this.participants = this.item.chosenAE.participants;
-          if (this.item.id) {
-            this.item.file = await this.loadFile(0, this.item);
-            this.onFileChange(this.item);
-            this.resetFileUpdatedToFalse();
-            this.$forceUpdate();
-          }
-        });
-    this.item.data.push(this.createDataPrototype());
-    ChannelsAPI.index()
-        .then(({ data }) => {
-          this.channels = data;
-        });
+    this.onCreation();
   },
   methods: {
     availableChannels(element) {
@@ -286,25 +307,37 @@ export default {
       let res = this.channels.filter(item => !propertiesArray.includes(item.id) || (!!element && item.id == element.id));
       return res;
     },
-    async loadFileFromIndexedDB(key) {
-      const fileData = await IndexedDB.readFileFromIndexedDB(key);
-      if (fileData) {
-        return fileData;
-      } else {
-        console.log('No file found in IndexedDB.');
-      }
-    },
-    async loadFile(index, allInfo) {
-      var id = allInfo.id.toString() + '_';
-      var key = id + index.toString();
-      return await this.loadFileFromIndexedDB(key);
-    },
-    onFileChange(file) {
-      this.fileWasUpdated = true;
-      file.fileSelected = !!file.file;
-    },
-    resetFileUpdatedToFalse() {
-      this.fileWasUpdated = false;
+    // async loadFileFromIndexedDB(key) {
+    //   const fileData = await IndexedDB.readFileFromIndexedDB(key);
+    //   if (fileData) {
+    //     return fileData;
+    //   } else {
+    //     console.log('No file found in IndexedDB.');
+    //   }
+    // },
+    // async loadFile(index, allInfo) {
+    //   var id = allInfo.id.toString() + '_';
+    //   var key = id + index.toString();
+    //   return await this.loadFileFromIndexedDB(key);
+    // },
+    // onFileChange(file) {
+    //   this.fileWasUpdated = true;
+    //   file.fileSelected = !!file.file;
+    // },
+    // resetFileUpdatedToFalse() {
+    //   this.fileWasUpdated = false;
+    // },
+    onCreation(){
+      this.item.data.push(this.createDataPrototype());
+      ChannelsAPI.index()
+          .then(({ data }) => {
+            this.channels = data;
+          });
+      return ExperimentsAPI.show(this.$route.params.experiment)
+        .then(async ({ data }) => {
+          this.experiment = data;
+          this.scenarioExecutions = this.experiment.scenarioExecutions.reverse();
+        }); 
     },
     deleteItem(file, event) {
       const index = this.item.data.indexOf(file);
@@ -339,35 +372,51 @@ export default {
       this.updateParticipantsList();
     },
     performAction() {
-      if (!this.item.file || (this.item.file.fileSelected != null && !this.item.file.fileSelected)) {
-        this.fileSnackbar = true;
-        return;
-      }
+      // if (!this.item.file || (this.item.file.fileSelected != null && !this.item.file.fileSelected)) {
+      //   this.fileSnackbar = true;
+      //   return;
+      // }
       if (!this.$refs.form.validate()) {
         return;
       }
       const method = this.isEditMode ? 'update' : 'store';
 
-      var files = [];
-      files.push(this.item.file);
-      this.item.file.index = 0;
-      delete this.item.file;
-      delete this.item.fileSelected;
+      // var files = [];
+      // files.push(this.item.file);
+      // this.item.file.index = 0;
+      // delete this.item.file;
+      // delete this.item.fileSelected;
+      const test1 = { ...this.item };
+      //console.log(test1);
 
-      RecordingsAPI[method]({ ...this.item, activityExecution: this.item.chosenAE.id })
-          .then(() => {
-            RecordingsAPI.index().then(({ data }) => {
-              var lastRec = data[data.length - 1];
-              var id = lastRec.id.toString();
-              if (this.fileWasUpdated) {
-                files.forEach((element, index) => {
-                  var key = id + '_' + index.toString();
-                  IndexedDB.saveFileToIndexedDB(element, key);
-                });
-              }
-            });
-            this.$router.go(-1);
-          });
+      const participations = this.item.chosenAE.participations;
+
+      RecordingsAPI[method](this.item).then(() => {
+        this.$router.go(-1);
+      });
+      // RecordingsAPI[method]({ ...this.item, activityExecution: this.item.chosenAE.id })
+      //     .then(() => {
+      //       // RecordingsAPI.index().then(({ data }) => {
+      //       //   var lastRec = data[data.length - 1];
+      //       //   var id = lastRec.id.toString();
+      //       //   if (this.fileWasUpdated) {
+      //       //     files.forEach((element, index) => {
+      //       //       var key = id + '_' + index.toString();
+      //       //       IndexedDB.saveFileToIndexedDB(element, key);
+      //       //     });
+      //       //   }
+      //       // });
+      //       this.$router.go(-1);
+      //     });
+    },
+    isValidHttpUrl(urlToCheck) {
+      let url;
+      try {
+        url = new URL(urlToCheck);
+      } catch (_) {
+        return false;  
+      }
+      return url.protocol === 'http:' || url.protocol === 'https:';
     },
   },
 };

@@ -165,7 +165,6 @@ export default {
               datasetId: data.id,
               role: Roles.OWNER,
             }).then(({ data }) => {
-              console.log(data);
               localStorage.setItem('token', data.token);
               localStorage.setItem('tokenExpiration', this.tokenExpiration);
               this.$router.push('/datasets');

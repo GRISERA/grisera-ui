@@ -39,7 +39,7 @@ export default class extends BaseAPI2 {
       name: data.additional_properties?.find(param => param.key === 'name').value,
       description: data.additional_properties?.find(param => param.key === 'description').value,
       activity_ids: activities_ids,
-      additional_properties: data.additional_properties.filter(
+      additionalParameters: data.additional_properties.filter(
         param => !['name', 'description', 'activity_id'].includes(param.key),
       ).map(e => {return { ...e, name: e.key };}),
     };
@@ -61,5 +61,9 @@ export default class extends BaseAPI2 {
     }).then((finalData) => {
       return { data: finalData };
     });
+  }
+
+  static delete(id){
+    return { 'Message': 'Right now deleting scenario is disabled' };
   }
 }

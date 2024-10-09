@@ -33,7 +33,7 @@
                 class="col-12"
               />
               <v-col
-                v-for="additionalParameter in item.additionalParameters"
+                v-for="additionalParameter in item.additionalParameters.filter(key => key === 'scenarioExecutionName')"
                 :key="`activity_${item.id}_additional_parameter_${additionalParameter.key}`"
                 class="col-3"
               >

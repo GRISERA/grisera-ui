@@ -30,6 +30,8 @@ export default class extends BaseAPI2 {
   }
 
   static dTOAPIToFront(data){
+    if(!data)
+      return;
     const typeMapping = {
       'individual': 'Individual',
       'two-people': 'Two persons activity',
