@@ -8,7 +8,9 @@ RUN npm ci && npm cache clean --force
 
 COPY . .
 
-RUN ./build.sh
+RUN chmod +x /app/build.sh
+
+RUN /app/build.sh
 
 FROM nginx:1.23.0-alpine as production-stage
 

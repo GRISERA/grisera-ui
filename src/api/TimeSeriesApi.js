@@ -81,9 +81,6 @@ export default class extends BaseAPI2 {
       const observableInformationsToUpdate = newObservableInformations.filter(e => oldObservableInformations.some(oldObservableInformation => oldObservableInformation.id === e.id))
         .map(observableInformation => ObservableInformationsAPI.update(observableInformation));
 
-      console.log('observableInformationsToDelete: ', observableInformationsToDelete.length);
-      console.log('observableInformationsToAdd: ', observableInformationsToAdd.length);
-      console.log('observableInformationsToUpdate: ', observableInformationsToUpdate.length);
       return Promise.all([...observableInformationsToDelete, ...observableInformationsToAdd, ...observableInformationsToUpdate]).then(async(results) => {
         data.observableInformationIds = results.slice(observableInformationsToDelete.length).map(e => e.data.id);
 
