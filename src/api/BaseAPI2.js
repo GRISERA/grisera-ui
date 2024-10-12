@@ -33,36 +33,27 @@ export default class BaseAPI2 {
 
 
   static index() {
-    //console.log(`/${this.getBasePath()}?${this.getDatasetName()}`);
     return apiService.get(`/${this.getBasePath()}?${this.getDatasetName()}`).then(({ data }) => {
-      
         data = data[this.getReturnValues()].map(e => this.dTOAPIToFront(e));
-        //console.log('Index ', this.getBasePath(), ': ', data);
         return { data };
     });
   }
 
   static show(id, depth = 0) {
-    //console.log(`/${this.getBasePath()}/${id}?${this.getDatasetName()}`);
     if(!id)
       return {};
 
     return apiService.get(`/${this.getBasePath()}/${id}?${this.getDatasetName()}&depth=${depth}`).then(({ data }) => {
-        //console.log(data);
         data = this.dTOAPIToFront(data);
-        //console.log('Show ', id, ' ', this.getBasePath(), ': ', data);
         return { data };
     });
   }
 
   static store(data) {
-    //console.log('Store: ', data);
-    //console.log('Store after dto: ', this.dTOFrontToAPI(data));
     return apiService.post(`/${this.getBasePath()}?${this.getDatasetName()}`, this.dTOFrontToAPI(data));
   }
 
   static update(data) {
-    console.log('Update: ', data);
     return apiService.put(`/${this.getBasePath()}/${data.id}?${this.getDatasetName()}`, this.dTOFrontToAPI(data));
   }
 

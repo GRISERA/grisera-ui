@@ -23,7 +23,6 @@ export default class extends BaseAPI2 {
   }
 
   static dTOAPIToFront(data){
-    //console.log(data);
     if(data.activity_executions.length === 0){
       return {};
     }
@@ -47,8 +46,6 @@ export default class extends BaseAPI2 {
   }
 
   static store(id, data) {
-    //console.log('Store: ', data);
-    //console.log('Store after dto: ', this.dTOFrontToAPI(data));
     return apiService.post(`/${this.getBasePath()}/${id}?${this.getDatasetName()}`, this.dTOFrontToAPI(data));
   }
 }

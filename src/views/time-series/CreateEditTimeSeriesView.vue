@@ -311,7 +311,6 @@ export default {
     },
     getRecordings() {
       return RecordingsAPI.index().then(({ data }) => {
-        console.log(data);
         let recordingsWithChosenAE = data.filter((recording) => recording.chosenAE.id == this.timeSeries.activityExecutionId);
         
         recordingsWithChosenAE.forEach((recording) => {

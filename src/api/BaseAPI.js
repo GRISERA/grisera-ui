@@ -1,5 +1,6 @@
 import LocalStorageService from '@/storage/LocalStorageService';
 
+//legacy base api that uses local storage
 export default class BaseAPI {
   static getBasePath() {
     return '';

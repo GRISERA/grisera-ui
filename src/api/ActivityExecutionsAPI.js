@@ -30,7 +30,6 @@ export default class extends BaseAPI2 {
   }
 
   static dTOAPIToFront(data){
-    //console.log(data);
     const recordings = RecordingsAPI.dTOAPIToFront(data.participations?.map(participation =>{
       participation.recordings?.forEach(element => {
         element.participant = participation.participant_state?.participant;
@@ -59,7 +58,6 @@ export default class extends BaseAPI2 {
   }
 
   static update(data) {
-    // console.log(data);
     const dtoData = this.dTOFrontToAPI(data);
     return apiService.put(`/${this.getBasePath()}/${data.id}?${this.getDatasetName()}`, dtoData).then(async (response) => {
       if(dtoData.arrangement_id !== response.data.arrangement_id){
@@ -80,16 +78,10 @@ export default class extends BaseAPI2 {
           }
         }
       }
-      // console.log('oldParticipants: ', oldParticipants);
-      // console.log('newParticipants: ', newParticipants);
-      // console.log('participantsAreEqual: ', participantsAreEqual);
 
       if(!participantsAreEqual){
         const participantsToDelete = oldParticipants.filter(e => !newParticipants.includes(e));
         const participantsToAdd = newParticipants.filter(e => !oldParticipants.includes(e));
-
-        // console.log('participantsToDelete: ', participantsToDelete);
-        // console.log('participantsToAdd: ', participantsToAdd);
         
         const promiseAdd = Promise.all(participantsToAdd.map(participant => {
           return ParticipantStatesAPI.store({ participantId: participant }).then(newParticipantState => {

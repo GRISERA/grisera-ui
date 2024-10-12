@@ -12,7 +12,7 @@ export default class extends BaseAPI2 {
 
   static dTOFrontToAPI(data){
     const participants_ids = data.participants?.map(e => ({ key: 'participant_id', value: e.id }));
-    //console.log(participants_ids);
+
     return {
       experiment_name: data.name,
       additional_properties: [
@@ -39,7 +39,6 @@ export default class extends BaseAPI2 {
   }
 
   static dTOAPIToFront(data){
-    //console.log(data);
     const scenarioExecutions = data.scenarios?.map(scenario => (
       scenario.activity_executions?.map(activity_executions => {
         return ScenarioExecutionsAPI.dTOAPIToFront({ ...scenario, activity_executions: activity_executions });

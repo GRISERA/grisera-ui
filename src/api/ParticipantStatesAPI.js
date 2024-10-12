@@ -29,7 +29,6 @@ export default class extends BaseAPI2 {
     if(!data)
       return;
     
-    console.log('dTOAPIToFront: ', data);
     return {
       id: data.id,
       participantId: data.participant_id,

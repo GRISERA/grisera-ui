@@ -7,7 +7,6 @@ import ChannelsAPI from './ChannelsAPI';
 import ParticipantsAPI from './ParticipantsAPI';
 
 function mapRecordings(recordings){
-  //console.log(recordings);
   if(!recordings){
     return recordings;
   }
@@ -80,7 +79,6 @@ export default class extends BaseAPI2 {
     var registeredChannel = data.registered_channel ? RegisteredChannelsAPI.dTOAPIToFront(data.registered_channel) : null;
     var dataOfRecording = [];
     if(data.links){
-      //console.log(data);
       dataOfRecording.push({
         channel: data.registered_channel.channel ? ChannelsAPI.dTOAPIToFront(data.registered_channel.channel) : null,
         participants: [ParticipantsAPI.dTOAPIToFront(data.participation.participant_state.participant)],
@@ -136,9 +134,7 @@ export default class extends BaseAPI2 {
   static index(){
     return super.index()
       .then(({ data }) => {
-        //console.log(data);
         return Promise.all(data.map(recording => {
-          //console.log(recording.id);
           return this.show(recording.id, 3);
         })).then((data) => {
           return { data: mapRecordings(data.map(e => e.data)) };

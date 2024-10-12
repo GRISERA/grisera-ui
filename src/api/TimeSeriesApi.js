@@ -29,9 +29,6 @@ export default class extends BaseAPI2 {
   }
 
   static dTOAPIToFront(data){
-    if(data.links)
-      console.log(data);
-
     return {
       id: data.id,
       observableInformationIds: data.observable_information_ids,
@@ -54,10 +51,6 @@ export default class extends BaseAPI2 {
         this.show(timeSeries.id, 4),
       )).then(multipleTimeSeries => {
         multipleTimeSeries = multipleTimeSeries.map(e => e.data);
-        console.log(multipleTimeSeries);
-        console.log(multipleTimeSeries[0].observableInformations[0].recording.participation.participant_state.participant_id === participantId);
-        console.log(multipleTimeSeries[0].observableInformations[0].recording.participation.activity_execution_id === activityExecutionId);
-
         multipleTimeSeries = multipleTimeSeries.filter(timeSeries => timeSeries.observableInformations[0].recording.participation.participant_state.participant_id === participantId && timeSeries.observableInformations[0].recording.participation.activity_execution_id === activityExecutionId);
         return { data: multipleTimeSeries };
       });

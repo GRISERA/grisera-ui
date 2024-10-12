@@ -9,7 +9,6 @@ export default class extends BaseAPI2 {
   }
 
   static dTOFrontToAPI(data){
-    //console.log(data);
     const test = {
       experiment_id: data.experiment,
       additional_properties: [
@@ -25,12 +24,10 @@ export default class extends BaseAPI2 {
         ...(data.activities?.map(e => ({ key: 'activity_id', value: e.id })) || []),
       ],
     };
-    //console.log(test);
     return test;
   }
 
   static dTOAPIToFront(data){
-    //console.log(data);
     const activities_ids = data.additional_properties?.filter(
       param => 'activity_id' === param.key,
     ).map(e => e.value);
@@ -47,7 +44,6 @@ export default class extends BaseAPI2 {
 
   static show(id, depth = 0) {
     return super.show(id, depth).then(async ({ data }) => {
-      console.log(data);
       if (data.activity_ids.length !== 0){
         const activities = await ActivitiesAPI.index().then(({ data }) => data);
         data.activities = [];

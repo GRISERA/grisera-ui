@@ -308,7 +308,6 @@ export default {
     this.getActivityExecution(this.$route.params.activityExecution).then(data => {
       this.participantState = data.participantStates.find(participantState => participantState.participantId === this.$route.params.id);
       this.id = this.participantState.id;
-      console.log(this.participantState);
       
       this.participantState.personalities?.forEach(personality => {
         if(personality.bigFiveValues){
@@ -351,10 +350,7 @@ export default {
       if (!this.$refs.form.validate()) {
         return;
       }
-
-      console.log('is it working');
       
-
       var appearances = [];
       var personalities = [];
 
@@ -399,18 +395,15 @@ export default {
         }
       }
       if(this.selected.oclusion){
-        console.log('this.selected.oclusion', this.appearanceOclusionValues);
         var appearanceAdded = false;
         for(var appearance of this.participantState.appearances || []){
           if(appearance.appearanceOclusionValues){
-            console.log('oclusion update');
             appearance.appearanceOclusionValues = this.appearanceOclusionValues;
             appearances.push(ApperancesAPI.update(appearance));
             appearanceAdded = true;
           }
         }
         if(!appearanceAdded){
-          console.log('oclusion store');
           appearances.push(ApperancesAPI.store({ appearanceOclusionValues: this.appearanceOclusionValues }));
         }
       }
@@ -418,10 +411,6 @@ export default {
       Promise.all([...personalities, ...appearances]).then((results) => {
         personalities = results.slice(0, personalities.length);
         appearances = results.slice(personalities.length);
-
-        console.log('appearances: ', appearances);
-        appearances.forEach(e => console.log(e));
-        console.log('personalities: ', personalities);
 
         const oldAppearances = this.participantState.appearances?.map(e => e.id);
         const newAppearances = appearances.map(e => e.data.id);
@@ -441,13 +430,7 @@ export default {
           additionalParameters: this.participantState.additionalParameters,
         });
 
-        Promise.all([...appearancesToDelete, ...personatitiesToDelete, participantStateUpdate]).then(({ data }) => {
-          console.log('newAppearances: ', newAppearances);
-          console.log('oldAppearances: ', oldAppearances);
-          console.log('newPersonatities: ', newPersonatities);
-          console.log('oldPersonatities: ', oldPersonatities);
-          console.log('data: ', data);
-                  
+        Promise.all([...appearancesToDelete, ...personatitiesToDelete, participantStateUpdate]).then(({ data }) => {     
           this.$router.go(-1);
         });
       });

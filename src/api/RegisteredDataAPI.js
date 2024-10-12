@@ -28,7 +28,6 @@ export default class extends BaseAPI2 {
     if(data.link){
       var dataOfRecording = [];
       if(data.participation){
-        //console.log(data);
         dataOfRecording.push({
           channel: data.registered_channel.channel ? ChannelsAPI.dTOAPIToFront(data.registered_channel.channel) : null,
           participants: [ParticipantsAPI.dTOAPIToFront(data.participation.participant_state.participant)],

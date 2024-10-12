@@ -19,7 +19,7 @@ export default [
     {
       path: '/measures/create',
       name: 'measure-creation',
-      component: () => import('@/views/CreateEditMeasureView.vue'),
+      component: () => import('@/views/measures/CreateEditMeasureView.vue'),
       meta: {
         breadcrumbs: [
           { text: 'Measures', href: '/measures' },
@@ -32,7 +32,7 @@ export default [
     {
       path: '/measures/edit/:id([0-9a-fA-F]+)',
       name: 'measure-edit',
-      component: () => import('@/views/CreateEditMeasureView.vue'),
+      component: () => import('@/views/measures/CreateEditMeasureView.vue'),
       meta: {
         breadcrumbs: [
           { text: 'Measures', href: '/measures' },

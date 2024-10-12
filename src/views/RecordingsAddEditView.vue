@@ -182,26 +182,6 @@
         </v-card>
       </v-col>
     </v-row>
-    <!-- <v-snackbar
-      v-model="fileSnackbar"
-      color="error"
-      timeout="3000"
-      bottom
-    >
-      <v-row
-        align="center"
-        justify="center"
-      >
-        You need to pick a file.
-        <v-btn
-          text
-          small
-          @click="fileSnackbar = false"
-        >
-          Close
-        </v-btn>
-      </v-row>
-    </v-snackbar> -->
   </v-container>
 </template>
 
@@ -227,7 +207,6 @@ export default {
       experiment: undefined,
       scenarioExecutions: [],
       activityExecutions: [],
-      // fileWasUpdated: false,
       item: {
         chosenAE: undefined,
         chosenScenarioExecution: undefined,
@@ -235,7 +214,6 @@ export default {
         description: undefined,
         data: [],
         link: '',
-//        file: undefined,
       },
       dataProtoType: {
         channel: undefined,
@@ -243,7 +221,6 @@ export default {
       },
       isEditMode: false,
       channels: [],
-//      fileSnackbar: false,
       participants: [],
     };
   },
@@ -278,20 +255,6 @@ export default {
             if(this.item.chosenAE)
               break;
           }
-          console.log(this.item);
-
-          // RecordingsAPI.show(newValue, 3)
-          //   .then(({ data }) => {
-          //     //console.log(data);
-          //     this.item = data;
-          //     //console.log(this.scenarioExecutions);
-          //     this.item.chosenScenarioExecution = this.scenarioExecutions.find(scenarioExecution => scenarioExecution.activityExecutions.some(activityExecution => activityExecution.id === data.chosenAE.id));
-          //     if (this.item.chosenScenarioExecution)
-          //       this.activityExecutions = this.item.chosenScenarioExecution.activityExecutions;
-          //     if (this.item.chosenAE)
-          //       this.participants = this.item.chosenAE.participants;
-          //     this.isEditMode = true;
-          //   });
         });
       },
       immediate: true,
@@ -307,26 +270,6 @@ export default {
       let res = this.channels.filter(item => !propertiesArray.includes(item.id) || (!!element && item.id == element.id));
       return res;
     },
-    // async loadFileFromIndexedDB(key) {
-    //   const fileData = await IndexedDB.readFileFromIndexedDB(key);
-    //   if (fileData) {
-    //     return fileData;
-    //   } else {
-    //     console.log('No file found in IndexedDB.');
-    //   }
-    // },
-    // async loadFile(index, allInfo) {
-    //   var id = allInfo.id.toString() + '_';
-    //   var key = id + index.toString();
-    //   return await this.loadFileFromIndexedDB(key);
-    // },
-    // onFileChange(file) {
-    //   this.fileWasUpdated = true;
-    //   file.fileSelected = !!file.file;
-    // },
-    // resetFileUpdatedToFalse() {
-    //   this.fileWasUpdated = false;
-    // },
     onCreation(){
       this.item.data.push(this.createDataPrototype());
       ChannelsAPI.index()
@@ -372,42 +315,14 @@ export default {
       this.updateParticipantsList();
     },
     performAction() {
-      // if (!this.item.file || (this.item.file.fileSelected != null && !this.item.file.fileSelected)) {
-      //   this.fileSnackbar = true;
-      //   return;
-      // }
       if (!this.$refs.form.validate()) {
         return;
       }
       const method = this.isEditMode ? 'update' : 'store';
 
-      // var files = [];
-      // files.push(this.item.file);
-      // this.item.file.index = 0;
-      // delete this.item.file;
-      // delete this.item.fileSelected;
-      const test1 = { ...this.item };
-      //console.log(test1);
-
-      const participations = this.item.chosenAE.participations;
-
       RecordingsAPI[method](this.item).then(() => {
         this.$router.go(-1);
       });
-      // RecordingsAPI[method]({ ...this.item, activityExecution: this.item.chosenAE.id })
-      //     .then(() => {
-      //       // RecordingsAPI.index().then(({ data }) => {
-      //       //   var lastRec = data[data.length - 1];
-      //       //   var id = lastRec.id.toString();
-      //       //   if (this.fileWasUpdated) {
-      //       //     files.forEach((element, index) => {
-      //       //       var key = id + '_' + index.toString();
-      //       //       IndexedDB.saveFileToIndexedDB(element, key);
-      //       //     });
-      //       //   }
-      //       // });
-      //       this.$router.go(-1);
-      //     });
     },
     isValidHttpUrl(urlToCheck) {
       let url;

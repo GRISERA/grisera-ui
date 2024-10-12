@@ -53,24 +53,6 @@
                     {{ item.name }}
                   </template>
                 </v-autocomplete>
-
-                <!-- <v-autocomplete
-                  v-model="item.activityExecution"
-                  class="ma-2 pa-2"
-                  :items="activityExecutions"
-                  label="Next activity execution"
-                  item-text="name"
-                  item-value="id"
-                  :return-object="true"
-                  :disabled="isEditMode"
-                >
-                  <template #selection="{ item }">
-                    {{ item.name }}
-                  </template>
-                  <template #item="{ item }">
-                    {{ item.name }}
-                  </template>
-                </v-autocomplete> -->
               </v-row>
               <horizontal-text-divider
                 text="Participants"

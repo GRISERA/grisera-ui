@@ -77,7 +77,6 @@ export default {
   created() {
     TimeSeriesApi.index(this.$route.params.activityExecution, this.$route.params.id)
       .then(({ data }) => {
-        console.log(data);
         this.timeSeries = data;
       });
   },

@@ -19,7 +19,7 @@ export default [
   {
     path: '/participants/create',
     name: 'participant-creation',
-    component: () => import('@/views/CreateParticipantView.vue'),
+    component: () => import('@/views/participants/CreateParticipantView.vue'),
     meta: {
       breadcrumbs: [
         { text: 'Participants', href: '/participants' },

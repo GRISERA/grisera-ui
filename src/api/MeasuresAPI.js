@@ -36,24 +36,19 @@ export default class extends BaseAPI2 {
   
   static index() {
     return super.index().then(({ data }) => { 
-      //console.log('MeasureAPI data inside data variable:', data);
       return  Promise.all(data.map( measure => {
-          //console.log('MeasureAPI data inside measure variable: ', measure);
           if (measure.measure_name_id !== null) {
             return MeasureNamesAPI.show(measure.measure_name_id).then(({ data }) => {
-              //console.log('MeasureAPI data inside measure_name_response variable: ', data);
               const measure_final = {
                 ...measure,
                 name: data.name,
                 source: data.source,
               };
-              //console.log('MeasureAPI data inside returned full measure variable: ', measure_final);
               return measure_final;
             });
           } else {
             return measure;
           }
-             
       })).then((finalMeasures) => {
         return { data: finalMeasures };
       });
