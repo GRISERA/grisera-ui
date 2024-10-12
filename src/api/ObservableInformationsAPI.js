@@ -1,4 +1,4 @@
-import BaseAPI2 from '@/api/BaseAPI2';
+import BaseAPI2, { apiService } from '@/api/BaseAPI2';
 import DatabaseName from '@/const/relations/DatabaseName';
 import RecordingsAPI from './RecordingsAPI';
 import ModalitiesAPI from './ModalitiesAPI';
@@ -11,6 +11,7 @@ export default class extends BaseAPI2 {
 
   static dTOFrontToAPI(data){
     return {
+        id: data.id,
         modality_id: data.modality.id,
         life_activity_id: data.lifeActivity.id,
         recording_id: data.channel.recording_id,
@@ -31,5 +32,9 @@ export default class extends BaseAPI2 {
         modality: data.modality ? ModalitiesAPI.dTOAPIToFront(data.modality) : null,
         lifeActivity: data.life_activity ? LifeActivitiesAPI.dTOAPIToFront(data.life_activity) : null,
     };
+  }
+
+  static update(data){
+    return apiService.put(`/${this.getBasePath()}/${data.id}/relationships?${this.getDatasetName()}`, this.dTOFrontToAPI(data));
   }
 }

@@ -65,8 +65,8 @@ export default class extends BaseAPI2 {
       }
 
       
-      const oldParticipants = data.participations?.map(e => e.participant_state.participant_id).slice().sort();
-      const newParticipants = data.participants?.map(e => e.id).slice().sort();
+      const oldParticipants = data.participations?.map(e => e.participant_state.participant_id).sort();
+      const newParticipants = data.participants?.map(e => e.id).sort();
       var participantsAreEqual = true;
       if(oldParticipants.length !== newParticipants.length){
         participantsAreEqual = false;

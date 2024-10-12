@@ -37,7 +37,7 @@ export default class extends BaseAPI2 {
       link: data.source,
       spacing: data.additional_properties?.find(param => param.key === 'spacing').value,
       additionalParameters: data.additional_properties.filter(
-        param => !['name', 'description'].includes(param.key),
+        param => !['spacing'].includes(param.key),
       ).map(e => {return { ...e, name: e.key };}),
       signalValues: data.signal_values,//not used yet
       observableInformations: data.observable_informations?.length > 0 ? ObservableInformationsAPI.dTOAPIToFront(data.observable_informations) : null,
@@ -65,6 +65,35 @@ export default class extends BaseAPI2 {
         data.observableInformationIds = observableInformations.map(item => item.data.id);
         return super.store(data);
       });
+  }
+
+  static update(data) {
+    
+    return this.show(data.id, 4).then(oldTimeSeries => {
+      oldTimeSeries = oldTimeSeries.data;
+
+      const oldObservableInformations = oldTimeSeries.observableInformations;
+      const newObservableInformations = data.observableInformations;
+      const observableInformationsToDelete = oldObservableInformations.filter(e => !newObservableInformations.some(newObservableInformation => newObservableInformation.id === e.id))
+        .map(observableInformation => ObservableInformationsAPI.delete(observableInformation.id));
+      const observableInformationsToAdd = newObservableInformations.filter(e => !e.id)
+        .map(observableInformation => ObservableInformationsAPI.store(observableInformation));
+      const observableInformationsToUpdate = newObservableInformations.filter(e => oldObservableInformations.some(oldObservableInformation => oldObservableInformation.id === e.id))
+        .map(observableInformation => ObservableInformationsAPI.update(observableInformation));
+
+      console.log('observableInformationsToDelete: ', observableInformationsToDelete.length);
+      console.log('observableInformationsToAdd: ', observableInformationsToAdd.length);
+      console.log('observableInformationsToUpdate: ', observableInformationsToUpdate.length);
+      return Promise.all([...observableInformationsToDelete, ...observableInformationsToAdd, ...observableInformationsToUpdate]).then(async(results) => {
+        data.observableInformationIds = results.slice(observableInformationsToDelete.length).map(e => e.data.id);
+
+        const updatedValues = super.update(data);
+        const updatedRelations = apiService.put(`/${this.getBasePath()}/${data.id}/relationships?${this.getDatasetName()}`, this.dTOFrontToAPI(data));
+        await updatedValues;
+        await updatedRelations;
+        return updatedRelations;
+      });
+    });
   }
 
   

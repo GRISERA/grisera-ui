@@ -243,6 +243,7 @@ export default {
   data () {
     return {
       timeSeries: {
+        id: null,
         activityExecutionId: this.$route.params.activityExecution,
         participantId: this.$route.params.id,
         link: '',

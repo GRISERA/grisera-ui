@@ -76,10 +76,13 @@
                 <v-card-actions>
                   <v-icon
                     color="primary"
-                    @click="$router.push({
-                      name: 'dataset-edit',
-                      params: { id: dataset.id}
-                    })"
+                    @click="() => {
+                      selectCurrentDataset(dataset);
+                      $router.push({
+                        name: 'dataset-edit',
+                        params: { id: dataset.id}
+                      });
+                    }"
                     v-if="canEditDataset(dataset.id)"
                   >
                     mdi-pen

@@ -12,7 +12,7 @@ export default class extends BaseAPI2 {
       datatype: data.datatype,
       range: data.rangeStart ? data.rangeStart + '-' + data.rangeEnd : null,
       unit: data.unit || null,
-      values: data.definedValue.map(e => e.definedValue ),
+      values: data.definedValue?.map(e => e.definedValue ),
       measure_name_id: data.measure_name_id,
     };
   }
@@ -25,7 +25,7 @@ export default class extends BaseAPI2 {
       rangeStart: data.range?.split('-')[0],
       rangeEnd: data.range?.split('-')[1],
       unit: data.unit,
-      definedValue: data.values.map(value => ({ definedValue: value })),
+      definedValue: data.values?.map(value => ({ definedValue: value })),
       measure_name_id: data.measure_name_id,
       type: data.datatype === 'string' ? 'Categorical' : 'Numeric',
       source: data.measure_name?.type,
