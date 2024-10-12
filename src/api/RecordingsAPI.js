@@ -121,7 +121,6 @@ export default class extends BaseAPI2 {
   }
 
   static update(data){
-    //console.log('update: ', data);
     return this.delete(data.id).then(() => {
       return this.store(data);
     });

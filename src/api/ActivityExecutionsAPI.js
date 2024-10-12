@@ -45,6 +45,7 @@ export default class extends BaseAPI2 {
       activity: ActivitiesAPI.dTOAPIToFront(data.activity),
       participations: data.participations,
       participants: data.participations?.map(e => ParticipantsAPI.dTOAPIToFront(e.participant_state?.participant)),
+      participantStates: data.participations?.map(e => ParticipantStatesAPI.dTOAPIToFront(e.participant_state)),
       arrangement: data.arrangement,
       recordings: recordings,
       additionalParameters: data.additional_properties.filter(
@@ -91,7 +92,7 @@ export default class extends BaseAPI2 {
         // console.log('participantsToAdd: ', participantsToAdd);
         
         const promiseAdd = Promise.all(participantsToAdd.map(participant => {
-          return ParticipantStatesAPI.store({ participant_id: participant }).then(newParticipantState => {
+          return ParticipantStatesAPI.store({ participantId: participant }).then(newParticipantState => {
             return ParticipationsAPI.store({ activity_execution_id: data.id, participant_state_id: newParticipantState.data.id });
           });
         }));

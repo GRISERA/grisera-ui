@@ -1,6 +1,7 @@
 export default {
   ACTIVITIES: 'activities',
   ACTIVITY_EXECUTIONS: 'activity_executions',
+  APPEARANCES: 'appearance',
   ARRANGEMENTS: 'arrangements',
   CHANNELS: 'channels',
   DATASETS: 'datasets',
@@ -12,6 +13,7 @@ export default {
   PARAMETERS: 'parameters',
   PARTICIPANTS: 'participants',
   PARTICIPANT_STATES: 'participant_state',
+  PERSONALITIES: 'personality',
   PARTICIPATIONS: 'participations',
   RECORDINGS: 'recordings',
   REGISTERED_DATA: 'registered_data',

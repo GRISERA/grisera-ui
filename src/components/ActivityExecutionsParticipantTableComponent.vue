@@ -44,8 +44,8 @@ export default {
   },
   props: {
     executionId: {
-      type: Number,
-      default: () => (0),
+      type: String,
+      default: () => (''),
     },
     participants: {
       type: Array,

@@ -65,14 +65,14 @@ export default class extends BaseAPI2 {
   }
   
   static store(data) {
-    //console.log(data);
     return Promise.all(data.observableInformations
       .map(observableInformation =>
         ObservableInformationsAPI.store(observableInformation),
       )).then((observableInformations) => {
-        //console.log(observableInformations);
         data.observableInformationIds = observableInformations.map(item => item.data.id);
         return super.store(data);
       });
   }
+
+  
 }

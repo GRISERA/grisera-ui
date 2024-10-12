@@ -17,9 +17,9 @@ export default class extends BaseAPI2 {
   }
 
   static dTOAPIToFront(data){
-    if (!data){
+    if (!data)
       return;
-    }
+    
     const nameDivided = data.name?.split(' ');
     return {
       id: data.id,

@@ -62,6 +62,7 @@ export default class BaseAPI2 {
   }
 
   static update(data) {
+    console.log('Update: ', data);
     return apiService.put(`/${this.getBasePath()}/${data.id}?${this.getDatasetName()}`, this.dTOFrontToAPI(data));
   }
 
