@@ -11,8 +11,7 @@ services:
       - MONGO_API_PORT=27017
       - TIMEOUT=300
 
-# environment variables do set here when this image will be put to docker hub will be final
-# it will be impossible to change them in prod docker-compose
+
   frontend-ms:
     build:
       context: .
@@ -23,8 +22,9 @@ services:
     ports:
       - "8080:80"
     environment:
-      - VUE_APP_API_URL=https://grisera-backend.affectivese.org
-      - VUE_APP_AUTH_MS_URL=https://grisera-authms.affectivese.org/api
+      - VUE_APP_API_URL=http://localhost:18085
+      - VUE_APP_AUTH_MS_URL=http://localhost:8081/api
+
 
   auth-ms:
     image: maczomen/grisera_auth:0.3.3
