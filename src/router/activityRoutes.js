@@ -31,7 +31,7 @@ export default [
   {
     path: '/activities/create',
     name: 'activity-creation',
-    component: () => import('@/views/CreateActivityView.vue'),
+    component: () => import('@/views/activities/CreateActivityView.vue'),
     meta: {
       breadcrumbs: [
         { text: 'Activities', href: '/activities' },

@@ -2,7 +2,7 @@ import axios from 'axios';
 import config from '../../config.js';
 import Vue from 'vue';
 
-const apiService = axios.create({
+export const apiService = axios.create({
   baseURL: config.apiUrl,
   headers: {
     'Content-Type': 'application/json',
@@ -16,7 +16,11 @@ export default class BaseAPI2 {
   }
 
   static getDatasetName() {
-    return `dataset_name=${Vue.prototype.$store.state?.dataset?.name || NaN}`;
+    return `dataset_id=${Vue.prototype.$store.state?.dataset?.id || null}`;
+  }
+
+  static getReturnValues(){
+    return this.getBasePath();
   }
 
   static dTOFrontToAPI(data){
@@ -29,20 +33,18 @@ export default class BaseAPI2 {
 
 
   static index() {
-    //console.log(`/${this.getBasePath()}?${this.getDatasetName()}`);
     return apiService.get(`/${this.getBasePath()}?${this.getDatasetName()}`).then(({ data }) => {
-        data = data[this.getBasePath()].map(e => this.dTOAPIToFront(e));
-        //console.log('Index ', this.getBasePath(), ': ', data);
+        data = data[this.getReturnValues()].map(e => this.dTOAPIToFront(e));
         return { data };
     });
   }
 
   static show(id, depth = 0) {
-    //console.log(`/${this.getBasePath()}/${id}?${this.getDatasetName()}`);
+    if(!id)
+      return {};
+
     return apiService.get(`/${this.getBasePath()}/${id}?${this.getDatasetName()}&depth=${depth}`).then(({ data }) => {
-        //console.log(data);
         data = this.dTOAPIToFront(data);
-        //console.log('Show ', id, ' ', this.getBasePath(), ': ', data);
         return { data };
     });
   }

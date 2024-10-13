@@ -83,9 +83,9 @@
               >
                 <v-row>
                   <v-autocomplete
-                    v-model="observableInformation.file"
+                    v-model="observableInformation.link"
                     :items="filesWithChannels"
-                    label="File"
+                    label="Recording"
                     clearable
                     required
                     :rules="[
@@ -96,13 +96,13 @@
                       slot="selection"
                       slot-scope="data"
                     >
-                      {{ data.item?.file.name }} (recording name: {{ data.item?.recordingName }})
+                      {{ data.item?.link.name }} (recording name: {{ data.item?.recordingName }})
                     </template>
                     <template
                       slot="item"
                       slot-scope="data"
                     >
-                      {{ data.item?.file.name }} (recording name: {{ data.item?.recordingName }})
+                      {{ data.item?.link.name }} (recording name: {{ data.item?.recordingName }})
                     </template>
                   </v-autocomplete>
                   <v-icon
@@ -119,7 +119,7 @@
                 <v-row>
                   <v-autocomplete
                     v-model="observableInformation.channel"
-                    :items="observableInformation.file?.channels"
+                    :items="observableInformation.link?.channels"
                     label="Channel"
                     clearable
                     required
@@ -243,6 +243,7 @@ export default {
   data () {
     return {
       timeSeries: {
+        id: null,
         activityExecutionId: this.$route.params.activityExecution,
         participantId: this.$route.params.id,
         link: '',
@@ -264,31 +265,42 @@ export default {
         if (!newValue) {
           return;
         }
-        TimeSeriesApi.show(newValue)
-          .then(({ data }) => {
-            this.timeSeries = data;
-            this.isEditMode = true;
-          });
+        this.onCreated().then(() => {
+          TimeSeriesApi.show(newValue, 4)
+            .then(({ data }) => {
+              data.observableInformations.forEach(e => {
+                e.link = this.filesWithChannels.find(obj => obj.channels.some(obj2 => obj2.recording_id === e.channel.recording_id));
+              });
+
+              this.timeSeries = data;
+              this.isEditMode = true;
+            });
+        });
+        
       },
       immediate: true,
     },
   },
   created() {
-    this.getRecordings();
-    ModalitiesAPI.index()
-      .then(({ data }) => {
-        this.modalities = data;
-      });
-    LifeActivitiesAPI.index()
-      .then(({ data }) => {
-        this.lifeActivities = data;
-      });
-    MeasuresAPI.index()
-      .then(({ data }) => {
-        this.measures = data;
-      });
+    this.onCreated();
   },
   methods: {
+    onCreated(){
+      
+      ModalitiesAPI.index()
+        .then(({ data }) => {
+          this.modalities = data;
+        });
+      LifeActivitiesAPI.index()
+        .then(({ data }) => {
+          this.lifeActivities = data;
+        });
+      MeasuresAPI.index()
+        .then(({ data }) => {
+          this.measures = data;
+        });
+      return this.getRecordings();
+    },
     create() {
       if (!this.$refs.form.validate()) {
         return;
@@ -299,18 +311,19 @@ export default {
       });
     },
     getRecordings() {
-      RecordingsAPI.index().then(({ data }) => {
+      return RecordingsAPI.index().then(({ data }) => {
         let recordingsWithChosenAE = data.filter((recording) => recording.chosenAE.id == this.timeSeries.activityExecutionId);
-        recordingsWithChosenAE.forEach(async (recording) => {
+        
+        recordingsWithChosenAE.forEach((recording) => {
           const fileWithChannels = {
             recordingName: recording.name,
-            file: await this.getFile(recording),
+            link: recording.link,
             channels: [],
           };
-          recording.data.forEach((channelParticipantPair) => {
+          recording.data.forEach((channelParticipantPair) => {  
             channelParticipantPair.participants.forEach((participant) => {
               if (participant.id == this.timeSeries.participantId) {
-                fileWithChannels.channels.push(channelParticipantPair.channel);
+                fileWithChannels.channels.push({ ...channelParticipantPair.channel, recording_id: participant.recording_id });
               }
             });
           });
@@ -323,20 +336,6 @@ export default {
           }
         });
       });
-    },
-    async loadFileFromIndexedDB(key) {
-      const fileData = await IndexedDB.readFileFromIndexedDB(key);
-      if (fileData) {
-        return fileData;
-      } else {
-        console.log('No file found in IndexedDB.');
-      }
-    },
-    async getFile(recording) {
-      var id = recording.id.toString() + '_';
-      var key = id + '0';
-      var fileLoaded = await this.loadFileFromIndexedDB(key);
-      return fileLoaded;
     },
     addObservableInformation() {
       this.timeSeries.observableInformations.push({ ... this.observableInformationPrototype });

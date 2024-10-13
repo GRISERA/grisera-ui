@@ -43,11 +43,11 @@
           </v-row>
         </v-col>
         <v-col
-          v-if="scenarioExecutions?.length"
+          v-if="localScenarioExecutions?.length"
           class="col-12 pa-6"
         >
           <scenario-executions-listing-component
-            :scenario-executions="scenarioExecutions"
+            :scenario-executions="localScenarioExecutions"
             @scenario-executions:delete="openDeleteConfirmDialog"
             @activity-execution:edit="editActivityExecution"
             :canPerformActions="!isReadOnly"
@@ -76,7 +76,7 @@
 </template>
 
 <script>
-import ActivityExecutionsAPI from '@/api/ActivityExecutionsAPI';
+import ExperimentsAPI from '@/api/ExperimentsAPI';
 import ScenarioExecutionsAPI from '@/api/ScenarioExecutionsAPI';
 import ScenarioExecutionsListingComponent from '@/components/ScenarioExecutionsListingComponent.vue';
 import DeleteConfirmDialog from '@/components/dialog/DeleteConfirmDialog.vue';
@@ -94,6 +94,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    scenarioExecutions: {
+      type: Array,
+      default: () => [],
+    },
     experiment: {
       type: Object,
       default: () => ({}),
@@ -107,7 +111,7 @@ export default {
     return {
       name: undefined,
       chosenScenario: undefined,
-      scenarioExecutions: undefined,
+      localScenarioExecutions: this.scenarioExecutions,
       deleteConfirmDialogActive: false,
       currentScenario: undefined,
       showValidationErrors: false,
@@ -168,9 +172,10 @@ export default {
       if (this.scenario != null) {
         this.chosenScenario = this.scenario;
       }
-      ScenarioExecutionsAPI.index().then(({ data }) => {
-        this.scenarioExecutions = data;
-      });
+      ExperimentsAPI.show(this.$route.params.id)
+          .then(({ data }) => {
+            this.localScenarioExecutions = data.scenarioExecutions;
+          });
     },
     setChosenScenario(value) {
       this.chosenScenario = value;
@@ -183,48 +188,21 @@ export default {
       if (typeof this.chosenScenario.activities === 'undefined') {
         return;
       }
-      ScenarioExecutionsAPI.store({
+      const activities = this.chosenScenario.activities;
+      var activityExecutions = [];
+      for (const [index, element] of activities.entries()) {
+        activityExecutions.push({
+          name: `Activity Execution: ${index + 1}`,
+          description: 'Activity execution description',
+          activity: element,
+        });
+      }
+      ScenarioExecutionsAPI.store(this.chosenScenario.id, {
         name: this.name,
         scenario: this.chosenScenario.name,
-        experiment: this.experiment.id,
+        activityExecutions: activityExecutions,
       }).then(() => {
-        ScenarioExecutionsAPI.index().then(async ({ data }) => {
-          var currentScenarioExecution = data[data.length - 1];
-          var activityExecutions = [];
-          const activities = this.chosenScenario.activities;
-          for (const [index, element] of activities.entries()) {
-            var objectToStore = {
-              name: `Activity Execution: ${index + 1}`,
-              description: 'Activity execution description',
-              activity: element,
-              activityExecution: null,
-              participants: [],
-            };
-            await ActivityExecutionsAPI.store(objectToStore).then(() => {
-              ActivityExecutionsAPI.index().then(({ data }) => {
-                activityExecutions.push(data[data.length - 1]);
-              });
-            });
-          }
-
-          await ScenarioExecutionsAPI.update({
-            ...currentScenarioExecution,
-            activityExecutions: activityExecutions,
-          }).then(() => {
-            ScenarioExecutionsAPI.index().then(async ({ data }) => {
-              this.scenarioExecutions = data;
-              var activityExecutions = data[data.length - 1].activityExecutions;
-              for (let i = 0; i < activityExecutions.length - 1; i++) {
-                activityExecutions[i].activityExecution =
-                    activityExecutions[i + 1].id;
-                await ActivityExecutionsAPI.update(activityExecutions[i]);
-              }
-              this.name = undefined;
-              this.chosenScenario = undefined;
-              this.showValidationErrors = false;
-            });
-          });
-        });
+        this.onCreation();
       });
     },
     closeDeleteConfirmDialog() {

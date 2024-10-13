@@ -1,13 +1,34 @@
-import BaseAPI from '@/api/BaseAPI';
+import BaseAPI2 from '@/api/BaseAPI2';
 import DatabaseName from '@/const/relations/DatabaseName';
-import ModelType from '@/const/relations/ModelType';
 
-export default class extends BaseAPI {
+export default class extends BaseAPI2 {
   static getBasePath() {
     return DatabaseName.PARTICIPANTS;
   }
 
-  static getModelType() {
-    return ModelType.PARTICIPANT;
+  static dTOFrontToAPI(data){
+    return {
+      name: data.name + ' ' + data.surname,
+      date_of_birth: data.birthDate,
+      sex: data.sex,
+      disorder: data.disorder, //not implemented in frontend
+      additional_properties: data.additionalParameters.map(e => {return { key: e.name, value: e.value };}),
+    };
+  }
+
+  static dTOAPIToFront(data){
+    if (!data)
+      return;
+    
+    const nameDivided = data.name?.split(' ');
+    return {
+      id: data.id,
+      name: nameDivided.slice(0, -1).join(' '),
+      surname: nameDivided[nameDivided.length - 1],
+      birthDate: data.date_of_birth,
+      sex: data.sex,
+      disorder: data.disorder, //not implemented in frontend
+      additionalParameters: data.additional_properties?.map(e => {return { ...e, name: e.key };}),
+    };
   }
 }

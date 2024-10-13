@@ -93,10 +93,9 @@ export default {
         ExperimentsAPI.store({
           ...this.experiment,
           created_at: format(new Date(), 'yyyy-MM-dd'),
-        })
-            .then(() => {
-              this.$router.push('/experiments');
-            });
+        }).then(() => {
+          this.$router.push('/experiments');
+        });
       }
     },
   },

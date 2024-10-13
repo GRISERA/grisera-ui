@@ -1,7 +1,7 @@
 version: "3.9" # optional since v1.27.0
 services:
   grisera_api_mongodb:
-    image: maczomen/grisera_core_mongo:latest
+    image: maczomen/grisera_core_mongo:0.2.3
     depends_on:
       - mongodb
     ports:
@@ -11,20 +11,23 @@ services:
       - MONGO_API_PORT=27017
       - TIMEOUT=300
 
+
   frontend-ms:
     build:
       context: .
-      dockerfile: dev.dockerfile
+      dockerfile: prod.dockerfile
     depends_on:
       - auth-ms
       - grisera_api_mongodb
     ports:
-      - "8080:8080"
+      - "8080:80"
     environment:
+      - VUE_APP_API_URL=http://localhost:18085
       - VUE_APP_AUTH_MS_URL=http://localhost:8081/api
 
+
   auth-ms:
-    image: maczomen/grisera_auth:latest
+    image: maczomen/grisera_auth:0.3.3
     depends_on:
       - mongodb
     ports:

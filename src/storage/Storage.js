@@ -48,7 +48,6 @@ export default class Storage {
 
     LS.setJSON(STORAGE_NAME, data);
     Vue.prototype.$store.commit('setDatasets', datasets);
-    Vue.prototype.$store.commit('setDataset', datasets[0]);
     Vue.prototype.$store.commit('setData', data);
   }
 

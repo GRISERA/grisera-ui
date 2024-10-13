@@ -176,7 +176,7 @@ export default {
     },
     '$route.params.experiment': {
       handler(newValue) {
-        ExperimentsAPI.show(newValue)
+        ExperimentsAPI.show(newValue, 0)
             .then(({ data }) => {
               this.experiment = data;
             });
