@@ -101,7 +101,7 @@
 <script>
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import ClassesDescriptions from '@/const/ClassesDescriptions';
-import CustomParametersComponent from '../components/CustomParametersComponent.vue';
+import CustomParametersComponent from '@/components/CustomParametersComponent.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 import ParticipantsAPI from '@/api/ParticipantsAPI';
 

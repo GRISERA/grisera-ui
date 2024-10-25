@@ -32,7 +32,7 @@ export default [
   {
     path: '/experiments/create',
     name: 'experiment-creation',
-    component: () => import('@/views/CreateExperimentView.vue'),
+    component: () => import('@/views/experiments/CreateExperimentView.vue'),
     meta: {
       breadcrumbs: [
         { text: 'Experiments', href: '/experiments' },

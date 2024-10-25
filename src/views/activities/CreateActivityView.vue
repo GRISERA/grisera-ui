@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import CustomParametersComponent from '../components/CustomParametersComponent.vue';
+import CustomParametersComponent from '@/components/CustomParametersComponent.vue';
 import ActivitiesAPI from '@/api/ActivitiesAPI';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import config from '../../config.js';
 import LS from '@/storage/LS.js';
+import Vue from 'vue';
 
 const authService = axios.create({
   baseURL: config.authUrl,
@@ -24,6 +25,8 @@ export default {
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('tokenExpiration');
+    Vue.prototype.$store.commit('setDataset', null);
+    Vue.prototype.$store.commit('setUser', null);
     LS.clear('user');
     LS.clear('dataset');
   },

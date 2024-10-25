@@ -158,8 +158,7 @@ export default {
     tokenExpiration() {
       return new Date().getTime() + config.sessionDurationMinutes * 60000;
     },
-    validationRules() {
-      //return [this.required, this.passwordRule];     
+    validationRules() {     
       return [v => !!v || (this.showComponent ? 'The password is incorrect' : 'This field is required')];     
     },
   },

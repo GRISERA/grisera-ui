@@ -53,24 +53,6 @@
                     {{ item.name }}
                   </template>
                 </v-autocomplete>
-
-                <v-autocomplete
-                  v-model="item.activityExecution"
-                  class="ma-2 pa-2"
-                  :items="activityExecutions"
-                  label="Next activity execution"
-                  item-text="name"
-                  item-value="id"
-                  :return-object="true"
-                  :disabled="isEditMode"
-                >
-                  <template #selection="{ item }">
-                    {{ item.name }}
-                  </template>
-                  <template #item="{ item }">
-                    {{ item.name }}
-                  </template>
-                </v-autocomplete>
               </v-row>
               <horizontal-text-divider
                 text="Participants"
@@ -117,10 +99,12 @@
               />
               <v-autocomplete
                 ref="arrangementAutocomplete"
-                v-model="item.arrangementDistance"
+                v-model="item.arrangement"
                 class="ml-2 pl-2"
                 :items="arrangementDistanceValues"
                 label="Arrangement Distance"
+                :item-text="'arrangementDistance'"
+                :item-value="'id'"
                 :rules="[
                   v => {
                     if(isArrangementsDisabled || v) {
@@ -169,10 +153,10 @@ import ActivitiesAPI from '@/api/ActivitiesAPI';
 import ParticipantsAPI from '@/api/ParticipantsAPI';
 import HorizontalTextDivider from '@/components/divider/HorizontalTextDivider.vue';
 import CustomParametersComponent from '../components/CustomParametersComponent.vue';
-import Models from '@/const/ActivityExecutionParticipantManagement.js';
 import ActivityTypes from '@/const/ActivityTypes';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
+import ArrangementsAPI from '@/api/ArrangementsAPI';
 
 export default {
   name: 'ActivityExecutionAddEditView',
@@ -188,16 +172,14 @@ export default {
         name: undefined,
         description: undefined,
         activity: undefined,
-        activityExecution: null,
         participants: [],
-        arrangementDistance: null,
+        arrangement: null,
       },
       valid: true,
       isEditMode: false,
       activities: [],
-      activityExecutions: [],
       participants: [],
-      arrangementDistanceValues: Models.arrangementDistanceValues,
+      arrangementDistanceValues: [],
     };
   },
   computed: {
@@ -221,9 +203,6 @@ export default {
         ActivityExecutionsAPI.show(newValue)
             .then(({ data }) => {
               this.item = data;
-              if (this.isIndividualActivity) {
-                this.item.participants = this.item.participants[0];
-              }
               this.isEditMode = true;
             });
       },
@@ -248,9 +227,9 @@ export default {
         .then(({ data }) => {
           this.activities = data;
         });
-    ActivityExecutionsAPI.index()
-        .then(({ data }) => {
-          this.activityExecutions = data;
+
+    ArrangementsAPI.index().then(({ data }) => {
+          this.arrangementDistanceValues = data.filter(e => e.arrangementDistance);
         });
     this.getParticipants();
   },
@@ -262,7 +241,7 @@ export default {
 
       const method = this.isEditMode ? 'update' : 'store';
       this.setItemParticipantsAsArray();
-      ActivityExecutionsAPI[method]({ ...this.item, experiment: this.$route.params.experimentId })
+      ActivityExecutionsAPI[method]({ ...this.item })
           .then(() => {
             this.$router.go(-1);
           });

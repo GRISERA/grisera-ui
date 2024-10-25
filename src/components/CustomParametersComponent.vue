@@ -21,8 +21,9 @@
 </template>
 
 <script>
-import ParametersAPI from '../api/ParametersAPI';
+import ParametersAPI from '@/api/ParametersAPI';
 import DatasetAPI from '@/api/DatasetAPI';
+import Vue from 'vue';
 
 export default {
   name: 'CustomParametersComponent',
@@ -52,7 +53,7 @@ export default {
       }
     },
     getParameters() {
-      DatasetAPI.show(this.dataset.id)
+      DatasetAPI.show(Vue.prototype.$store.state?.dataset?.id)
           .then(({ data }) => {
             this.parameters = data.parameters?.filter(param => param.type == this.type)
                 .map(param => {

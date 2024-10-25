@@ -21,12 +21,13 @@
         >
           mdi-pen
         </v-icon>
+        <!-- Right now deleting scenario is disabled
         <v-icon
           color="error"
           @click.stop.prevent="$emit('scenario:delete', item)"
         >
           mdi-delete
-        </v-icon>
+        </v-icon> -->
       </div>
     </template>
     <template #panel-content="{ item }">

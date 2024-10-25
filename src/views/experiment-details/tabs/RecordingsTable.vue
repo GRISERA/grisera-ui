@@ -52,7 +52,6 @@
 
 <script>
 import BaseTable from '@/components/base/BaseTable.vue';
-import IndexedDB from '@/storage/IndexedDB';
 import RecordingsSubTable from './RecordingsSubTable.vue';
 
 export default {
@@ -75,7 +74,7 @@ export default {
   data() {
     return {
       headers: [
-        { text: 'ID', value: 'id', sortable: false },
+        { text: 'Registered Data ID', value: 'registeredDataId', sortable: false },
         { text: 'Name', value: 'name' },
         { text: 'Scenario Execution', value: 'scenarioExecution_name' },
         { text: 'Activity Execution', value: 'activityExecution_name' },
@@ -91,26 +90,14 @@ export default {
       this.$router.push({
         name: 'experiment-recording-edit',
         params: {
-          id: item.id,
+          id: item.registeredDataId,
           experiment: this.experiment.id,
         },
       });
     },
-    async loadFileFromIndexedDB(key) {
-      const fileData = await IndexedDB.readFileFromIndexedDB(key);
-      if (fileData) {
-        return fileData;
-      } else {
-        console.log('No file found in IndexedDB.');
-      }
-    },
     async downloadFile(allInfo) {
-      var id = allInfo.id.toString() + '_';
-      var key = id + '0';
-      var fileLoaded = await this.loadFileFromIndexedDB(key);
-      const fileUrl = URL.createObjectURL(fileLoaded.file);
       const link = document.createElement('a');
-      link.href = fileUrl;
+      link.href = allInfo.link;
       link.download = '';
       link.click();
     },

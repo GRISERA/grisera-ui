@@ -158,11 +158,11 @@
                         :key="i"
                       >
                         <v-radio-group
-                          v-model="appearanceOclusionItem.value"
+                          v-model="appearanceOclusionValues[i]"
                           class="ma-0 pa-0"
                         >
                           <template v-slot:label>
-                            <div style="font-size: 16px;">{{ appearanceOclusionItem.name }}</div>
+                            <div style="font-size: 16px;">{{ appearanceOclusionItem.title }}</div>
                           </template>
                           <div v-if="i < 2">
                             <v-radio
@@ -236,6 +236,8 @@ import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 import AppearanceValues from '@/const/AppearanceValues';
 import AccessRoles from '@/const/AccessRoles';
 import { mapGetters } from 'vuex';
+import PersonatitiesAPI from '@/api/PersonatitiesAPI';
+import ApperancesAPI from '@/api/ApperancesAPI';
 
 export default {
   name: 'ScenarioAddEditView',
@@ -257,8 +259,7 @@ export default {
       item: Object,
       participant: Object,
       valid: true,
-      isEditMode: false,
-      participants: [],
+      isEditMode: true,
       bigFiveMin: 0,
       bigFiveMax: 1,
       bigFiveValues: [0.5, 0.5, 0.5, 0.5, 0.5],
@@ -270,7 +271,9 @@ export default {
       appearanceSomatotypeMin: 1,
       appearanceSomatotypeMax: 7,
       appearanceOclusion: Models.appearanceOclusion,
+      appearanceOclusionValues: ['some', 'heavy', false],
       appearanceValues: [ AppearanceValues.APPEARANCE_NO, AppearanceValues.APPEARANCE_SOME, AppearanceValues.APPEARANCE_HEAVY ],
+      participantState: Object,
       additionalParameters: [
         {
           name: 'Age',
@@ -286,12 +289,9 @@ export default {
           return;
         }
 
-        ActivityExecutionsAPI.show(newValue)
-            .then(({ data }) => {
-              this.item = data;              
-            });
+        this.getActivityExecution(newValue);
       },
-      immediate: true,
+      immediate: false,
     },
     '$route.params.id': {
       handler(newValue) {
@@ -299,76 +299,142 @@ export default {
           return;
         }
 
-        ParticipantsAPI.show(newValue)
-            .then(({ data }) => {
-              this.participant = data;              
-            });      
-        
+        this.getParticipant(newValue);
       },
       immediate: true,
     },
   },
-  created() {   
-    ParticipantsAPI.index()
-        .then(({ data }) => {
-          this.participants = data;
-        });
-    ParticipantStatesAPI.index()
-    .then(({ data }) => {              
-        var state = data.filter(state => {        
-          return state.participant === this.$route.params.id && state.activityExecution === is.$route.params.activityExecution;
-        });
-        if(Array.isArray(state) && state.length > 0){
-          this.id = state[0].id;
-          this.isEditMode = true;
-          this.appearanceOclusion = state[0].occlusion;
-          if (state[0].hasOwnProperty('panasValues')) {
-            this.selected.panas = true;
-            this.panasValues = state[0].panasValues;
-          }  
-          if (state[0].hasOwnProperty('bigFiveValues')) {
-            this.selected.bigFive = true;
-            this.bigFiveValues = state[0].bigFiveValues;
-          } 
-          if (state[0].hasOwnProperty('somatotype')) {
-            this.selected.somatotype = true;
-            this.apperanceSomatotypeValues = state[0].somatotype;
-          }
-      }
+  created() { 
+    this.getActivityExecution(this.$route.params.activityExecution).then(data => {
+      this.participantState = data.participantStates.find(participantState => participantState.participantId === this.$route.params.id);
+      this.id = this.participantState.id;
+      
+      this.participantState.personalities?.forEach(personality => {
+        if(personality.bigFiveValues){
+          this.bigFiveValues = personality.bigFiveValues;
+          this.selected.bigFive = true;
+        }
+        if(personality.panasValues){
+          this.panasValues = personality.panasValues;
+          this.selected.panas = true;
+        }
+      });
+      this.participantState.appearances?.forEach(apperance => {
+        if(apperance.appearanceOclusionValues){
+          this.appearanceOclusionValues = apperance.appearanceOclusionValues;
+          this.selected.oclusion = true;
+        }
+        if(apperance.apperanceSomatotypeValues){
+          this.apperanceSomatotypeValues = apperance.apperanceSomatotypeValues;
+          this.selected.somatotype = true;
+        }
+      });
     });
   },
   methods: {
+    getActivityExecution(id){
+      return ActivityExecutionsAPI.show(id, 4)
+        .then(({ data }) => {
+          this.item = data;
+          return data;              
+        });
+    },
+    getParticipant(id){
+      return ParticipantsAPI.show(id)
+        .then(({ data }) => {
+          this.participant = data;
+          return data;              
+        });
+    },
     performAction() {
       if (!this.$refs.form.validate()) {
         return;
       }
-
-      var newParticipantState = {        
-        participant: this.$route.params.id,
-        activityExecution: this.$route.params.activityExecution,
-        ...(this.selected.bigFive && { bigFiveValues: this.bigFiveValues }),
-        ...(this.id != undefined && { id: this.id }),
-        ...(this.selected.panas && { panasValues: this.panasValues }),
-        ...(this.selected.somatotype && { somatotype: this.apperanceSomatotypeValues }),
-        occlusion: this.appearanceOclusion,
-        additionalParameters: [],
-      };
-      this.$refs.apc.parameters.forEach(param => {
-        if (param.selected) {
-          newParticipantState.additionalParameters.push({
-            key: param.properties.key,
-            name: param.properties.name,
-            value: param.value,
-          });
-          this.$refs.apc.updateParameter(param);
-        }
-      });      
-      const method = this.isEditMode ? 'update' : 'store';
-
-      ParticipantStatesAPI[method](newParticipantState).then(() => {        
-        this.$router.go(-1);
-      });       
       
+      var appearances = [];
+      var personalities = [];
+
+      if(this.selected.bigFive){
+        var personalityAdded = false;
+        for(var personality of (this.participantState.personalities || [])){
+          if(personality.bigFiveValues){
+            personality.bigFiveValues = this.bigFiveValues;
+            personalities.push(PersonatitiesAPI.update(personality));
+            personalityAdded = true;
+          }
+        }
+        if(!personalityAdded){
+          personalities.push(PersonatitiesAPI.store({ bigFiveValues: this.bigFiveValues }));
+        }
+      }
+      if(this.selected.panas){
+        var personalityAdded = false;
+        for(var personality of (this.participantState.personalities || [])){
+          if(personality.panasValues){
+            personality.panasValues = this.panasValues;
+            personalities.push(PersonatitiesAPI.update(personality));
+            personalityAdded = true;
+          }
+        }
+        if(!personalityAdded){
+          personalities.push(PersonatitiesAPI.store({ panasValues: this.panasValues }));
+        }
+      }
+
+      if(this.selected.somatotype){
+        var appearanceAdded = false;
+        for(var appearance of this.participantState.appearances || []){
+          if(appearance.panasValues){
+            appearance.apperanceSomatotypeValues = this.apperanceSomatotypeValues;
+            appearances.push(ApperancesAPI.update(appearance));
+            appearanceAdded = true;
+          }
+        }
+        if(!appearanceAdded){
+          appearances.push(ApperancesAPI.store({ apperanceSomatotypeValues: this.apperanceSomatotypeValues }));
+        }
+      }
+      if(this.selected.oclusion){
+        var appearanceAdded = false;
+        for(var appearance of this.participantState.appearances || []){
+          if(appearance.appearanceOclusionValues){
+            appearance.appearanceOclusionValues = this.appearanceOclusionValues;
+            appearances.push(ApperancesAPI.update(appearance));
+            appearanceAdded = true;
+          }
+        }
+        if(!appearanceAdded){
+          appearances.push(ApperancesAPI.store({ appearanceOclusionValues: this.appearanceOclusionValues }));
+        }
+      }
+
+      Promise.all([...personalities, ...appearances]).then((results) => {
+        personalities = results.slice(0, personalities.length);
+        appearances = results.slice(personalities.length);
+
+        const oldAppearances = this.participantState.appearances?.map(e => e.id);
+        const newAppearances = appearances.map(e => e.data.id);
+        const appearancesToDelete = oldAppearances?.filter(e => !newAppearances.includes(e)).map(apperance => ApperancesAPI.delete(apperance)) || [];
+
+        const oldPersonatities = this.participantState.personalities?.map(e => e.id);
+        const newPersonatities = personalities.map(e => e.data.id);
+        const personatitiesToDelete = oldPersonatities?.filter(e => !newPersonatities.includes(e)).map(personality => PersonatitiesAPI.delete(personality)) || [];
+
+
+        const participantStateUpdate = ParticipantStatesAPI.update({
+          id: this.participantState.id,
+          participantId: this.participant.id,
+          personalityIds: newPersonatities,
+          appearanceIds: newAppearances,
+          age: this.participantState.age,
+          additionalParameters: this.participantState.additionalParameters,
+        });
+
+        Promise.all([...appearancesToDelete, ...personatitiesToDelete, participantStateUpdate]).then(({ data }) => {     
+          this.$router.go(-1);
+        });
+      });
+       
     },
   },
   computed: {

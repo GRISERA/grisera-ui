@@ -38,19 +38,13 @@ export default {
     ],
     appearanceOclusion: [
         {
-            id: 'hasBeard',
-            name: 'has beard',
-            value: AppearanceValues.APPEARANCE_NO,
+            title: 'has beard',
         },
         {
-            id: 'hasMoustache',
-            name: 'has moustache',
-            value: AppearanceValues.APPEARANCE_NO,
+            title: 'has moustache',
         },
         {
-            id: 'hasGlasses',
-            name: 'has glasses',
-            value: false,
+            title: 'has glasses',
         },
     ],
     arrangementDistanceValues:[
