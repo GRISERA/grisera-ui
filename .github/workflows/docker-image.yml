@@ -15,7 +15,7 @@ on:
 
 env:
   # Use docker.io for Docker Hub if empty
-  REGISTRY: docker.io
+  REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: "grisera_ui"
 
@@ -38,7 +38,7 @@ jobs:
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
       - name: Install cosign
-        if: github.event_name != 'pull_request'
+        #if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@6e04d228eb30da1757ee4e1dd75a0ec73a653e06 #v3.1.1
         with:
           cosign-release: 'v2.1.1'
@@ -52,21 +52,21 @@ jobs:
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
       - name: Log into registry ${{ env.REGISTRY }}
-        if: github.event_name != 'pull_request'
+        #if: github.event_name != 'pull_request'
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.THIS_GITHUB_TOKEN }}
 
       - name: Bump version and push tag
-        if: github.event_name != 'pull_request'
+        #if: github.event_name != 'pull_request'
         id: version_bump
         uses: anothrNick/github-tag-action@1.61.0
         env:
           GITHUB_TOKEN: ${{ secrets.THIS_GITHUB_TOKEN }}
           DEFAULT_BRANCH: ${{ github.ref_name }}
-          DEFAULT_BUMP: minor
+          DEFAULT_BUMP: none
           WITH_V: true
 
       # Extract metadata (tags, labels) for Docker
@@ -75,7 +75,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
         with:
-          images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: type=semver,pattern={{version}},value=${{ steps.version_bump.outputs.new_tag }}
 
       # Build and push Docker image with Buildx (don't push on PR)
@@ -86,6 +86,7 @@ jobs:
         with:
           context: .
           file: prod.dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          
