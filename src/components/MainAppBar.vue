@@ -38,7 +38,7 @@
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title>
-                  Tester Testowy
+                  {{ userName }}
                 </v-list-item-title>
                 <v-list-item-subtitle>
                   {{ user?.email }}
@@ -48,7 +48,7 @@
           </v-col>
           <v-col class="shrink pa-0 my-auto mr-4">
             <v-menu>
-              <template v-slot:activator="{ on, attrs }">
+              <template #activator="{ on, attrs }">
                 <v-icon
                   v-bind="attrs"
                   v-on="on"
@@ -59,7 +59,7 @@
               <v-list>
                 <v-list-item @click="logout()">
                   <v-list-item-icon>
-                    <v-icon v-text="'mdi-logout'"></v-icon>
+                    <v-icon v-text="'mdi-logout'" />
                   </v-list-item-icon>
                   <v-list-item-title>Logout</v-list-item-title>
                 </v-list-item>
@@ -78,6 +78,14 @@ import AuthService from '@/services/AuthService';
 
 export default {
   name: 'MainAppBar',
+  data() {
+    return {
+      userName: 'Guest',
+    };
+  },
+  mounted() {
+    this.userName = this.$keycloak.tokenParsed?.preferred_username || 'Guest';
+  },
   methods: {
     logout() {
       AuthService.logout();

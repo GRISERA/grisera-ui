@@ -128,7 +128,7 @@ export default {
     DatasetAPI.index().then(({ data }) => {
       this.datasets = data;
     });
-    PermissionsService.getUserPermissions(this.getUser().userId).then((response) => {
+    PermissionsService.getUserPermissions(this.getUser().sub).then((response) => {
       this.permissions = response.data;
     });
   },
