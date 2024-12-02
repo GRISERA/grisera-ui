@@ -18,6 +18,7 @@ apiService.interceptors.request.use(
           config.headers.Authorization = `Bearer ${token}`;
         }
       } catch (error) {
+        console.error(error);
       }
       return config;
     },

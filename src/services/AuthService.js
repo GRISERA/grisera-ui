@@ -19,8 +19,8 @@ export default {
 
   async getToken() {
     const refreshed = await keycloak.updateToken(5);
-    if (!refreshed) {
-      throw new Error('Could not refresh token');
+    if (refreshed) {
+      console.log('Refreshed token');
     }
     return keycloak.token;
   },
