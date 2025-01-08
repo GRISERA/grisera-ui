@@ -1,0 +1,11 @@
+services:
+  playwright-tests:
+    image: playwright-tests
+    build:
+      context: .
+      dockerfile: tests.Dockerfile
+    volumes:
+      - .:/app
+    ports:
+      - "9323:9323"
+    network_mode: host
