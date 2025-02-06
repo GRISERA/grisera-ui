@@ -15,14 +15,12 @@ services:
   frontend-ms:
     build:
       context: .
-      dockerfile: dev.dockerfile
-    volumes:
-      - .:/app
+      dockerfile: prod.dockerfile
     depends_on:
       - auth-ms
       - grisera_api_mongodb
     ports:
-      - "8080:8080"
+      - "8080:80"
     environment:
       - VUE_APP_API_URL=http://localhost:18085
       - VUE_APP_AUTH_MS_URL=http://localhost:8081/api
