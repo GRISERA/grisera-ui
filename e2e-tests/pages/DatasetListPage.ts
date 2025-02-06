@@ -25,4 +25,11 @@ export class DatasetListPage extends BasePage {
         await expect(card).toContainText(dataset.date);
         await expect(card).toContainText(dataset.description);
     }
+
+    async useAnyDataset(): Promise<void> {
+        const card = this.page.locator('.dataset-card').first();
+        await card.locator('button:has-text("Select and proceed")').click();
+        await this.page.waitForURL('/');
+        await this.waitForPageLoad();
+    }
 }
