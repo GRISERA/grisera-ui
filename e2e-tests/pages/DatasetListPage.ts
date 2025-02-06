@@ -32,4 +32,10 @@ export class DatasetListPage extends BasePage {
         await this.page.waitForURL('/');
         await this.waitForPageLoad();
     }
+
+    async usingAnyDataset(): Promise<void> {
+        await this.visit();
+        await this.waitForPageLoad();
+        await this.useAnyDataset();
+    }
 }
