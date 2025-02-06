@@ -24,7 +24,7 @@
               <v-card
                 :elevation="8"
                 height="100%"
-                class="d-flex flex-column"
+                class="d-flex flex-column dataset-card"
               >
                 <v-card-text class="pa-0 flex-grow-1">
                   <v-container class="container--fluid">
