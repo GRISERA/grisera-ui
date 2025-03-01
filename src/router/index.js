@@ -9,7 +9,6 @@ import participantRoutes from '@/router/participantRoutes';
 import measureRoutes from '@/router/measureRoutes';
 import datasetRoutes from '@/router/datasetRoutes';
 import ClassesDescriptions from '@/const/ClassesDescriptions';
-import jwt_decode from 'jwt-decode';
 import AuthService from '@/services/AuthService';
 import store from '@/store/index';
 
@@ -23,24 +22,6 @@ const routes = [
   ...measureRoutes,
   ...modalityRoutes,
   ...participantRoutes,
-  {
-    path: '/register',
-    name: 'register',
-    component: () => import('@/views/RegisterView.vue'),
-    meta: {
-      disableNavigation: true,
-      disableMainAppBar: true,
-    },
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: () => import('@/views/LoginView.vue'),
-    meta: {
-      disableNavigation: true,
-      disableMainAppBar: true,
-    },
-  },
   {
     path: '/',
     name: 'main',
@@ -98,22 +79,11 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const requiresAuth = to.name !== 'login' && to.name !== 'register';
-  const isAuthenticated = !!(AuthService.isAuthenticated() || to.params.isAuthenticated);
-
-  if(requiresAuth && !isAuthenticated) {
-    next('/login');
+  const token = AuthService.getTokenParsed();
+  if(token) {
+    router.app.$store.commit('setUser', token);
   }
-  else if(!requiresAuth && isAuthenticated) {
-    next(from.path);
-  }
-  else {
-    const token = localStorage.getItem('token');
-    if(token) {
-      router.app.$store.commit('setUser', jwt_decode(token));
-    }
-    next();
-  }
+  next();
 });
 
 router.beforeEach((to, from, next) => {
