@@ -1,8 +1,9 @@
 import Keycloak from 'keycloak-js';
+import config from '../../config.js';
 
 const keycloak = new Keycloak({
-    url: 'http://localhost:8090',
-    clientId: 'grisera-ui',
-    realm: 'grisera',
+    url: config.keycloakUrl,
+    clientId: config.keycloakClientId,
+    realm: config.realm,
 });
 export default keycloak;
