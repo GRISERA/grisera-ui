@@ -56,7 +56,7 @@
         </template>
       </td>
     </template>
-    <template 
+    <template
       #actions="{ item }"
       v-if="canEditActivityExecution"
     >
@@ -66,15 +66,15 @@
         @click.stop.prevent="$emit('activity-execution:edit', item)"
       >
         mdi-pen
-      </v-icon>  
+      </v-icon>
     </template>
   </base-table>
 </template>
-  
+
   <script>
   import BaseTable from '@/components/base/BaseTable.vue';
   import ActivityExecutionsParticipantTableComponent from '@/components/ActivityExecutionsParticipantTableComponent.vue';
-  
+
   export default {
     name: 'ActivityExecutionsListingComponent',
     components: {
@@ -114,7 +114,7 @@
     },
 };
 </script>
-  
+
   <style scoped>
   ::v-deep .v-timeline-item__body {
     margin: auto;
