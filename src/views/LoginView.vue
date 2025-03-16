@@ -22,10 +22,10 @@
             </v-col>
             <v-col class="col-8 mx-auto pb-16">
               <transition
-                name="fade"                
+                name="fade"
               >
                 <div v-if="formNumber === 1">
-                  <v-form 
+                  <v-form
                     ref="form"
                     @keyup.native.enter="submit"
                     @submit.stop.prevent="$router.push({ name: 'datasets' })"
@@ -35,22 +35,22 @@
                       label="Login"
                       outlined
                       :rules="required"
-                    />                
-                    <v-text-field                  
+                    />
+                    <v-text-field
                       v-model="password"
                       label="Password"
                       outlined
                       type="password"
                       :rules="validationRules"
-                    />                
+                    />
                     <v-row>
-                      <v-col cols="6">                    
+                      <v-col cols="6">
                         <v-btn
                           v-if="showComponent"
                           color="primary"
                           outlined
                           class="text-left"
-                      
+
                           @click="formNumber++"
                         >
                           Forgot your password?
@@ -60,28 +60,28 @@
                         cols="6"
                         class="d-flex justify-end"
                       >
-                        <v-btn                      
+                        <v-btn
                           color="primary"
                           @click="submit"
                         >
                           Log in
                         </v-btn>
                       </v-col>
-                    </v-row>                              
-                  </v-form>                  
+                    </v-row>
+                  </v-form>
                 </div>
               </transition>
               <transition
-                name="fade"                
+                name="fade"
               >
                 <div v-if="formNumber === 2">
-                  Enter the code we send to your email.                  
-                  <v-text-field                    
+                  Enter the code we send to your email.
+                  <v-text-field
                     label="Code"
                     outlined
                     :rules="required"
                   />
-                  <v-btn                      
+                  <v-btn
                     color="primary"
                     class="text-right"
                     @click="formNumber++"
@@ -90,22 +90,22 @@
                   </v-btn>
                 </div>
               </transition>
-              <transition name="fade">                
+              <transition name="fade">
                 <div v-if="formNumber === 3">
-                  Enter the new password.                  
-                  <v-text-field                    
+                  Enter the new password.
+                  <v-text-field
                     label="Password"
                     outlined
                     :rules="required"
                   />
-                  <v-text-field                    
+                  <v-text-field
                     label="Repeat password"
                     outlined
                     :rules="required"
-                  />                  
-                  <v-btn                    
+                  />
+                  <v-btn
                     class="text-right"
-                    color="primary"  
+                    color="primary"
                     @click="formNumber++"
                   >
                     Save password
@@ -158,8 +158,8 @@ export default {
     tokenExpiration() {
       return new Date().getTime() + config.sessionDurationMinutes * 60000;
     },
-    validationRules() {     
-      return [v => !!v || (this.showComponent ? 'The password is incorrect' : 'This field is required')];     
+    validationRules() {
+      return [v => !!v || (this.showComponent ? 'The password is incorrect' : 'This field is required')];
     },
   },
   methods: {
@@ -179,9 +179,9 @@ export default {
             })
             .catch(error => {
               //this.$refs.form.reset();
-              //this.$refs.form.validate();              
+              //this.$refs.form.validate();
               this.password = undefined;
-              this.showComponent = true;                            
+              this.showComponent = true;
             });
       }
     },
