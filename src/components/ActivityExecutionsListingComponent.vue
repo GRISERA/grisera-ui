@@ -64,6 +64,7 @@
         class="mr-2"
         color="primary"
         @click.stop.prevent="$emit('activity-execution:edit', item)"
+        :data-testid="'edit-activity-execution'"
       >
         mdi-pen
       </v-icon>  
