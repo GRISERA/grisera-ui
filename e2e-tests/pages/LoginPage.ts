@@ -31,6 +31,12 @@ export class LoginPage extends BasePage {
         await this.verifyLoggedIn('test@example.com');
     }
 
+    async loggedInAsUser({ email, password }): Promise<void> {
+        await this.visit();
+        await this.login(email, password);
+        await this.verifyLoggedIn(email);
+    }
+
     async verifyLoggedIn(email: string): Promise<void> {
         await expect(this.page.getByText(email)).toBeVisible();
     }

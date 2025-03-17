@@ -10,6 +10,8 @@ import { ExperimentListPage } from '../pages/ExperimentListPage';
 import { ScenariosTab } from '../pages/ScenariosTab';
 import { ScenariosExecutionsTab } from '../pages/ScenariosExecutionsTab';
 import { RecordingsTab } from '../pages/RecordingsTab';
+import generateRandomEmail from '../utils/generate-random-email';
+import { RegistrationPage } from '../pages/RegistrationPage';
 
 const hash = Math.random().toString(36).substring(2);
 
@@ -117,10 +119,22 @@ const newScenarioExecutions = [
     },
 ];
 
-test.beforeEach(async ({ page }) => new LoginPage(page).loggedInAsDefaultUser());
+const email = `${ hash }@example.com`;
 
 test.describe.serial('Przejście całego procesu', () => {
-    test('[01] - Użytkownik tworzy nowy zbiór danych', async ({ page }) => {
+    test('[00] - Użytkownik rejestruje konto', async ({ page }) => {
+        const registrationPage = new RegistrationPage(page);
+        await registrationPage.visit();
+        await registrationPage.register(email, email);
+    });
+
+    test.beforeEach(async ({ page }, testInfo) => {
+        if (testInfo.title !== '[00] - Użytkownik rejestruje konto') {
+            await new LoginPage(page).loggedInAsUser({ email, password: email });
+        }
+    });
+
+    test('[01] - Użytkownik tworzy zbiór danych', async ({ page }) => {
         const datasetPage = new DatasetCreatePage(page);
         await datasetPage.visit();
         await datasetPage.createDataset(newDataset);
@@ -177,7 +191,7 @@ test.describe.serial('Przejście całego procesu', () => {
         }
     });
 
-    test('[06] - Użytkownik dodaje scenariusz testowy', async ({ page }) => {
+    test('[06] - Użytkownik tworzy scenariusz testowy', async ({ page }) => {
         await (new DatasetListPage(page)).useDatasetByName(newDataset.name);
         await (new ExperimentListPage(page)).useExperimentByName(newExperiment.name);
 
@@ -202,7 +216,7 @@ test.describe.serial('Przejście całego procesu', () => {
         }
     });
 
-    test('[08] - Użytkownik dodaje uczestnika do wykonania scenariusza', async ({ page }) => {
+    test('[08] - Użytkownik dodaje uczestników do wykonań scenariusza', async ({ page }) => {
         await (new DatasetListPage(page)).useDatasetByName(newDataset.name);
         await (new ExperimentListPage(page)).useExperimentByName(newExperiment.name);
 
@@ -223,7 +237,7 @@ test.describe.serial('Przejście całego procesu', () => {
         }
     });
 
-    test('[09] - Użytkownik dodaje nagrania', async ({ page }) => {
+    test('[09] - Użytkownik tworzy nagrania', async ({ page }) => {
         await (new DatasetListPage(page)).useDatasetByName(newDataset.name);
         await (new ExperimentListPage(page)).useExperimentByName(newExperiment.name);
 
