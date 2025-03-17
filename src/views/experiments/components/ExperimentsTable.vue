@@ -25,6 +25,7 @@
       <v-btn
         outlined
         small
+        data-testid="go-to-details-button"
         @click.stop.prevent="goToDetails(item.id)"
       >
         Go to details

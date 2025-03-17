@@ -4,7 +4,7 @@ export class ExperimentPage extends BasePage {
 
     async useAnyExperiment(): Promise<void> {
         await this.visit();
-        await this.page.locator('tr >> td:nth-child(5) button', { hasText: 'Go To Details' }).first().click(); //FIXME
+        await this.page.getByTestId('go-to-details-button').first().click();
     }
 
 
