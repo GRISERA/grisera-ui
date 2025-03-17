@@ -53,7 +53,7 @@ export class DatasetCreatePage extends BasePage {
     async selectDate(date: string): Promise<void> {
         await this.dateField.click();
         const day = new Date(date).getDate().toString();
-        await this.page.getByRole('button', { name: day }).click();
+        await this.page.getByRole('button', { name: day }).first().click();
         await this.page.getByRole('button', { name: 'OK' }).click();
     }
 

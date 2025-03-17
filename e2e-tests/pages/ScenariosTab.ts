@@ -1,11 +1,11 @@
-import {BasePage} from "./BasePage";
+import { BasePage } from './BasePage';
 
-export class ScenariosTab extends BasePage{
+export class ScenariosTab extends BasePage {
     async visit(): Promise<void> {
         await this.page.getByRole('tab', { name: 'Scenarios', exact: true }).click();
     }
 
-    async addScenario(name: string, description: string, activities: string[]): Promise<void> {
+    async addScenario({ name, description, activities }): Promise<void> {
         await this.page.getByRole('button', { name: 'Create' }).click();
         await this.page.getByLabel('Name').fill(name);
         await this.page.getByLabel('Description').fill(description);

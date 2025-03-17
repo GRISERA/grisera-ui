@@ -33,7 +33,7 @@
                         <div class="caption">
                           Name
                         </div>
-                        <div class="black--text font-weight-bold">
+                        <div :test-data="dataset.name" class="black--text font-weight-bold">
                           {{ dataset.name }}
                         </div>
                       </v-col>

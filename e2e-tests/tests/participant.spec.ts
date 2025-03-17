@@ -11,12 +11,12 @@ test.beforeEach(async ({ page }) => {
 test('Użytkownik może utworzyć nowego uczestnika 1', async ({ page }) => {
     const participantPage = new ParticipantCreatePage(page);
     await participantPage.visit();
-    await participantPage.fillParticipantForm(
-        'James',
-        'Anderson',
-        '1992-07-01',
-        'Male',
-    );
+    await participantPage.fillParticipantForm({
+        name: 'James',
+        surname: 'Anderson',
+        birthDate: '1992-07-01',
+        sex: 'Male',
+    });
     await participantPage.submitForm();
 
     await expect(page).toHaveURL('/participants');
@@ -26,12 +26,12 @@ test('Użytkownik może utworzyć nowego uczestnika 1', async ({ page }) => {
 test('Użytkownik może utworzyć nowego uczestnika 2', async ({ page }) => {
     const participantPage = new ParticipantCreatePage(page);
     await participantPage.visit();
-    await participantPage.fillParticipantForm(
-        'Emma',
-        'Carter',
-        '1987-03-01',
-        'Female',
-    );
+    await participantPage.fillParticipantForm({
+        name: 'Emma',
+        surname: 'Carter',
+        birthDate: '1987-03-01',
+        sex: 'Female',
+    });
     await participantPage.submitForm();
 
     await expect(page).toHaveURL('/participants');
@@ -41,12 +41,12 @@ test('Użytkownik może utworzyć nowego uczestnika 2', async ({ page }) => {
 test('Użytkownik może utworzyć nowego uczestnika 3', async ({ page }) => {
     const participantPage = new ParticipantCreatePage(page);
     await participantPage.visit();
-    await participantPage.fillParticipantForm(
-        'Caroline',
-        'Kane',
-        '1999-01-01',
-        'Female',
-    );
+    await participantPage.fillParticipantForm({
+        name: 'Caroline',
+        surname: 'Kane',
+        birthDate: '1999-01-01',
+        sex: 'Female',
+    });
     await participantPage.submitForm();
 
     await expect(page).toHaveURL('/participants');

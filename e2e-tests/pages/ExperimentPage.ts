@@ -1,4 +1,4 @@
-import {BasePage} from "./BasePage";
+import { BasePage } from './BasePage';
 
 export class ExperimentPage extends BasePage {
 
@@ -37,8 +37,7 @@ export class ExperimentPage extends BasePage {
         await this.waitForPageLoad();
     }
 
-
-    async createExperiment(name: string, author: string, description: string, footnote: string): Promise<void> {
+    async createExperiment({ name, author, description, footnote }): Promise<void> {
         await this.createButton.click();
         await this.nameInput.fill(name);
         await this.authorInput.fill(author);

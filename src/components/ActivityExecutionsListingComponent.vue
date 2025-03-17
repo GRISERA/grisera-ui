@@ -4,6 +4,11 @@
     :items="activityExecutions"
     :show-expand="true"
   >
+    <template #[`item.name`]="{ item }">
+      <div :test-data="item.name">
+        {{ item.name }}
+      </div>
+    </template>
     <template #[`item.type`]="{ item }">
       <td>
         <v-chip

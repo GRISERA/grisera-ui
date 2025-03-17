@@ -4,6 +4,11 @@
     :items="experiments"
     :show-expand="true"
   >
+    <template #[`item.name`]="{ item }">
+      <div test-name="experiment-name" :test-data="item.name">
+        {{ item.name }}
+      </div>
+    </template>
     <template #expanded-item="{ item }">
       <td :colspan="6">
         <v-container class="container--fluid px-0">
@@ -57,9 +62,9 @@ export default {
   },
   created() {
     ExperimentsAPI.index()
-        .then(({ data }) => {
-          this.experiments = data;
-        });
+      .then(({ data }) => {
+        this.experiments = data;
+      });
   },
   methods: {
     goToDetails(id) {

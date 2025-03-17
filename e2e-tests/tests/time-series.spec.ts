@@ -2,10 +2,12 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { DatasetListPage } from '../pages/DatasetListPage';
 import { TimeSeriesCreatePage } from '../pages/TimeSeriesCreatePage';
+import { ExperimentListPage } from '../pages/ExperimentListPage';
 
 test.beforeEach(async ({ page }) => {
     await new LoginPage(page).loggedInAsDefaultUser();
     await new DatasetListPage(page).usingAnyDataset();
+    await new ExperimentListPage(page).useExperimentByName('Nyssa Rivas');
 });
 
 test('Użytkownik może utworzyć nowy szeregi czasowe', async ({ page }) => {

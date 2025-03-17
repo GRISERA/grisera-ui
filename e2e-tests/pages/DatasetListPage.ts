@@ -33,6 +33,15 @@ export class DatasetListPage extends BasePage {
         await this.waitForPageLoad();
     }
 
+    async useDatasetByName(name: string): Promise<void> {
+        await this.page.locator(`.dataset-card:has([test-data="${ name }"])`)
+            .first()
+            .getByRole('button', { name: 'Select and proceed' })
+            .click();
+        await this.page.waitForURL('/');
+        await this.waitForPageLoad();
+    }
+
     async usingAnyDataset(): Promise<void> {
         await this.visit();
         await this.waitForPageLoad();

@@ -39,7 +39,7 @@ export class ParticipantCreatePage extends BasePage {
         await this.page.getByText(sex, { exact: true }).click();
     }
 
-    async fillParticipantForm(name: string, surname: string, birthDate: string, sex: string) {
+    async fillParticipantForm({ name, surname, birthDate, sex }) {
         await this.nameInput.fill(name);
         await this.surnameInput.fill(surname);
         await this.selectDate(birthDate);
