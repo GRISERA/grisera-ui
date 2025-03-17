@@ -5,15 +5,16 @@ import { DatasetListPage } from '../pages/DatasetListPage';
 import { ParticipantCreatePage } from '../pages/ParticipantCreatePage';
 import { ExperimentPage } from '../pages/ExperimentPage';
 import { ActivityPage } from '../pages/ActivityPage';
-import { RegistrationPage } from '../pages/RegistrationPage';
 import { ParticipantsTab } from '../pages/ParticipantsTab';
 import { ExperimentListPage } from '../pages/ExperimentListPage';
 import { ScenariosTab } from '../pages/ScenariosTab';
 import { ScenariosExecutionsTab } from '../pages/ScenariosExecutionsTab';
 import { RecordingsTab } from '../pages/RecordingsTab';
 
+const hash = Math.random().toString(36).substring(2);
+
 const newDataset = {
-    name: 'Inconsistency dataset',
+    name: `Inconsistency dataset ${ hash }`,
     creator: 'Gdańsk University of Technology',
     rights: 'Creative Commons Attribution 4.0 International License',
     date: '2025-03-01',
@@ -21,7 +22,7 @@ const newDataset = {
 };
 
 const newExperiment = {
-    name: 'Emotion recognition',
+    name: `Emotion recognition ${ hash }`,
     author: 'Gdańsk University of Technology',
     description: 'Multi-camera facial expression analysis with multiple recognition systems.',
     footnote: '-',
