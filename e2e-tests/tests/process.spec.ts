@@ -10,6 +10,7 @@ import { ParticipantsTab } from '../pages/ParticipantsTab';
 import { ExperimentListPage } from '../pages/ExperimentListPage';
 import { ScenariosTab } from '../pages/ScenariosTab';
 import { ScenariosExecutionsTab } from '../pages/ScenariosExecutionsTab';
+import { RecordingsTab } from '../pages/RecordingsTab';
 
 const newDataset = {
     name: 'Inconsistency dataset',
@@ -218,6 +219,92 @@ test.describe.serial('Przejście całego procesu', () => {
                 }
                 count++;
             }
+        }
+    });
+
+    test('[09] - Użytkownik dodaje nagrania', async ({ page }) => {
+        await (new DatasetListPage(page)).useDatasetByName(newDataset.name);
+        await (new ExperimentListPage(page)).useExperimentByName(newExperiment.name);
+
+        const newRecordings = [
+            {
+                scenarioExecutionName: 'ex-01',
+                activityExecutionName: 'Activity Execution: 1',
+                name: 'Audio Recording 1',
+                description: 'Audio recording for individual activity execution 1.',
+                link: 'https://www.test.com',
+                channel: 'Audio',
+                participant: 'James Anderson',
+            },
+            {
+                scenarioExecutionName: 'ex-01',
+                activityExecutionName: 'Activity Execution: 2',
+                name: 'BVP Recording 2',
+                description: 'BVP recording for individual activity execution 2.',
+                link: 'https://www.test.com',
+                channel: 'BVP',
+                participant: 'James Anderson',
+            },
+            {
+                scenarioExecutionName: 'ex-01',
+                activityExecutionName: 'Activity Execution: 3',
+                name: 'ECG Recording 3',
+                description: 'ECG recording for individual activity execution 3.',
+                link: 'https://www.test.com',
+                channel: 'ECG',
+                participant: 'James Anderson',
+            },
+            {
+                scenarioExecutionName: 'ex-01',
+                activityExecutionName: 'Activity Execution: 4',
+                name: 'EDA Recording 4',
+                description: 'EDA recording for individual activity execution 4.',
+                link: 'https://www.test.com',
+                channel: 'EDA',
+                participant: 'James Anderson',
+            },
+            {
+                scenarioExecutionName: 'ex-01',
+                activityExecutionName: 'Activity Execution: 5',
+                name: 'Depth Video 5',
+                description: 'Depth video recording for individual activity 5.',
+                link: 'https://www.test.com',
+                channel: 'Depth video',
+                participant: 'James Anderson',
+            },
+            {
+                scenarioExecutionName: 'ex-01',
+                activityExecutionName: 'Activity Execution: 6',
+                name: 'RGB Video 6',
+                description: 'RGB video recording for individual activity 6.',
+                link: 'https://www.test.com',
+                channel: 'RGB video',
+                participant: 'James Anderson',
+            },
+            // {
+            //     scenarioExecutionName: 'ex-01',
+            //     activityExecutionName: 'Activity Execution: 7',
+            //     name: 'Group EEG Recording 7',
+            //     description: 'EEG recording for group activity with three participants.',
+            //     link: 'https://www.test.com',
+            //     channel: 'EEG',
+            //     participant: 'James Anderson, Emma Carter, Caroline Kane',
+            // },
+            // {
+            //     scenarioExecutionName: 'ex-01',
+            //     activityExecutionName: 'Activity Execution: 8',
+            //     name: 'Temperature Recording 8',
+            //     description: 'Temperature recording for two-person activity.',
+            //     link: 'https://www.test.com',
+            //     channel: 'Temperature',
+            //     participant: 'James Anderson, Emma Carter',
+            // },
+        ];
+
+        for (const recording of newRecordings) {
+            const recordingsTab = new RecordingsTab(page);
+            await recordingsTab.visit();
+            await recordingsTab.addRecording(recording);
         }
     });
 });
