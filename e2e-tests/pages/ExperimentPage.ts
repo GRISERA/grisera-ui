@@ -39,6 +39,7 @@ export class ExperimentPage extends BasePage {
 
     async createExperiment({ name, author, description, footnote }): Promise<void> {
         await this.createButton.click();
+        await this.page.waitForURL('/experiments/create');
         await this.nameInput.fill(name);
         await this.authorInput.fill(author);
         await this.descriptionInput.fill(description);

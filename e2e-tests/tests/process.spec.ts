@@ -322,4 +322,8 @@ test.describe.serial('Przejście całego procesu', () => {
             await recordingsTab.addRecording(recording);
         }
     });
+
+    test('[10] - Użytkownik tworzy szeregi czasowe', async ({ page }) => {
+        // TODO: przenieść testy z time-series.spec.ts
+    });
 });
