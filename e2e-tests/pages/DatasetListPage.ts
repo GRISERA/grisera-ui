@@ -40,6 +40,7 @@ export class DatasetListPage extends BasePage {
             .click();
         await this.page.waitForURL('/');
         await this.waitForPageLoad();
+        await expect(this.page.getByText(name).first()).toBeVisible();
     }
 
     async usingAnyDataset(): Promise<void> {

@@ -3,7 +3,7 @@ import { BasePage } from './BasePage';
 
 export class LoginPage extends BasePage {
     private get loginInput() {
-        return this.page.getByLabel('Login');
+        return this.page.getByLabel('Username or email');
     }
 
     private get passwordInput() {
@@ -15,7 +15,7 @@ export class LoginPage extends BasePage {
     }
 
     async visit(): Promise<void> {
-        await this.page.goto('/login');
+        await this.page.goto('/');
         await this.waitForPageLoad();
     }
 
@@ -38,6 +38,6 @@ export class LoginPage extends BasePage {
     }
 
     async verifyLoggedIn(email: string): Promise<void> {
-        await expect(this.page.getByText(email)).toBeVisible();
+        await expect(this.page.getByText(email).first()).toBeVisible();
     }
 }

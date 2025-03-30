@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import {expect, Page, test} from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { DatasetCreatePage } from '../pages/DatasetCreatePage';
 import { DatasetListPage } from '../pages/DatasetListPage';
@@ -119,13 +119,17 @@ const newScenarioExecutions = [
     },
 ];
 
+const username = `${ hash }`;
+const firstName = `${ hash }FirstName`;
+const lastName = `${ hash }LastName`;
 const email = `${ hash }@example.com`;
+
 
 test.describe.serial('Przejście całego procesu', () => {
     test('[00] - Użytkownik rejestruje konto', async ({ page }) => {
         const registrationPage = new RegistrationPage(page);
         await registrationPage.visit();
-        await registrationPage.register(email, email);
+        await registrationPage.register(username, email, email, firstName, lastName);
     });
 
     test.beforeEach(async ({ page }, testInfo) => {
@@ -146,7 +150,7 @@ test.describe.serial('Przejście całego procesu', () => {
     });
 
     test('[02] - Użytkownik tworzy uczestników', async ({ page }) => {
-        await (new DatasetListPage(page)).useDatasetByName(newDataset.name);
+        await selectDataset(page);
 
         for (const newParticipant of newParticipants) {
             const participantPage = new ParticipantCreatePage(page);
@@ -159,7 +163,7 @@ test.describe.serial('Przejście całego procesu', () => {
     });
 
     test('[03] - Użytkownik tworzy eksperyment', async ({ page }) => {
-        await (new DatasetListPage(page)).useDatasetByName(newDataset.name);
+        await selectDataset(page);
 
         const experimentPage = new ExperimentPage(page);
         await experimentPage.visit();
@@ -168,7 +172,7 @@ test.describe.serial('Przejście całego procesu', () => {
     });
 
     test('[04] - Użytkownik tworzy aktywności', async ({ page }) => {
-        await (new DatasetListPage(page)).useDatasetByName(newDataset.name);
+        await selectDataset(page);
 
         const activityPage = new ActivityPage(page);
         await activityPage.visit();
@@ -180,7 +184,7 @@ test.describe.serial('Przejście całego procesu', () => {
     });
 
     test('[05] - Użytkownik dodaje uczestników do eksperymentu', async ({ page }) => {
-        await (new DatasetListPage(page)).useDatasetByName(newDataset.name);
+        await selectDataset(page);
         await (new ExperimentListPage(page)).useExperimentByName(newExperiment.name);
 
         for (const newParticipant of newParticipants) {
@@ -192,7 +196,7 @@ test.describe.serial('Przejście całego procesu', () => {
     });
 
     test('[06] - Użytkownik tworzy scenariusz testowy', async ({ page }) => {
-        await (new DatasetListPage(page)).useDatasetByName(newDataset.name);
+        await selectDataset(page);
         await (new ExperimentListPage(page)).useExperimentByName(newExperiment.name);
 
         const scenariosTab = new ScenariosTab(page);
@@ -204,7 +208,7 @@ test.describe.serial('Przejście całego procesu', () => {
     });
 
     test('[07] - Użytkownik dodaje wykonania scenariusza', async ({ page }) => {
-        await (new DatasetListPage(page)).useDatasetByName(newDataset.name);
+        await selectDataset(page);
         await (new ExperimentListPage(page)).useExperimentByName(newExperiment.name);
 
         for (const newScenarioExecution of newScenarioExecutions) {
@@ -217,7 +221,7 @@ test.describe.serial('Przejście całego procesu', () => {
     });
 
     test('[08] - Użytkownik dodaje uczestników do wykonań scenariusza', async ({ page }) => {
-        await (new DatasetListPage(page)).useDatasetByName(newDataset.name);
+        await selectDataset(page);
         await (new ExperimentListPage(page)).useExperimentByName(newExperiment.name);
 
         for (const scenarioExecution of newScenarioExecutions) {
@@ -238,7 +242,7 @@ test.describe.serial('Przejście całego procesu', () => {
     });
 
     test('[09] - Użytkownik tworzy nagrania', async ({ page }) => {
-        await (new DatasetListPage(page)).useDatasetByName(newDataset.name);
+        await selectDataset(page);
         await (new ExperimentListPage(page)).useExperimentByName(newExperiment.name);
 
         const newRecordings = [
@@ -327,3 +331,9 @@ test.describe.serial('Przejście całego procesu', () => {
         // TODO: przenieść testy z time-series.spec.ts
     });
 });
+
+async function selectDataset(page: Page) {
+    const datasetPage = new DatasetListPage(page);
+    await datasetPage.visit()
+    await datasetPage.useDatasetByName(newDataset.name);
+}

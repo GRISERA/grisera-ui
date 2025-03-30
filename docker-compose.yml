@@ -79,7 +79,7 @@ services:
   mongodb-show:
     image: mongo-express
     ports:
-      - "8084:8081"
+      - "8888:8081"
     depends_on:
       - mongodb
     restart: always
