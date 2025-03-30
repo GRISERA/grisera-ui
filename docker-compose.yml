@@ -22,6 +22,8 @@ services:
     build:
       context: .
       dockerfile: prod.dockerfile
+    volumes:
+      - .:/app
     depends_on:
       - auth-ms
       - grisera_api_mongodb

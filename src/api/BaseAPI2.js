@@ -6,7 +6,7 @@ import AuthService from '@/services/AuthService';
 export const apiService = axios.create({
   baseURL: config.apiUrl,
   headers: {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json'
   },
 });
 
@@ -36,15 +36,18 @@ export default class BaseAPI2 {
     return `dataset_id=${Vue.prototype.$store.state?.dataset?.id || null}`;
   }
 
-  static getReturnValues(){
+
+  static getReturnValues() {
     return this.getBasePath();
   }
 
-  static dTOFrontToAPI(data){
+
+  static dTOFrontToAPI(data) {
     return {};
   }
 
-  static dTOAPIToFront(data){
+
+  static dTOAPIToFront(data) {
     return {};
   }
 
@@ -57,12 +60,13 @@ export default class BaseAPI2 {
   }
 
   static show(id, depth = 0) {
-    if(!id)
+    if (!id) {
       return {};
+    }
 
-    return apiService.get(`/${this.getBasePath()}/${id}?${this.getDatasetName()}&depth=${depth}`).then(({ data }) => {
-        data = this.dTOAPIToFront(data);
-        return { data };
+    return apiService.get(`/${ this.getBasePath() }/${ id }?${ this.getDatasetName() }&depth=${ depth }`).then(({ data }) => {
+      data = this.dTOAPIToFront(data);
+      return { data };
     });
   }
 

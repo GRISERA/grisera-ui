@@ -6,12 +6,7 @@
   >
     <template #[`item.type`]="{ item }">
       <td>
-        <v-chip
-          :color="getActivityTypeChipColor(item.type)"
-          :small="true"
-        >
-          {{ item.type }}
-        </v-chip>
+        <activity-type-chip :activity="item" />
       </td>
     </template>
     <template #expanded-item="{ item }">
@@ -65,11 +60,13 @@
 <script>
 import ActivitiesAPI from '@/api/ActivitiesAPI';
 import BaseTable from '@/components/base/BaseTable.vue';
+import ActivityTypeChip from '@/components/chips/ActivityTypeChip.vue';
 import HorizontalTextDivider from '@/components/divider/HorizontalTextDivider.vue';
 
 export default {
   name: 'ActivitiesTable',
   components: {
+    ActivityTypeChip,
     BaseTable,
     HorizontalTextDivider,
   },
@@ -86,18 +83,9 @@ export default {
   },
   created() {
     ActivitiesAPI.index()
-        .then(({ data }) => {
-          this.activities = data;
-        });
-  },
-  methods: {
-    getActivityTypeChipColor(type) {
-      return {
-        ['Individual']: 'accent',
-        ['Two persons activity']: 'primary',
-        ['Group activity']: 'success',
-      }[type];
-    },
+      .then(({ data }) => {
+        this.activities = data;
+      });
   },
 };
 </script>
