@@ -49,7 +49,7 @@ services:
       - KEYCLOAK_URL=http://keycloak:8080
       - REALM=grisera
       - CLIENT_ID=grisera-auth
-      - CLIENT_SECRET=1HtHJPFnsReotU6unJkkl2RHsbytXZ31
+      - CLIENT_SECRET=1FrVLc5QFTDNvrJVNvJdqkeWkcpulPJZ
 
   keycloak:
     image: ghcr.io/grisera/grisera-auth-keycloak:2.1.7
