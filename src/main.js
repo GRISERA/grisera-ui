@@ -5,6 +5,7 @@ import vuetify from './plugins/vuetify';
 import router from './router';
 import store from './store';
 import keycloak from '@/keycloak/keycloak-config';
+import PermissionsService from '@/services/PermissionsService';
 
 Vue.config.productionTip = false;
 
@@ -30,3 +31,16 @@ keycloak.init({ onLoad: 'login-required' })
     .catch(err => {
       console.error('Keycloak initialization failed:', err);
     });
+
+keycloak.onAuthSuccess = () => {
+    PermissionsService.getUserPermissions(keycloak.tokenParsed.sub).then(data =>
+        router.app.$store.commit('setPermissions', data.data));
+};
+
+keycloak.onAuthError = () => {
+    router.app.$store.commit('setPermissions', null);
+};
+
+keycloak.onAuthLogout = () => {
+    router.app.$store.commit('setPermissions', null);
+};

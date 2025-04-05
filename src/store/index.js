@@ -9,6 +9,7 @@ const store = new Vuex.Store({
     datasets: [],
     dataset: undefined,
     user: undefined,
+    permissions: undefined,
     data: undefined,
   },
   mutations: {
@@ -21,6 +22,9 @@ const store = new Vuex.Store({
     setUser(state, value) {
       state.user = { ...value };
     },
+    setPermissions(state, value) {
+      state.permissions = value;
+    },
     setData(state, value) {
       state.data = { ...value };
     },
@@ -29,7 +33,7 @@ const store = new Vuex.Store({
   getters: {
     getUser: state => state.user,
     getDataset: state => state.dataset,
-    getPermission: state => state.user.permissions.filter(permission => permission.datasetId == state.dataset.id)[0],
+    getPermission: state => state.permissions.filter(permission => permission.datasetId == state.dataset.id)[0],
   },
   plugins: [createPersistedState()],
 });

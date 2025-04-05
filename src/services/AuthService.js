@@ -8,8 +8,10 @@ export default {
     keycloak.logout().then(() => {
       Vue.prototype.$store.commit('setDataset', null);
       Vue.prototype.$store.commit('setUser', null);
+      Vue.prototype.$store.commit('setPermissions', null);
       LS.clear('user');
       LS.clear('dataset');
+      LS.clear('permissions');
     });
   },
 
