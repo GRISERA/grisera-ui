@@ -1,4 +1,4 @@
-import {expect, Page, test} from '@playwright/test';
+import {expect, Page, test as base} from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { DatasetCreatePage } from '../pages/DatasetCreatePage';
 import { DatasetListPage } from '../pages/DatasetListPage';
@@ -10,16 +10,21 @@ import { ExperimentListPage } from '../pages/ExperimentListPage';
 import { ScenariosTab } from '../pages/ScenariosTab';
 import { ScenariosExecutionsTab } from '../pages/ScenariosExecutionsTab';
 import { RecordingsTab } from '../pages/RecordingsTab';
-import generateRandomEmail from '../utils/generate-random-email';
 import { RegistrationPage } from '../pages/RegistrationPage';
+import {SettingsPage} from "../pages/SettingsPage";
+import {AccessPermissionsTab} from "../pages/AccessPermissionsTab";
+import generateDate from '../utils/generate-date-util';
 
 const hash = Math.random().toString(36).substring(2);
+
+const firstDayOfMonth = generateDate(1);
+
 
 const newDataset = {
     name: `Inconsistency dataset ${ hash }`,
     creator: 'Gdańsk University of Technology',
     rights: 'Creative Commons Attribution 4.0 International License',
-    date: '2025-03-01',
+    date: firstDayOfMonth,
     description: `The dataset from Gdańsk University of Technology results from an experiment where facial expressions were recorded using four cameras placed at the corners of a screen. The goal was to recognize emotional states using three systems: Noldus FaceReader, QuantumLab Express Engine, and Luxand-based. FaceReader identified nine emotional states, including six basic Ekman emotions, neutral, and PAD model's valence and arousal. QuantumLab Express Engine recognized five basic emotions (excluding fear) and neutral, while Luxand identified six basic emotions and neutral. The experiment analyzed consistency between systems and cameras, as well as the impact of variables like sex, glasses, and facial hair. Twelve participants recorded their faces while completing tasks on an e-learning platform.`,
 };
 
@@ -119,11 +124,110 @@ const newScenarioExecutions = [
     },
 ];
 
+
+const newRecordings = [
+    {
+        scenarioExecutionName: 'ex-01',
+        activityExecutionName: 'Activity Execution: 1',
+        name: 'Audio Recording 1',
+        description: 'Audio recording for individual activity execution 1.',
+        link: 'https://www.test.com',
+        channel: 'Audio',
+        participant: 'James Anderson',
+    },
+    {
+        scenarioExecutionName: 'ex-01',
+        activityExecutionName: 'Activity Execution: 2',
+        name: 'BVP Recording 2',
+        description: 'BVP recording for individual activity execution 2.',
+        link: 'https://www.test.com',
+        channel: 'BVP',
+        participant: 'James Anderson',
+    },
+    {
+        scenarioExecutionName: 'ex-01',
+        activityExecutionName: 'Activity Execution: 3',
+        name: 'ECG Recording 3',
+        description: 'ECG recording for individual activity execution 3.',
+        link: 'https://www.test.com',
+        channel: 'ECG',
+        participant: 'James Anderson',
+    },
+    {
+        scenarioExecutionName: 'ex-01',
+        activityExecutionName: 'Activity Execution: 4',
+        name: 'EDA Recording 4',
+        description: 'EDA recording for individual activity execution 4.',
+        link: 'https://www.test.com',
+        channel: 'EDA',
+        participant: 'James Anderson',
+    },
+    {
+        scenarioExecutionName: 'ex-01',
+        activityExecutionName: 'Activity Execution: 5',
+        name: 'Depth Video 5',
+        description: 'Depth video recording for individual activity 5.',
+        link: 'https://www.test.com',
+        channel: 'Depth video',
+        participant: 'James Anderson',
+    },
+    {
+        scenarioExecutionName: 'ex-01',
+        activityExecutionName: 'Activity Execution: 6',
+        name: 'RGB Video 6',
+        description: 'RGB video recording for individual activity 6.',
+        link: 'https://www.test.com',
+        channel: 'RGB video',
+        participant: 'James Anderson',
+    },
+    // {
+    //     scenarioExecutionName: 'ex-01',
+    //     activityExecutionName: 'Activity Execution: 7',
+    //     name: 'Group EEG Recording 7',
+    //     description: 'EEG recording for group activity with three participants.',
+    //     link: 'https://www.test.com',
+    //     channel: 'EEG',
+    //     participant: 'James Anderson, Emma Carter, Caroline Kane',
+    // },
+    // {
+    //     scenarioExecutionName: 'ex-01',
+    //     activityExecutionName: 'Activity Execution: 8',
+    //     name: 'Temperature Recording 8',
+    //     description: 'Temperature recording for two-person activity.',
+    //     link: 'https://www.test.com',
+    //     channel: 'Temperature',
+    //     participant: 'James Anderson, Emma Carter',
+    // },
+];
+
 const username = `${ hash }`;
 const firstName = `${ hash }FirstName`;
 const lastName = `${ hash }LastName`;
 const email = `${ hash }@example.com`;
 
+const usernameOther = `other${ hash }`;
+const emailOther = `other${ hash }@example.com`;
+const firstNameOther = `other${ hash }FirstName`;
+const lastNameOther = `other${ hash }LastName`;
+
+type LoggedInFixtures = {
+    userPage: Page;
+    otherUserPage: Page;
+};
+
+const test = base.extend<LoggedInFixtures>({
+    userPage: async({page}, use) => {
+        const loginPage = await new LoginPage(page);
+        await loginPage.loggedInAsUser({ email, password: email })
+        await use(page)
+    },
+
+    otherUserPage: async({page}, use) => {
+        const loginPage = await new LoginPage(page);
+        await loginPage.loggedInAsUser({ email: emailOther, password: emailOther })
+        await use(page)
+    }
+});
 
 test.describe.serial('Przejście całego procesu', () => {
     test('[00] - Użytkownik rejestruje konto', async ({ page }) => {
@@ -132,103 +236,97 @@ test.describe.serial('Przejście całego procesu', () => {
         await registrationPage.register(username, email, email, firstName, lastName);
     });
 
-    test.beforeEach(async ({ page }, testInfo) => {
-        if (testInfo.title !== '[00] - Użytkownik rejestruje konto') {
-            await new LoginPage(page).loggedInAsUser({ email, password: email });
-        }
-    });
-
-    test('[01] - Użytkownik tworzy zbiór danych', async ({ page }) => {
-        const datasetPage = new DatasetCreatePage(page);
+    test('[01] - Użytkownik tworzy zbiór danych', async ({ userPage }) => {
+        const datasetPage = new DatasetCreatePage(userPage);
         await datasetPage.visit();
         await datasetPage.createDataset(newDataset);
-        const datasetListPage = new DatasetListPage(page);
+        const datasetListPage = new DatasetListPage(userPage);
         await datasetListPage.visit();
         await datasetListPage.waitForPageLoad();
         await datasetListPage.verifyDatasetDetails(newDataset);
         await datasetListPage.useDatasetByName(newDataset.name);
     });
 
-    test('[02] - Użytkownik tworzy uczestników', async ({ page }) => {
-        await selectDataset(page);
+    test('[02] - Użytkownik tworzy uczestników', async ({ userPage }) => {
+        await selectDataset(userPage);
 
         for (const newParticipant of newParticipants) {
-            const participantPage = new ParticipantCreatePage(page);
+            const participantPage = new ParticipantCreatePage(userPage);
             await participantPage.visit();
             await participantPage.fillParticipantForm(newParticipant);
             await participantPage.submitForm();
-            await expect(page).toHaveURL('/participants');
-            await expect(page.locator(`text=${ newParticipant.name } ${ newParticipant.surname }`).last()).toBeVisible();
+            await expect(userPage).toHaveURL('/participants');
+            await expect(userPage.locator(`text=${ newParticipant.name } ${ newParticipant.surname }`).last()).toBeVisible();
         }
     });
 
-    test('[03] - Użytkownik tworzy eksperyment', async ({ page }) => {
-        await selectDataset(page);
+    test('[03] - Użytkownik tworzy eksperyment', async ({ userPage }) => {
+        await selectDataset(userPage);
 
-        const experimentPage = new ExperimentPage(page);
+        const experimentPage = new ExperimentPage(userPage);
         await experimentPage.visit();
         await experimentPage.createExperiment(newExperiment);
-        await page.getByRole('cell', { name: newExperiment.name }).last().click();
+        await userPage.getByRole('cell', { name: newExperiment.name }).last().click();
     });
 
-    test('[04] - Użytkownik tworzy aktywności', async ({ page }) => {
-        await selectDataset(page);
+    test('[04] - Użytkownik tworzy aktywności', async ({ userPage }) => {
+        await selectDataset(userPage);
 
-        const activityPage = new ActivityPage(page);
+        const activityPage = new ActivityPage(userPage);
         await activityPage.visit();
 
         for (const newActivity of newActivities) {
             await activityPage.createActivity(newActivity.name, newActivity.description, newActivity.type);
-            await expect(page.getByRole('cell', { name: newActivity.name }).last()).toBeVisible();
+            await expect(userPage.getByRole('cell', { name: newActivity.name }).last()).toBeVisible();
         }
     });
 
-    test('[05] - Użytkownik dodaje uczestników do eksperymentu', async ({ page }) => {
-        await selectDataset(page);
-        await (new ExperimentListPage(page)).useExperimentByName(newExperiment.name);
+    test('[05] - Użytkownik dodaje uczestników do eksperymentu', async ({ userPage }) => {
+        await selectDataset(userPage);
+        await (new ExperimentListPage(userPage)).useExperimentByName(newExperiment.name);
 
         for (const newParticipant of newParticipants) {
-            const participantsTab = new ParticipantsTab(page);
+            const participantsTab = new ParticipantsTab(userPage);
             await participantsTab.visit();
             await participantsTab.addParticipant(`${ newParticipant.surname } ${ newParticipant.name }`);
-            await expect(page.getByRole('cell', { name: newParticipant.name }).first()).toBeVisible();
+            await expect(userPage.getByRole('cell', { name: newParticipant.name }).first()).toBeVisible();
         }
     });
 
-    test('[06] - Użytkownik tworzy scenariusz testowy', async ({ page }) => {
-        await selectDataset(page);
-        await (new ExperimentListPage(page)).useExperimentByName(newExperiment.name);
+    test('[06] - Użytkownik tworzy scenariusz testowy', async ({ userPage }) => {
+        await selectDataset(userPage);
+        await (new ExperimentListPage(userPage)).useExperimentByName(newExperiment.name);
 
-        const scenariosTab = new ScenariosTab(page);
+        const scenariosTab = new ScenariosTab(userPage);
         await scenariosTab.visit();
         await scenariosTab.addScenario(newScenario);
 
         await scenariosTab.visit();
-        await expect(page.getByRole('button', { name: newScenario.name }).first()).toBeVisible();
+        await expect(userPage.getByRole('button', { name: newScenario.name }).first()).toBeVisible();
     });
 
-    test('[07] - Użytkownik dodaje wykonania scenariusza', async ({ page }) => {
-        await selectDataset(page);
-        await (new ExperimentListPage(page)).useExperimentByName(newExperiment.name);
+    test('[07] - Użytkownik dodaje wykonania scenariusza', async ({ userPage }) => {
+        await selectDataset(userPage);
+        await (new ExperimentListPage(userPage)).useExperimentByName(newExperiment.name);
 
         for (const newScenarioExecution of newScenarioExecutions) {
-            const scenariosExecutionTab = new ScenariosExecutionsTab(page);
+            const scenariosExecutionTab = new ScenariosExecutionsTab(userPage);
             await scenariosExecutionTab.visit();
             await scenariosExecutionTab.addScenarioExecution(newScenarioExecution.scenarioName, newScenarioExecution.executionName);
             await scenariosExecutionTab.visit();
-            await expect(page.getByRole('button', { name: newScenarioExecution.executionName }).first()).toBeVisible();
+            await expect(userPage.getByRole('button', { name: newScenarioExecution.executionName }).first()).toBeVisible();
         }
     });
 
-    test('[08] - Użytkownik dodaje uczestników do wykonań scenariusza', async ({ page }) => {
-        await selectDataset(page);
-        await (new ExperimentListPage(page)).useExperimentByName(newExperiment.name);
+    test('[08] - Użytkownik dodaje uczestników do wykonań scenariusza', async ({ userPage }) => {
+        await selectDataset(userPage);
+        await (new ExperimentListPage(userPage)).useExperimentByName(newExperiment.name);
 
         for (const scenarioExecution of newScenarioExecutions) {
             let count = 1;
             for (const newActivity of newActivities) {
                 for (const participant of newActivity.participants) {
-                    const scenariosExecutionTab = new ScenariosExecutionsTab(page);
+                    const scenariosExecutionTab = new ScenariosExecutionsTab(userPage);
                     await scenariosExecutionTab.visit();
                     await scenariosExecutionTab.addParticipantToScenariosActivity({
                         participantName: participant,
@@ -241,94 +339,63 @@ test.describe.serial('Przejście całego procesu', () => {
         }
     });
 
-    test('[09] - Użytkownik tworzy nagrania', async ({ page }) => {
-        await selectDataset(page);
-        await (new ExperimentListPage(page)).useExperimentByName(newExperiment.name);
-
-        const newRecordings = [
-            {
-                scenarioExecutionName: 'ex-01',
-                activityExecutionName: 'Activity Execution: 1',
-                name: 'Audio Recording 1',
-                description: 'Audio recording for individual activity execution 1.',
-                link: 'https://www.test.com',
-                channel: 'Audio',
-                participant: 'James Anderson',
-            },
-            {
-                scenarioExecutionName: 'ex-01',
-                activityExecutionName: 'Activity Execution: 2',
-                name: 'BVP Recording 2',
-                description: 'BVP recording for individual activity execution 2.',
-                link: 'https://www.test.com',
-                channel: 'BVP',
-                participant: 'James Anderson',
-            },
-            {
-                scenarioExecutionName: 'ex-01',
-                activityExecutionName: 'Activity Execution: 3',
-                name: 'ECG Recording 3',
-                description: 'ECG recording for individual activity execution 3.',
-                link: 'https://www.test.com',
-                channel: 'ECG',
-                participant: 'James Anderson',
-            },
-            {
-                scenarioExecutionName: 'ex-01',
-                activityExecutionName: 'Activity Execution: 4',
-                name: 'EDA Recording 4',
-                description: 'EDA recording for individual activity execution 4.',
-                link: 'https://www.test.com',
-                channel: 'EDA',
-                participant: 'James Anderson',
-            },
-            {
-                scenarioExecutionName: 'ex-01',
-                activityExecutionName: 'Activity Execution: 5',
-                name: 'Depth Video 5',
-                description: 'Depth video recording for individual activity 5.',
-                link: 'https://www.test.com',
-                channel: 'Depth video',
-                participant: 'James Anderson',
-            },
-            {
-                scenarioExecutionName: 'ex-01',
-                activityExecutionName: 'Activity Execution: 6',
-                name: 'RGB Video 6',
-                description: 'RGB video recording for individual activity 6.',
-                link: 'https://www.test.com',
-                channel: 'RGB video',
-                participant: 'James Anderson',
-            },
-            // {
-            //     scenarioExecutionName: 'ex-01',
-            //     activityExecutionName: 'Activity Execution: 7',
-            //     name: 'Group EEG Recording 7',
-            //     description: 'EEG recording for group activity with three participants.',
-            //     link: 'https://www.test.com',
-            //     channel: 'EEG',
-            //     participant: 'James Anderson, Emma Carter, Caroline Kane',
-            // },
-            // {
-            //     scenarioExecutionName: 'ex-01',
-            //     activityExecutionName: 'Activity Execution: 8',
-            //     name: 'Temperature Recording 8',
-            //     description: 'Temperature recording for two-person activity.',
-            //     link: 'https://www.test.com',
-            //     channel: 'Temperature',
-            //     participant: 'James Anderson, Emma Carter',
-            // },
-        ];
+    test('[09] - Użytkownik tworzy nagrania', async ({ userPage }) => {
+        await selectDataset(userPage);
+        await (new ExperimentListPage(userPage)).useExperimentByName(newExperiment.name);
 
         for (const recording of newRecordings) {
-            const recordingsTab = new RecordingsTab(page);
+            const recordingsTab = new RecordingsTab(userPage);
             await recordingsTab.visit();
             await recordingsTab.addRecording(recording);
         }
     });
 
-    test('[10] - Użytkownik tworzy szeregi czasowe', async ({ page }) => {
+    test('[10] - Użytkownik tworzy szeregi czasowe', async ({ userPage }) => {
         // TODO: przenieść testy z time-series.spec.ts
+    });
+
+    test('[11] - Inny użytkownik rejestruje konto', async ({ page }) => {
+        const registrationPage = new RegistrationPage(page);
+        await registrationPage.visit();
+        await registrationPage.register(usernameOther, emailOther, emailOther, firstNameOther, lastNameOther);
+    });
+
+    test('[12] - Użytkownik dodaje uprawnienia dostępu', async ({ userPage }) => {
+        await selectDataset(userPage);
+        await new SettingsPage(userPage).visit();
+        const accessPermissionsTab = new AccessPermissionsTab(userPage);
+        await accessPermissionsTab.visit();
+        await accessPermissionsTab.addPermission(usernameOther, 'Reader');
+    });
+
+    test('[13] - Inny użytkonik nie może tworzyć eksperymentu', async ({ otherUserPage }) => {
+        await selectDataset(otherUserPage);
+
+        const experimentPage = new ExperimentPage(otherUserPage);
+        await experimentPage.visit();
+        await expect(otherUserPage.getByRole('Button', { name: 'Create' }).first()).toHaveCount(0);
+    });
+
+    test('[14] - Inny użytkonik nie może edytować składowych eksperymentu', async ({ otherUserPage }) => {
+        await selectDataset(otherUserPage);
+
+        await (new ExperimentListPage(otherUserPage)).useExperimentByName(newExperiment.name);
+
+        const participantsTab = new ParticipantsTab(otherUserPage);
+        await participantsTab.visit();
+        await expect(otherUserPage.getByRole('Button', { name: 'Add' }).first()).toHaveCount(0);
+
+        const scenariosTab = new ScenariosTab(otherUserPage);
+        await scenariosTab.visit();
+        await expect(otherUserPage.getByRole('Button', { name: 'Create' }).first()).toHaveCount(0);
+
+        const scenariosExecutionTab = new ScenariosExecutionsTab(otherUserPage);
+        await scenariosExecutionTab.visit();
+        await expect(otherUserPage.getByRole('Button', { name: 'Create' }).first()).toHaveCount(0);
+
+        const recordingsTab = new RecordingsTab(otherUserPage);
+        await recordingsTab.visit();
+        await expect(otherUserPage.getByRole('Button', { name: 'Create' }).first()).toHaveCount(0);
     });
 });
 

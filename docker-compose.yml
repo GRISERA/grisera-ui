@@ -16,8 +16,6 @@ services:
       - PERMISSIONS_ENDPOINT=http://auth-ms:3000/api/permissions
       - CLIENT_SECRET=6UkCrp7UqFy78vh5TVhkaYP0OuVagNTd
 
-
-
   frontend-ms:
     build:
       context: .
@@ -38,7 +36,7 @@ services:
 
 
   auth-ms:
-    image: ghcr.io/grisera/grisera-auth:2.1.6
+    image: ghcr.io/grisera/grisera-auth:2.1.8
     depends_on:
       - mongodb
     ports:
@@ -52,7 +50,7 @@ services:
       - CLIENT_SECRET=1FrVLc5QFTDNvrJVNvJdqkeWkcpulPJZ
 
   keycloak:
-    image: ghcr.io/grisera/grisera-auth-keycloak:2.1.7
+    image: ghcr.io/grisera/grisera-auth-keycloak:2.1.8
     depends_on:
       - postgres
     ports:
