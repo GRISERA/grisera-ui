@@ -1,17 +1,17 @@
 <template>
-  <v-tab-item>
+  <v-tab-item class="py-2">
     <v-container v-if="parameters && types">
       <collapse-listing :data="types">
         <template #panel-header="{ item }">
           <slot name="panel-header">
-            <h4>{{ transformParameterName(item) }}</h4>
+            <h4>{{ transformParameterName(item.name) }}</h4>
           </slot>
         </template>
         <template #panel-content="{ item }">
           <parameters-table-component
             v-if="parameters"
             :params="parameters"
-            :type="item"
+            :type="item.name"
           />
         </template>
       </collapse-listing>
@@ -48,7 +48,7 @@ export default {
     },
 
     getParametersTypes() {
-      this.types = DummyParametersTypes;
+      this.types = Object.values(DummyParametersTypes).map((value) => ({ name: value }));
     },
 
     transformParameterName(name) {

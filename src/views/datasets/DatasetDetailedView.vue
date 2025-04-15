@@ -161,7 +161,7 @@ export default {
         DatasetAPI.store(this.dataset)
           .then(({ data }) => {
             PermissionsService.add({
-              userId: this.user.userId,
+              userId: this.user.sub,
               datasetId: data.id,
               role: Roles.OWNER,
             }).then(({ data }) => {
