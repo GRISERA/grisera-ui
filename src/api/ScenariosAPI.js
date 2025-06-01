@@ -30,15 +30,15 @@ export default class extends BaseAPI2 {
   static dTOAPIToFront(data){
     const activities_ids = data.additional_properties?.filter(
       param => 'activity_id' === param.key,
-    ).map(e => e.value);
+    )?.map(e => e.value) || [];
     return {
       id: data.id,
-      name: data.additional_properties?.find(param => param.key === 'name').value,
-      description: data.additional_properties?.find(param => param.key === 'description').value,
+      name: data.additional_properties?.find(param => param.key === 'name')?.value,
+      description: data.additional_properties?.find(param => param.key === 'description')?.value,
       activity_ids: activities_ids,
-      additionalParameters: data.additional_properties.filter(
+      additionalParameters: data.additional_properties?.filter(
         param => !['name', 'description', 'activity_id'].includes(param.key),
-      ).map(e => {return { ...e, name: e.key };}),
+      )?.map(e => {return { ...e, name: e.key };}) || [],
     };
   }
 

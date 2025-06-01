@@ -23,10 +23,10 @@ export default class extends BaseAPI2 {
   }
 
   static dTOAPIToFront(data){
-    if(data.activity_executions.length === 0){
+    if(data.activity_executions?.length === 0){
       return {};
     }
-    if(data.activity_executions.some(item => Array.isArray(item))){
+    if(data.activity_executions?.some(item => Array.isArray(item))){
       return data.activity_executions?.map(activity_executions => {
         return this.dTOAPIToFront({ ...data, activity_executions: activity_executions });
       }) || [];
@@ -35,13 +35,13 @@ export default class extends BaseAPI2 {
     const activityExecutions = data.activity_executions?.map(e => ActivityExecutionsAPI.dTOAPIToFront(e));
     const additional_properties = activityExecutions?.map(activityExecution => activityExecution.additionalParameters).flat();// additional_properties of scenario executions are stored in one of their activity executions
     return {
-      id: activityExecutions[0].id,
+      id: activityExecutions?.[0]?.id,
       name: additional_properties?.find(param => param.key === 'scenarioExecutionName')?.value,
       activityExecutions: activityExecutions,
-      scenario: data.additional_properties?.find(param => param.key === 'name').value,
-      additionalParameters: additional_properties.filter(
+      scenario: data.additional_properties?.find(param => param.key === 'name')?.value,
+      additionalParameters: additional_properties?.filter(
         param => !['scenarioExecutionName'].includes(param.key),
-      ).map(e => {return { ...e, name: e.key };}),
+      )?.map(e => {return { ...e, name: e.key };}) || [],
     };
   }
 

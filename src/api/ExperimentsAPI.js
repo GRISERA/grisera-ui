@@ -47,16 +47,16 @@ export default class extends BaseAPI2 {
     return {
       id: data.id,
       name: data.experiment_name,
-      description: data.additional_properties.find(param => param.key === 'description').value,
-      creator: data.additional_properties.find(param => param.key === 'creator').value,
-      created_at: data.additional_properties.find(param => param.key === 'created_at').value,
-      footnote: data.additional_properties.find(param => param.key === 'footnote').value,
-      participants_ids: data.additional_properties.filter(
+      description: data.additional_properties?.find(param => param.key === 'description')?.value || '',
+      creator: data.additional_properties?.find(param => param.key === 'creator')?.value || '',
+      created_at: data.additional_properties?.find(param => param.key === 'created_at')?.value || '',
+      footnote: data.additional_properties?.find(param => param.key === 'footnote')?.value || '',
+      participants_ids: data.additional_properties?.filter(
         param => 'participant_id' === param.key,
-      ).map(e => e.value),
-      additionalParameters: data.additional_properties.filter(
+      )?.map(e => e.value) || [],
+      additionalParameters: data.additional_properties?.filter(
         param => !['description', 'creator', 'created_at', 'footnote', 'participant_id'].includes(param.key),
-      ).map(e => {return { ...e, name: e.key };}),
+      )?.map(e => {return { ...e, name: e.key };}) || [],
       scenarios: data.scenarios?.map(e => ScenariosAPI.dTOAPIToFront(e)),
       scenarioExecutions: scenarioExecutions,
     };
