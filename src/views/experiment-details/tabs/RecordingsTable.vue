@@ -4,6 +4,24 @@
     :items="dataToDisplay"
     :show-expand="true"
   >
+    <template #[`item.link`]="{ item }">
+      <td v-if="item.link">
+        {{ preparedLink(item.link) }}
+        <v-tooltip top>
+          <template #activator="{ on, attrs }">
+            <v-icon
+              v-bind="attrs"
+              v-on="on"
+              color="primary"
+              @click.stop.prevent="downloadFile(item)"
+            >
+              mdi-file-find
+            </v-icon>
+          </template>
+          <span>Click to preview</span>
+        </v-tooltip>
+      </td>
+    </template>
     <template #expanded-item="{ item }">
       <td :colspan="6">
         <v-container class="container--fluid px-0">
@@ -25,24 +43,17 @@
     </template>
     <template #actions="{ item }">
       <v-icon
-        class="mr-2"
-        color="primary"
-        @click.stop.prevent="download(item)"
-      >
-        mdi-download
-      </v-icon>
-      <v-icon
+        v-if="canEditAndDelete"
         class="mr-2"
         color="primary"
         @click.stop.prevent="goToEdition(item)"
-        v-if="canEditAndDelete"
       >
         mdi-pen
       </v-icon>
       <v-icon
+        v-if="canEditAndDelete"
         color="error"
         @click.stop.prevent="$emit('recordings:delete', item)"
-        v-if="canEditAndDelete"
       >
         mdi-delete
       </v-icon>
@@ -78,14 +89,12 @@ export default {
         { text: 'Name', value: 'name' },
         { text: 'Scenario Execution', value: 'scenarioExecution_name' },
         { text: 'Activity Execution', value: 'activityExecution_name' },
+        { text: 'Linked file', value: 'link' },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
     };
   },
   methods: {
-    download(item) {
-      this.downloadFile(item);
-    },
     goToEdition(item) {
       this.$router.push({
         name: 'experiment-recording-edit',
@@ -95,13 +104,12 @@ export default {
         },
       });
     },
-    async downloadFile(allInfo) {
-      const link = document.createElement('a');
-      link.href = allInfo.link;
-      link.download = '';
-      link.click();
+    downloadFile(allInfo) {
+      window.open(allInfo.link, '_blank');
+    },
+    preparedLink(link) {
+      return link.split('/').pop();
     },
   },
 };
 </script>
-    

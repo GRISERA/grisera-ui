@@ -77,17 +77,24 @@
                   v => !!v || 'This field is required'
                 ]"
               />
-              <v-text-field
-                v-model="item.link"
-                label="Link"
-                outlined
-                required
-                :rules="[
-                  l => !!l || 'This field is required',
-                  l => isValidHttpUrl(l) || 'Link has to be valid',
-                ]"
-              />
-              <!-- it no longer is a file but source link
+              <v-col v-if="item.link" class="col-12 my-auto">
+                <v-divider class="pt-4" />
+                Currently linked file:
+                {{ preparedLink(item.link) }}
+                <v-tooltip top>
+                  <template #activator="{ on, attrs }">
+                    <v-icon
+                      v-bind="attrs"
+                      v-on="on"
+                      color="primary"
+                      @click.stop.prevent="downloadFile(item)"
+                    >
+                      mdi-file-find
+                    </v-icon>
+                  </template>
+                  <span>Click to preview</span>
+                </v-tooltip>
+              </v-col>
               <v-col :flex="5">
                 <v-file-input
                   v-model="item.file"
@@ -96,7 +103,7 @@
                   outlined
                   @change="onFileChange(item)"
                 />
-              </v-col> -->
+              </v-col>
               <horizontal-text-divider
                 text="Channel info"
                 class="mb-2"
@@ -186,14 +193,12 @@
 </template>
 
 <script>
-import ExperimentsAPI from '@/api/ExperimentsAPI';
 import ChannelsAPI from '@/api/ChannelsAPI';
+import ExperimentsAPI from '@/api/ExperimentsAPI';
 import RecordingsAPI from '@/api/RecordingsAPI';
-import HorizontalTextDivider from '@/components/divider/HorizontalTextDivider.vue';
-import IndexedDB from '@/storage/IndexedDB';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
+import HorizontalTextDivider from '@/components/divider/HorizontalTextDivider.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
-import RegisteredDataAPI from '@/api/RegisteredDataAPI';
 
 export default {
   name: 'RecordingsAddEditView',
@@ -214,6 +219,7 @@ export default {
         description: undefined,
         data: [],
         link: '',
+        file: undefined,
       },
       dataProtoType: {
         channel: undefined,
@@ -239,10 +245,10 @@ export default {
           return;
         }
         this.onCreation().then(() => {
-          for(const scenarioExecution of this.experiment.scenarioExecutions){
-            for(const activityExecution of scenarioExecution.activityExecutions){
+          for (const scenarioExecution of this.experiment.scenarioExecutions) {
+            for (const activityExecution of scenarioExecution.activityExecutions) {
               const recording = activityExecution.recordings.find(recording => recording.registeredDataId === newValue);
-              if(recording){
+              if (recording) {
                 this.item = recording;
                 this.item.chosenScenarioExecution = scenarioExecution;
                 this.activityExecutions = this.item.chosenScenarioExecution.activityExecutions;
@@ -252,8 +258,9 @@ export default {
                 break;
               }
             }
-            if(this.item.chosenAE)
+            if (this.item.chosenAE) {
               break;
+            }
           }
         });
       },
@@ -264,23 +271,28 @@ export default {
     this.onCreation();
   },
   methods: {
+    onFileChange(file) {
+      if (!file || !file.file) {
+        return;
+      }
+
+      this.item.file = file.file;
+    },
     availableChannels(element) {
       let propertiesArray = this.item.data.filter(item => !!item.channel);
       propertiesArray = propertiesArray.map(object => object.channel.id);
-      let res = this.channels.filter(item => !propertiesArray.includes(item.id) || (!!element && item.id == element.id));
-      return res;
+
+      return this.channels.filter(item => !propertiesArray.includes(item.id) || (!!element && item.id == element.id));
     },
-    onCreation(){
+    onCreation() {
       this.item.data.push(this.createDataPrototype());
-      ChannelsAPI.index()
-          .then(({ data }) => {
-            this.channels = data;
-          });
+      ChannelsAPI.index().then(({ data }) => this.channels = data);
+
       return ExperimentsAPI.show(this.$route.params.experiment)
         .then(async ({ data }) => {
           this.experiment = data;
           this.scenarioExecutions = this.experiment.scenarioExecutions.reverse();
-        }); 
+        });
     },
     deleteItem(file, event) {
       const index = this.item.data.indexOf(file);
@@ -302,8 +314,9 @@ export default {
         this.participants = [];
       }
       this.item.data.forEach(obj => {
-        if (obj.participants)
+        if (obj.participants) {
           obj.participants = [];
+        }
       });
       this.$refs.form.resetValidation();
     },
@@ -320,18 +333,14 @@ export default {
       }
       const method = this.isEditMode ? 'update' : 'store';
 
-      RecordingsAPI[method](this.item).then(() => {
-        this.$router.go(-1);
-      });
+      RecordingsAPI[method](this.item, this.item.file)
+        .then(() => this.$router.go(-1));
     },
-    isValidHttpUrl(urlToCheck) {
-      let url;
-      try {
-        url = new URL(urlToCheck);
-      } catch (_) {
-        return false;  
-      }
-      return url.protocol === 'http:' || url.protocol === 'https:';
+    downloadFile(allInfo) {
+      window.open(allInfo.link, '_blank');
+    },
+    preparedLink(link) {
+      return link.split('/').pop();
     },
   },
 };
@@ -354,4 +363,3 @@ export default {
   transform: translateY(+75%);
 }
 </style>
-    

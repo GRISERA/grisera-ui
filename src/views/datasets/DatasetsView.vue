@@ -8,6 +8,12 @@
       <v-col class="text-right">
         <v-btn
           :outlined="true"
+          @click.prevent.stop="onTestGetHandler"
+        >
+          TEST GET
+        </v-btn>
+        <v-btn
+          :outlined="true"
           @click.prevent.stop="$router.push({ name: 'dataset-creation' })"
         >
           Create
@@ -105,6 +111,7 @@
 </template>
 
 <script>
+import { apiService } from '@/api/BaseAPI2';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 import AccessRoles from '@/const/AccessRoles';
@@ -146,6 +153,10 @@ export default {
     canEditDataset(datasetId) {
       const permission = this.permissions.find(permission => permission.datasetId == datasetId);
       return permission && permission.role != AccessRoles.READER;
+    },
+    async onTestGetHandler() {
+      const response = await apiService.get('/dupa?dataset_id=683335100fd800d95be6b50e');
+      console.log(response.status);
     },
   },
 };
