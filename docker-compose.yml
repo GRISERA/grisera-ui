@@ -16,8 +16,6 @@ services:
       - PERMISSIONS_ENDPOINT=http://auth-ms:3000/api/permissions
       - CLIENT_SECRET=6UkCrp7UqFy78vh5TVhkaYP0OuVagNTd
 
-
-
   frontend-ms:
     build:
       context: .
@@ -35,7 +33,6 @@ services:
       - VUE_APP_KEYCLOAK_URL=http://localhost:8090
       - VUE_APP_KEYCLOAK_CLIENT_ID=grisera-ui
       - VUE_APP_KEYCLOAK_REALM=grisera
-
 
   auth-ms:
     image: ghcr.io/grisera/grisera-auth:2.1.8
