@@ -36,7 +36,6 @@ services:
       - VUE_APP_KEYCLOAK_CLIENT_ID=grisera-ui
       - VUE_APP_KEYCLOAK_REALM=grisera
 
-
   auth-ms:
     image: ghcr.io/grisera/grisera-auth:2.1.8
     depends_on:
