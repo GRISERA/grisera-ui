@@ -57,6 +57,12 @@
                 </v-icon>
               </template>
               <v-list>
+                <v-list-item @click="account()">
+                  <v-list-item-icon>
+                    <v-icon v-text="'mdi-account'" />
+                  </v-list-item-icon>
+                  <v-list-item-title>Account</v-list-item-title>
+                </v-list-item>
                 <v-list-item @click="logout()">
                   <v-list-item-icon>
                     <v-icon v-text="'mdi-logout'" />
@@ -84,12 +90,15 @@ export default {
     };
   },
   mounted() {
-    this.userName = this.$keycloak.tokenParsed?.preferred_username || 'Guest';
+    this.userName = keycloak.tokenParsed?.preferred_username || 'Guest';
   },
   methods: {
     logout() {
       AuthService.logout();
       this.$router.push('/login');
+    },
+    account() {
+      AuthService.accountManagement();
     },
   },
   computed: {
