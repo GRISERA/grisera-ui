@@ -15,6 +15,10 @@ export default {
     });
   },
 
+  accountManagement() {
+    return keycloak.accountManagement();
+  },
+
   isAuthenticated() {
     return keycloak.authenticated;
   },
