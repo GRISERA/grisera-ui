@@ -79,7 +79,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const token = AuthService.getTokenParsed();
+  const token = AuthService.getIdTokenParsed();
   if(token) {
     router.app.$store.commit('setUser', token);
   }

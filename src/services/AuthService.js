@@ -34,4 +34,8 @@ export default {
   getTokenParsed()  {
     return keycloak.tokenParsed;
   },
+
+  getIdTokenParsed()  {
+    return keycloak.idTokenParsed;
+  },
 };

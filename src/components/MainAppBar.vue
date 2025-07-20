@@ -90,7 +90,7 @@ export default {
     };
   },
   mounted() {
-    this.userName = keycloak.tokenParsed?.preferred_username || 'Guest';
+    this.userName = AuthService.getIdTokenParsed()?.preferred_username || 'Guest';
   },
   methods: {
     logout() {
