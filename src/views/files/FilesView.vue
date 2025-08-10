@@ -8,6 +8,7 @@
       <v-col class="text-right">
         <v-btn
           color="primary"
+          data-testid="upload-file-button"
           @click="uploadDialog = true"
         >
           <v-icon left>
@@ -22,6 +23,7 @@
           :items="files"
           :loading="loading"
           class="elevation-1"
+          data-testid="files-table"
         >
           <template #[`item.size`]="{ item }">
             {{ formatFileSize(item.size) }}
@@ -37,6 +39,7 @@
                   color="primary"
                   small
                   v-bind="attrs"
+                  data-testid="preview-file-button"
                   @click="previewFile(item)"
                   v-on="on"
                 >
@@ -52,6 +55,7 @@
                   color="success"
                   small
                   v-bind="attrs"
+                  data-testid="download-file-button"
                   @click="downloadFile(item)"
                   v-on="on"
                 >
@@ -66,6 +70,7 @@
                   color="error"
                   small
                   v-bind="attrs"
+                  data-testid="delete-file-button"
                   @click="openDeleteConfirmDialog(item)"
                   v-on="on"
                 >
@@ -84,6 +89,7 @@
       v-model="uploadDialog"
       max-width="500px"
       persistent
+      data-testid="upload-dialog"
     >
       <v-card>
         <v-card-title>
@@ -98,6 +104,7 @@
               outlined
               placeholder="Enter name for the file"
               prepend-icon="mdi-rename-box"
+              data-testid="file-name-input"
             />
             <v-file-input
               v-model="selectedFile"
@@ -106,6 +113,8 @@
               outlined
               prepend-icon="mdi-paperclip"
               show-size
+              data-testid="file-input"
+              class="file-input-test"
             />
           </v-form>
         </v-card-text>
@@ -114,6 +123,7 @@
           <v-btn
             color="grey darken-1"
             text
+            data-testid="upload-cancel-button"
             @click="closeUploadDialog"
           >
             Cancel
@@ -121,6 +131,7 @@
           <v-btn
             :loading="uploading"
             color="primary"
+            data-testid="upload-submit-button"
             @click="uploadFile"
           >
             Upload

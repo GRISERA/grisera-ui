@@ -12,8 +12,9 @@ import { ScenariosExecutionsTab } from '../pages/ScenariosExecutionsTab';
 import { RecordingsTab } from '../pages/RecordingsTab';
 import generateRandomEmail from '../utils/generate-random-email';
 import { RegistrationPage } from '../pages/RegistrationPage';
+import { randomUUID } from 'crypto';
 
-const hash = Math.random().toString(36).substring(2);
+const hash = randomUUID().slice(0, 8);
 
 const newDataset = {
     name: `Inconsistency dataset ${ hash }`,
