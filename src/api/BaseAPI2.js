@@ -22,55 +22,65 @@ export default class BaseAPI2 {
     return '';
   }
 
+
   static getDatasetName() {
-    return `dataset_id=${Vue.prototype.$store.state?.dataset?.id || null}`;
+    return `dataset_id=${ Vue.prototype.$store.state?.dataset?.id || null }`;
   }
 
-  static getReturnValues(){
+
+  static getReturnValues() {
     return this.getBasePath();
   }
 
-  static dTOFrontToAPI(data){
+
+  static dTOFrontToAPI(data) {
     return {};
   }
 
-  static dTOAPIToFront(data){
+
+  static dTOAPIToFront(data) {
     return {};
   }
 
 
   static index() {
-    return apiService.get(`/${this.getBasePath()}?${this.getDatasetName()}`).then(({ data }) => {
-        data = data[this.getReturnValues()].map(e => this.dTOAPIToFront(e));
-        return { data };
+    return apiService.get(`/${ this.getBasePath() }?${ this.getDatasetName() }`).then(({ data }) => {
+      data = data[this.getReturnValues()].map(e => this.dTOAPIToFront(e));
+      return { data };
     });
   }
+
 
   static show(id, depth = 0) {
-    if(!id)
+    if (!id) {
       return {};
+    }
 
-    return apiService.get(`/${this.getBasePath()}/${id}?${this.getDatasetName()}&depth=${depth}`).then(({ data }) => {
-        data = this.dTOAPIToFront(data);
-        return { data };
+    return apiService.get(`/${ this.getBasePath() }/${ id }?${ this.getDatasetName() }&depth=${ depth }`).then(({ data }) => {
+      data = this.dTOAPIToFront(data);
+      return { data };
     });
   }
 
+
   static store(data) {
-    return apiService.post(`/${this.getBasePath()}?${this.getDatasetName()}`, this.dTOFrontToAPI(data));
+    return apiService.post(`/${ this.getBasePath() }?${ this.getDatasetName() }`, this.dTOFrontToAPI(data));
   }
+
 
   static update(data) {
-    return apiService.put(`/${this.getBasePath()}/${data.id}?${this.getDatasetName()}`, this.dTOFrontToAPI(data));
+    return apiService.put(`/${ this.getBasePath() }/${ data.id }?${ this.getDatasetName() }`, this.dTOFrontToAPI(data));
   }
+
 
   static delete(id) {
-    return apiService.delete(`/${this.getBasePath()}/${id}?${this.getDatasetName()}`);
+    return apiService.delete(`/${ this.getBasePath() }/${ id }?${ this.getDatasetName() }`);
   }
 
+
   static count() {
-    return apiService.get(`/${this.getBasePath()}?${this.getDatasetName()}`).then(({ data }) => {
-        return data[this.getBasePath()].length;
-      });
+    return apiService.get(`/${ this.getBasePath() }?${ this.getDatasetName() }`).then(({ data }) => {
+      return data[this.getBasePath()].length;
+    });
   }
 }

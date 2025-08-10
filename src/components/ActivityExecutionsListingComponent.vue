@@ -4,6 +4,11 @@
     :items="activityExecutions"
     :show-expand="true"
   >
+    <template #[`item.name`]="{ item }">
+      <div :test-data="item.name">
+        {{ item.name }}
+      </div>
+    </template>
     <template #[`item.type`]="{ item }">
       <td>
         <v-chip
@@ -56,7 +61,7 @@
         </template>
       </td>
     </template>
-    <template 
+    <template
       #actions="{ item }"
       v-if="canEditActivityExecution"
     >
@@ -64,60 +69,63 @@
         class="mr-2"
         color="primary"
         @click.stop.prevent="$emit('activity-execution:edit', item)"
+        :data-testid="'edit-activity-execution'"
       >
         mdi-pen
-      </v-icon>  
+      </v-icon>
     </template>
   </base-table>
 </template>
-  
-  <script>
-  import BaseTable from '@/components/base/BaseTable.vue';
-  import ActivityExecutionsParticipantTableComponent from '@/components/ActivityExecutionsParticipantTableComponent.vue';
-  
-  export default {
-    name: 'ActivityExecutionsListingComponent',
-    components: {
-      BaseTable,
-      ActivityExecutionsParticipantTableComponent,
+
+<script>
+import BaseTable from '@/components/base/BaseTable.vue';
+import ActivityExecutionsParticipantTableComponent from '@/components/ActivityExecutionsParticipantTableComponent.vue';
+import HorizontalTextDivider from '@/components/divider/HorizontalTextDivider.vue';
+
+export default {
+  name: 'ActivityExecutionsListingComponent',
+  components: {
+    HorizontalTextDivider,
+    BaseTable,
+    ActivityExecutionsParticipantTableComponent,
+  },
+  props: {
+    activityExecutions: {
+      type: Array,
+      default: () => ([]),
     },
-    props: {
-      activityExecutions: {
-        type: Array,
-        default: () => ([]),
-      },
-      canEditActivityExecution: Boolean,
-    },
-    data() {
-      return {
-        activityExecutionNames: {},
-        headers: [
+    canEditActivityExecution: Boolean,
+  },
+  data() {
+    return {
+      activityExecutionNames: {},
+      headers: [
         { text: 'ID', value: 'id', sortable: false },
         { text: 'Name', value: 'name', sortable: true },
         { text: 'Type', value: 'type', sortable: true },
       ],
-      };
+    };
+  },
+  created() {
+    if (this.canEditActivityExecution) {
+      this.headers.push({ text: 'Actions', value: 'actions', sortable: false });
+    }
+  },
+  methods: {
+    getActivityTypeChipColor(type) {
+      return {
+        ['Individual']: 'accent',
+        ['Two persons activity']: 'primary',
+        ['Group activity']: 'success',
+      }[type];
     },
-    created() {
-      if(this.canEditActivityExecution) {
-        this.headers.push({ text: 'Actions', value: 'actions', sortable: false });
-      }
-    },
-    methods: {
-      getActivityTypeChipColor(type) {
-        return {
-          ['Individual']: 'accent',
-          ['Two persons activity']: 'primary',
-          ['Group activity']: 'success',
-        }[type];
-      },
-    },
+  },
 };
 </script>
-  
-  <style scoped>
-  ::v-deep .v-timeline-item__body {
-    margin: auto;
-  }
-  </style>
+
+<style scoped>
+::v-deep .v-timeline-item__body {
+  margin: auto;
+}
+</style>
   

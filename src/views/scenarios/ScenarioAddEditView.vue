@@ -76,7 +76,10 @@
                           {{ item.name }}
                         </template>
                         <template #item="{ item }">
-                          {{ item.name }}
+                          <div class="flex flex-col">
+                            <activity-type-chip :activity="item" />
+                            {{ item.name }}
+                          </div>
                         </template>
                       </v-autocomplete>
                     </v-card-text>
@@ -128,6 +131,7 @@
 <script>
 import ScenariosAPI from '@/api/ScenariosAPI';
 import ActivitiesAPI from '@/api/ActivitiesAPI';
+import ActivityTypeChip from '@/components/chips/ActivityTypeChip.vue';
 import HorizontalTextDivider from '@/components/divider/HorizontalTextDivider.vue';
 import TimelineActivityItem from '@/views/scenarios/components/TimelineActivityItem.vue';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
@@ -138,6 +142,7 @@ import ExperimentsAPI from '@/api/ExperimentsAPI';
 export default {
   name: 'ScenarioAddEditView',
   components: {
+    ActivityTypeChip,
     InfoToolTipComponent,
     AppBreadcrumbs,
     TimelineActivityItem,
@@ -167,28 +172,28 @@ export default {
         }
 
         ScenariosAPI.show(newValue)
-            .then(({ data }) => {
-              this.item = data;
-              this.isEditMode = true;
-            });
+          .then(({ data }) => {
+            this.item = data;
+            this.isEditMode = true;
+          });
       },
       immediate: true,
     },
     '$route.params.experiment': {
       handler(newValue) {
         ExperimentsAPI.show(newValue, 0)
-            .then(({ data }) => {
-              this.experiment = data;
-            });
+          .then(({ data }) => {
+            this.experiment = data;
+          });
       },
       immediate: true,
     },
   },
   created() {
     ActivitiesAPI.index()
-        .then(({ data }) => {
-          this.activities = data;
-        });
+      .then(({ data }) => {
+        this.activities = data;
+      });
   },
   methods: {
     performAction() {
@@ -199,9 +204,9 @@ export default {
       const method = this.isEditMode ? 'update' : 'store';
 
       ScenariosAPI[method]({ ...this.item, experiment: this.$route.params.experiment })
-          .then(() => {
-            this.$router.go(-1);
-          });
+        .then(() => {
+          this.$router.go(-1);
+        });
     },
     removeExistingActivity(index) {
       this.item.activities.splice(index, 1);
