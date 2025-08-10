@@ -155,3 +155,6 @@ node_modules
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# E2E Test Authentication
+/e2e-tests/auth-state.json

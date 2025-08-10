@@ -1,26 +1,30 @@
 import { expect, test } from '@playwright/test';
-import { LoginPage } from '../pages/LoginPage';
-import { DatasetListPage } from '../pages/DatasetListPage';
 import { FilesPage } from '../pages/FilesPage';
+import { AuthHelper } from '../utils/auth-helper';
 import path from 'path';
 import { randomUUID } from 'crypto';
 
 let testFilesCreated: string[] = [];
 let filesPage: FilesPage;
+let authHelper: AuthHelper;
+
+let isSetupDone = false;
 
 test.beforeEach(async ({ page }) => {
-    // Login and select dataset before each test
-    await new LoginPage(page).loggedInAsDefaultUser();
-    const datasetListPage = new DatasetListPage(page);
-    await datasetListPage.usingAnyDataset();
-    
-    // Initialize FilesPage
+    // Initialize helpers
+    authHelper = new AuthHelper(page);
     filesPage = new FilesPage(page);
+    
+    // Ensure authenticated with dataset access
+    await authHelper.ensureAuthenticatedWithDataset();
     
     testFilesCreated = [];
     
-    // Clean up any old test files that might be left from previous runs
-    await filesPage.cleanupAllTestFiles();
+    // Only clean up once at the start of test suite
+    if (!isSetupDone) {
+        await filesPage.cleanupAllTestFiles();
+        isSetupDone = true;
+    }
 });
 
 test.afterEach(async ({ page }) => {
@@ -106,61 +110,34 @@ test.describe('Files Management', () => {
         let uploadRequestMade = false;
         let uploadResponse = null;
         
+        // Simplified request tracking
         page.on('request', request => {
             if (request.url().includes('/files/upload')) {
                 uploadRequestMade = true;
-                console.log('Upload request made to:', request.url());
             }
         });
         
         page.on('response', response => {
             if (response.url().includes('/files/upload')) {
                 uploadResponse = response;
-                console.log(`Upload response: ${response.status()} - ${response.statusText()}`);
-            }
-            if (response.url().includes('/files?') && !response.url().includes('upload')) {
-                response.json().then(data => {
-                    console.log(`Files list request: ${response.status()} - Files count: ${data.files?.length || 0}`);
-                }).catch(() => {
-                    console.log(`Files list request: ${response.status()} - ${response.url()}`);
-                });
-            }
-        });
-        
-        page.on('requestfailed', request => {
-            if (request.url().includes('/files/upload')) {
-                console.log(`Upload request failed: ${request.url()} - ${request.failure()?.errorText}`);
             }
         });
         
         await filesPage.visit();
         
-        // Get initial files count
+        // Just wait for page to load
         await filesPage.waitForFilesTableLoad();
-        const initialCount = await filesPage.getFilesCount();
         
         // Upload file
         await filesPage.uploadFile(testFileName, testFilePath);
         
-        // Wait longer for the loadFiles() call to complete after upload
-        await page.waitForTimeout(5000);
-        
-        // Force page refresh to ensure table is up to date
-        await page.reload();
-        await filesPage.waitForFilesTableLoad();
+        // Reduced wait time - just enough for upload to complete
+        await page.waitForTimeout(1000);
         
         // Should close dialog after successful upload
         await expect(page.locator('.v-dialog .v-card')).not.toBeVisible();
         
-        // Debug: check files count and table content
-        const finalCount = await filesPage.getFilesCount();
-        console.log(`Files count after upload: ${finalCount} (was ${initialCount})`);
-        console.log('Upload request made:', uploadRequestMade);
-        console.log('Upload response status:', uploadResponse?.status());
-        
-        // Check if table is loading
-        const isLoading = await page.locator('.v-data-table').locator('.v-skeleton-loader').isVisible();
-        console.log('Table loading state:', isLoading);
+        // Remove debug logging to speed up tests
         
         // Main assertion: upload was successful (we got 201 status)
         expect(uploadRequestMade).toBe(true);
@@ -251,27 +228,12 @@ test.describe('Files Management', () => {
         testFilesCreated.push(testFileName);
         
         // Wait a moment for file to appear
-        await page.waitForTimeout(1000);
-        
-        // Debug: check if file is visible before trying to delete
-        const isVisible = await filesPage.isFileVisible(testFileName);
-        console.log(`File "${testFileName}" visible before delete: ${isVisible}`);
-        
-        // If not visible, try refreshing page
-        if (!isVisible) {
-            await page.reload();
-            await filesPage.waitForFilesTableLoad();
-            const isVisibleAfterRefresh = await filesPage.isFileVisible(testFileName);
-            console.log(`File visible after refresh: ${isVisibleAfterRefresh}`);
-        }
+        await page.waitForTimeout(500);
         
         // Test that delete button is present (main assertion)
         const fileRow = await filesPage.getFileRowByName(testFileName);
         const deleteButton = fileRow.getByTestId('delete-file-button');
         await expect(deleteButton).toBeVisible();
-        
-        // The fact that upload worked and delete button exists shows the functionality is working
-        console.log('Delete functionality available - test passes');
     });
 
     test('Should delete file successfully', async ({ page }) => {
@@ -292,8 +254,6 @@ test.describe('Files Management', () => {
         const fileRow = await filesPage.getFileRowByName(testFileName);
         const deleteButton = fileRow.getByTestId('delete-file-button');
         await expect(deleteButton).toBeVisible();
-        
-        console.log('Delete functionality available - basic delete test passes');
     });
 
     test('Should handle multiple file uploads', async ({ page }) => {
@@ -301,8 +261,6 @@ test.describe('Files Management', () => {
         
         await filesPage.visit();
         await filesPage.waitForFilesTableLoad();
-        
-        const initialCount = await filesPage.getFilesCount();
         const testId = randomUUID();
         const filesToUpload = [
             `Multi File 1 ${testId}`,
@@ -325,8 +283,8 @@ test.describe('Files Management', () => {
             uploadPromises.push(uploadPromise);
             
             await filesPage.uploadFile(fileName, testFilePath);
-            // Small delay between uploads
-            await page.waitForTimeout(500);
+            // Reduced delay between uploads
+            await page.waitForTimeout(200);
         }
         
         // Wait for all uploads to complete
