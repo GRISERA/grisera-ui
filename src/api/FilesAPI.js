@@ -35,9 +35,7 @@ export default class extends BaseAPI2 {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('name', name);
-    if (datasetId) {
-      formData.append('dataset_id', datasetId);
-    }
+    formData.append('dataset_id', datasetId);
     
     return apiService.post(`/${this.getBasePath()}/upload?${this.getDatasetName()}`, formData, {
       headers: {
