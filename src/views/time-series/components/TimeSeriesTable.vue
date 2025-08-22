@@ -59,6 +59,7 @@
 </template>
 
 <script>
+import RegisteredDataAPI from '@/api/RegisteredDataAPI';
 import BaseTable from '@/components/base/BaseTable.vue';
 import TimeSeriesApi from '@/api/TimeSeriesApi';
 import ObservableInformationsTable from '@/views/time-series/components/ObservableInformationsTable.vue';
@@ -107,8 +108,9 @@ export default {
         },
       });
     },
-    downloadFile(allInfo) {
-      window.open(allInfo.link, '_blank');
+    async downloadFile(item) {
+      const response = await RegisteredDataAPI.getPreviewUrl(item.link);
+      window.open(response.data.preview_url, '_blank');
     },
     preparedLink(link) {
       return link.split('/').pop();

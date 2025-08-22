@@ -29,6 +29,10 @@ export default class extends BaseAPI2 {
     });
   }
 
+  static getPreviewUrl(objectName) {
+    return apiService.get(`/time-series/preview/${ encodeURIComponent(objectName) }?${ this.getDatasetName() }`);
+  }
+
 
   static dTOFrontToAPI(data) {
     return {
@@ -54,6 +58,7 @@ export default class extends BaseAPI2 {
       measureId: data.measure_id,
       type: data.type,
       link: data.source,
+      objectName: data.object_name, // Add object_name for presigned URLs
       spacing: data.additional_properties?.find(param => param.key === 'spacing').value,
       additionalParameters: data.additional_properties.filter(
         param => !['spacing'].includes(param.key),
@@ -86,7 +91,7 @@ export default class extends BaseAPI2 {
       data.observableInformationIds = observableInformations.map(item => item.data.id);
 
       return this.uploadFile(file).then(response => {
-        data.link = response?.data?.file_url ? response.data.file_url : data.link;
+        data.link = response?.data?.object_name ? response.data.object_name : data.link;
         return super.store(data);
       });
     });
@@ -111,7 +116,7 @@ export default class extends BaseAPI2 {
         data.observableInformationIds = results.slice(observableInformationsToDelete.length).map(e => e.data.id);
 
         const updatedValues = await this.uploadFile(file).then(response => {
-          data.link = response?.data?.file_url ? response.data.file_url : data.link;
+          data.link = response?.data?.object_name ? response.data.object_name : data.link;
           return super.update(data);
         });
 

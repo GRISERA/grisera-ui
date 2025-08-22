@@ -241,6 +241,7 @@
 </template>
 
 <script>
+import RegisteredDataAPI from '@/api/RegisteredDataAPI';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import LifeActivitiesAPI from '@/api/LifeActivitiesAPI';
 import MeasuresAPI from '@/api/MeasuresAPI';
@@ -367,8 +368,9 @@ export default {
       }
       event.target.blur();
     },
-    downloadFile(allInfo) {
-      window.open(allInfo.link, '_blank');
+    async downloadFile(item) {
+      const response = await RegisteredDataAPI.getPreviewUrl(item.link);
+      window.open(response.data.preview_url, '_blank');
     },
     preparedLink(link) {
       return link.split('/').pop();
