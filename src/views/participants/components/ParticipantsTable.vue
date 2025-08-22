@@ -14,8 +14,10 @@
         </v-chip>
         <span v-else>-</span>
       </template>
-      
-      <template #actions="{ item }">
+      <template
+        v-if="aclCan(aclName.PARTICIPANT.EDIT)"
+        #actions="{ item }"
+      >
         <v-icon
           class="mr-2"
           color="primary"
@@ -30,15 +32,16 @@
       v-if="selectedParticipant"
       v-model="editDialog"
       :participant-data="selectedParticipant"
-      @saved="onParticipantSaved"
       @close="editDialog = false"
+      @saved="onParticipantSaved"
     />
   </div>
 </template>
 
 <script>
-import BaseTable from '@/components/base/BaseTable.vue';
 import ParticipantsAPI from '@/api/ParticipantsAPI';
+import BaseTable from '@/components/base/BaseTable.vue';
+import aclMixin from '@/mixins/acl-mixin';
 import ParticipantEditDialog from './ParticipantEditDialog.vue';
 
 export default {
@@ -47,6 +50,9 @@ export default {
     BaseTable,
     ParticipantEditDialog,
   },
+  mixins: [
+    aclMixin,
+  ],
   data() {
     return {
       headers: [

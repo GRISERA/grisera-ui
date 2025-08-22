@@ -4,7 +4,10 @@
       :headers="headers"
       :items="modalities"
     >
-      <template #actions="{ item }">
+      <template
+        v-if="aclCan(aclName.MODALITY.EDIT)"
+        #actions="{ item }"
+      >
         <v-icon
           class="mr-2"
           color="primary"
@@ -18,15 +21,16 @@
     <modality-edit-dialog
       v-model="editDialog"
       :modality-data="selectedModality"
-      @saved="onModalitySaved"
       @close="editDialog = false"
+      @saved="onModalitySaved"
     />
   </div>
 </template>
 
 <script>
-import BaseTable from '@/components/base/BaseTable.vue';
 import ModalitiesAPI from '@/api/ModalitiesAPI';
+import BaseTable from '@/components/base/BaseTable.vue';
+import aclMixin from '@/mixins/acl-mixin';
 import ModalityEditDialog from './ModalityEditDialog.vue';
 
 export default {
@@ -35,6 +39,9 @@ export default {
     BaseTable,
     ModalityEditDialog,
   },
+  mixins: [
+    aclMixin,
+  ],
   data() {
     return {
       headers: [

@@ -4,7 +4,10 @@
       :headers="headers"
       :items="lifeActivities"
     >
-      <template #actions="{ item }">
+      <template
+        v-if="aclCan(aclName.LIFE_ACTIVITY.EDIT)"
+        #actions="{ item }"
+      >
         <v-icon
           class="mr-2"
           color="primary"
@@ -18,15 +21,16 @@
     <life-activity-edit-dialog
       v-model="editDialog"
       :life-activity-data="selectedLifeActivity"
-      @saved="onLifeActivitySaved"
       @close="editDialog = false"
+      @saved="onLifeActivitySaved"
     />
   </div>
 </template>
 
 <script>
-import BaseTable from '@/components/base/BaseTable.vue';
 import LifeActivitiesAPI from '@/api/LifeActivitiesAPI';
+import BaseTable from '@/components/base/BaseTable.vue';
+import aclMixin from '@/mixins/acl-mixin';
 import LifeActivityEditDialog from './LifeActivityEditDialog.vue';
 
 export default {
@@ -35,6 +39,9 @@ export default {
     BaseTable,
     LifeActivityEditDialog,
   },
+  mixins: [
+    aclMixin,
+  ],
   data() {
     return {
       headers: [

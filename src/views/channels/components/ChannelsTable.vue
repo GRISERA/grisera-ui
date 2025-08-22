@@ -4,7 +4,10 @@
       :headers="headers"
       :items="channels"
     >
-      <template #actions="{ item }">
+      <template
+        v-if="aclCan(aclName.CHANNEL.EDIT)"
+        #actions="{ item }"
+      >
         <v-icon
           class="mr-2"
           color="primary"
@@ -18,15 +21,16 @@
     <channel-edit-dialog
       v-model="editDialog"
       :channel-data="selectedChannel"
-      @saved="onChannelSaved"
       @close="editDialog = false"
+      @saved="onChannelSaved"
     />
   </div>
 </template>
 
 <script>
-import BaseTable from '@/components/base/BaseTable.vue';
 import ChannelsAPI from '@/api/ChannelsAPI';
+import BaseTable from '@/components/base/BaseTable.vue';
+import aclMixin from '@/mixins/acl-mixin';
 import ChannelEditDialog from './ChannelEditDialog.vue';
 
 export default {
@@ -35,6 +39,9 @@ export default {
     BaseTable,
     ChannelEditDialog,
   },
+  mixins: [
+    aclMixin,
+  ],
   data() {
     return {
       headers: [
