@@ -8,7 +8,6 @@ export default {
   GROUP_ACTIVITY: 'A pattern of a group activity done within an experiment. This pattern describes an activity which is performed by three or more participants together.',
   INDIVIDUAL_ACTIVITY: 'A pattern of an individual activity done within an experiment. This pattern describes an activity which is performed by one participant only.',
   LIFE_ACTIVITY: 'Conscious and unconscious actions of a human body, which generate a specified symptom of an emotional state, which can be further analysed in a process of emotion recognition.',
-  MEASURE: 'Measured or estimated value which is stored within time series.',
   MODALITY: 'A type of observable information which is used as a proxy for the emotion recognition.',
   PARTICIPANT: 'A person taking part in an experiment.',
   PARTICIPANT_STATE: 'A state of a participant at a specific period of time.',
