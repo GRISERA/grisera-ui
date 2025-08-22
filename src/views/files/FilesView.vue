@@ -37,9 +37,9 @@
                 <v-icon
                   class="mr-2"
                   color="primary"
+                  data-testid="preview-file-button"
                   small
                   v-bind="attrs"
-                  data-testid="preview-file-button"
                   @click="previewFile(item)"
                   v-on="on"
                 >
@@ -53,9 +53,9 @@
                 <v-icon
                   class="mr-2"
                   color="success"
+                  data-testid="download-file-button"
                   small
                   v-bind="attrs"
-                  data-testid="download-file-button"
                   @click="downloadFile(item)"
                   v-on="on"
                 >
@@ -68,9 +68,9 @@
               <template #activator="{ on, attrs }">
                 <v-icon
                   color="error"
+                  data-testid="delete-file-button"
                   small
                   v-bind="attrs"
-                  data-testid="delete-file-button"
                   @click="openDeleteConfirmDialog(item)"
                   v-on="on"
                 >
@@ -87,9 +87,9 @@
     <!-- Upload Dialog -->
     <v-dialog
       v-model="uploadDialog"
+      data-testid="upload-dialog"
       max-width="500px"
       persistent
-      data-testid="upload-dialog"
     >
       <v-card>
         <v-card-title>
@@ -97,15 +97,6 @@
         </v-card-title>
         <v-card-text>
           <v-form ref="uploadForm">
-            <v-text-field
-              v-model="fileName"
-              :rules="[v => !!v || 'File name is required']"
-              label="File name"
-              outlined
-              placeholder="Enter name for the file"
-              prepend-icon="mdi-rename-box"
-              data-testid="file-name-input"
-            />
             <v-file-input
               v-model="selectedFile"
               :rules="[v => !!v || 'File is required']"
@@ -113,17 +104,31 @@
               outlined
               prepend-icon="mdi-paperclip"
               show-size
-              data-testid="file-input"
-              class="file-input-test"
+              @change="validateFile"
             />
+            <v-text-field
+              v-model="fileName"
+              :rules="[v => !!v || 'File name is required']"
+              label="File name"
+              outlined
+              placeholder="Enter name for the file"
+              prepend-icon="mdi-rename-box"
+            />
+            <v-alert
+              v-if="fileTypeWarning"
+              dense
+              type="warning"
+            >
+              {{ fileTypeWarning }}
+            </v-alert>
           </v-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn
             color="grey darken-1"
-            text
             data-testid="upload-cancel-button"
+            text
             @click="closeUploadDialog"
           >
             Cancel
@@ -180,6 +185,8 @@ export default {
       selectedFile: null,
       fileName: null,
       fileToDelete: null,
+      fileTypeWarning: '',
+      archiveExtensions: ['zip', 'tar', 'gz', 'tgz'],
       headers: [
         { text: 'Display Name', value: 'name', sortable: true },
         { text: 'Original Filename', value: 'originalFilename', sortable: true },
@@ -194,6 +201,47 @@ export default {
     this.loadFiles();
   },
   methods: {
+    validateFile() {
+      if (!this.selectedFile) {
+        return;
+      }
+
+      const fileName = this.selectedFile.name.toLowerCase();
+      let isArchive = false;
+      let archiveType = '';
+
+      // Check for archive types
+      if (fileName.endsWith('.tar.gz') || fileName.endsWith('.tgz')) {
+        isArchive = true;
+        archiveType = fileName.endsWith('.tar.gz') ? 'tar.gz' : 'tgz';
+      } else {
+        const extension = fileName.split('.').pop();
+        if (this.archiveExtensions.includes(extension)) {
+          isArchive = true;
+          archiveType = extension;
+        }
+      }
+
+      // Reset warning
+      this.fileTypeWarning = '';
+
+      // Add warning for archives
+      if (isArchive) {
+        this.fileTypeWarning = `You are uploading an archive (${ archiveType }). All files inside will be extracted recursively.`;
+      }
+
+      // Set default file name if not provided
+      if (!this.fileName) {
+        // Remove extension for file name
+        if (fileName.endsWith('.tar.gz')) {
+          this.fileName = this.selectedFile.name.slice(0, -7); // Remove .tar.gz
+        } else if (fileName.endsWith('.tgz')) {
+          this.fileName = this.selectedFile.name.slice(0, -4); // Remove .tgz
+        } else {
+          this.fileName = this.selectedFile.name.replace(/\.[^/.]+$/, '');
+        }
+      }
+    },
     async loadFiles() {
       try {
         const { data } = await FilesAPI.index();
@@ -208,8 +256,18 @@ export default {
       if (this.$refs.uploadForm.validate()) {
         this.uploading = true;
         try {
-          const datasetId = this.$store.state?.dataset?.id;
-          await FilesAPI.upload(this.selectedFile, this.fileName, datasetId);
+          // Przygotuj FormData
+          const formData = new FormData();
+          formData.append('file', this.selectedFile);
+
+          // Nazwa pliku - opcjonalna, bo API doda domyślną
+          if (this.fileName) {
+            formData.append('name', this.fileName);
+          }
+
+          // Wywołaj upload
+          await FilesAPI.upload(formData);
+
           this.closeUploadDialog();
           this.loadFiles();
         } catch (error) {
@@ -223,6 +281,7 @@ export default {
       this.uploadDialog = false;
       this.selectedFile = null;
       this.fileName = null;
+      this.fileTypeWarning = '';
       // Reset form validation
       this.$nextTick(() => {
         if (this.$refs.uploadForm) {
@@ -232,14 +291,21 @@ export default {
     },
     async previewFile(file) {
       try {
-        const response = await FilesAPI.preview(file.id);
-        const blob = new Blob([response.data], { type: file.contentType });
-        const url = window.URL.createObjectURL(blob);
-        window.open(url, '_blank');
-        // Clean up the URL after a short delay
-        setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+        const response = await FilesAPI.getPreviewUrl(file.id);
+        window.open(response.data.preview_url, '_blank');
       } catch (error) {
         console.error('Error previewing file:', error);
+        // Fallback to old method if preview URL fails
+        try {
+          const fallbackResponse = await FilesAPI.preview(file.id);
+          const blob = new Blob([fallbackResponse.data], { type: file.contentType });
+          const url = window.URL.createObjectURL(blob);
+          window.open(url, '_blank');
+          // Clean up the URL after a short delay
+          setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+        } catch (fallbackError) {
+          console.error('Error with fallback preview:', fallbackError);
+        }
       }
     },
     async downloadFile(file) {
@@ -298,3 +364,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.file-upload-warning {
+  margin-top: 10px;
+}
+</style>
