@@ -17,16 +17,16 @@
                   <v-row>
                     <v-autocomplete
                       v-model="item.chosenScenarioExecution"
-                      class="ma-2"
                       :items="scenarioExecutions"
-                      label="Scenario Executions"
-                      item-text="name"
-                      item-value="id"
                       :return-object="true"
-                      outlined
                       :rules="[
                         v => !!v || 'This field is required'
                       ]"
+                      class="ma-2"
+                      item-text="name"
+                      item-value="id"
+                      label="Scenario Executions"
+                      outlined
                       @change="resetAE"
                     >
                       <template #selection="{ item }">
@@ -39,16 +39,16 @@
 
                     <v-autocomplete
                       v-model="item.chosenAE"
-                      class="ma-2"
                       :items="activityExecutions"
-                      label="Activity Execution"
-                      item-text="name"
-                      item-value="id"
                       :return-object="true"
-                      outlined
                       :rules="[
                         v => !!v || 'This field is required'
                       ]"
+                      class="ma-2"
+                      item-text="name"
+                      item-value="id"
+                      label="Activity Execution"
+                      outlined
                       @change="updateParticipantsList"
                     >
                       <template #selection="{ item }">
@@ -63,19 +63,19 @@
               </v-row>
               <v-text-field
                 v-model="item.name"
-                label="Name"
                 :outlined="true"
                 :rules="[
                   v => !!v || 'This field is required'
                 ]"
+                label="Name"
               />
               <v-textarea
                 v-model="item.description"
                 :outlined="true"
-                label="Description"
                 :rules="[
                   v => !!v || 'This field is required'
                 ]"
+                label="Description"
               />
               <v-col v-if="item.link" class="col-12 my-auto">
                 <v-divider class="pt-4" />
@@ -84,9 +84,9 @@
                 <v-tooltip top>
                   <template #activator="{ on, attrs }">
                     <v-icon
+                      color="primary"
                       v-bind="attrs"
                       v-on="on"
-                      color="primary"
                       @click.stop.prevent="downloadFile(item)"
                     >
                       mdi-file-find
@@ -99,14 +99,14 @@
                 <v-file-input
                   v-model="item.file"
                   label="File input"
-                  prepend-icon="mdi-paperclip"
                   outlined
+                  prepend-icon="mdi-paperclip"
                   @change="onFileChange(item)"
                 />
               </v-col>
               <horizontal-text-divider
-                text="Channel info"
                 class="mb-2"
+                text="Channel info"
               />
               <v-col
                 v-for="(file, i) in item.data"
@@ -116,14 +116,14 @@
                 <v-row>
                   <v-autocomplete
                     v-model="file.channel"
-                    class="ma-2 pa-2"
-                    :items="availableChannels(file.channel)"
-                    label="Channel"
                     :item-text="'name'"
+                    :items="availableChannels(file.channel)"
+                    :return-object="true"
                     :rules="[
                       v => !!v || 'This field is required'
                     ]"
-                    :return-object="true"
+                    class="ma-2 pa-2"
+                    label="Channel"
                   />
                   <v-icon
                     v-if="moreThanOne"
@@ -140,16 +140,16 @@
                   <v-autocomplete
                     ref="participantsAutocomplete"
                     v-model="file.participants"
-                    class="ma-2 pa-2"
-                    label="Participants"
-                    :items="participants"
                     :item-text="item => '${item.name} ${item.surname}'"
-                    item-value="id"
-                    :return-object="true"
+                    :items="participants"
                     :multiple="true"
+                    :return-object="true"
                     :rules="[
                       v => !!(Array.isArray(v) && v.length) || !!(!Array.isArray(v) && v) || 'This field is required'
                     ]"
+                    class="ma-2 pa-2"
+                    item-value="id"
+                    label="Participants"
                   >
                     <template #selection="{ item }">
                       <v-chip>
@@ -196,6 +196,7 @@
 import ChannelsAPI from '@/api/ChannelsAPI';
 import ExperimentsAPI from '@/api/ExperimentsAPI';
 import RecordingsAPI from '@/api/RecordingsAPI';
+import RegisteredDataAPI from '@/api/RegisteredDataAPI';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import HorizontalTextDivider from '@/components/divider/HorizontalTextDivider.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
@@ -282,7 +283,9 @@ export default {
       let propertiesArray = this.item.data.filter(item => !!item.channel);
       propertiesArray = propertiesArray.map(object => object.channel.id);
 
-      return this.channels.filter(item => !propertiesArray.includes(item.id) || (!!element && item.id == element.id));
+      return this.channels.filter(item => !propertiesArray.includes(item.id) || (
+        !!element && item.id == element.id
+      ));
     },
     onCreation() {
       this.item.data.push(this.createDataPrototype());
@@ -336,8 +339,9 @@ export default {
       RecordingsAPI[method](this.item, this.item.file)
         .then(() => this.$router.go(-1));
     },
-    downloadFile(allInfo) {
-      window.open(allInfo.link, '_blank');
+    async downloadFile(item) {
+      const response = await RegisteredDataAPI.getPreviewUrl(item.link);
+      window.open(response.data.preview_url, '_blank');
     },
     preparedLink(link) {
       return link.split('/').pop();

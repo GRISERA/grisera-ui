@@ -10,9 +10,9 @@
         <v-tooltip top>
           <template #activator="{ on, attrs }">
             <v-icon
+              color="primary"
               v-bind="attrs"
               v-on="on"
-              color="primary"
               @click.stop.prevent="downloadFile(item)"
             >
               mdi-file-find
@@ -62,6 +62,7 @@
 </template>
 
 <script>
+import RegisteredDataAPI from '@/api/RegisteredDataAPI';
 import BaseTable from '@/components/base/BaseTable.vue';
 import RecordingsSubTable from './RecordingsSubTable.vue';
 
@@ -74,7 +75,9 @@ export default {
   props: {
     experiment: {
       type: Object,
-      default: () => ({}),
+      default: () => (
+        {}
+      ),
     },
     dataToDisplay: {
       type: Array,
@@ -104,8 +107,9 @@ export default {
         },
       });
     },
-    downloadFile(allInfo) {
-      window.open(allInfo.link, '_blank');
+    async downloadFile(item) {
+      const response = await RegisteredDataAPI.getPreviewUrl(item.link);
+      window.open(response.data.preview_url, '_blank');
     },
     preparedLink(link) {
       return link.split('/').pop();

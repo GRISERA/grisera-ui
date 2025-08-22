@@ -22,6 +22,10 @@ export default class extends BaseAPI2 {
     });
   }
 
+  static getPreviewUrl(objectName) {
+    return apiService.get(`/registered-data/preview/${ encodeURIComponent(objectName) }?${ this.getDatasetName() }`);
+  }
+
 
   static dTOFrontToAPI(data) {
     return {
@@ -54,6 +58,7 @@ export default class extends BaseAPI2 {
       return {
         id: data.id,
         link: data.source,
+        objectName: data.object_name, // Add object_name for presigned URLs
         name: data.additional_properties?.find(param => param.key === 'name').value,
         description: data.additional_properties?.find(param => param.key === 'description').value,
         registeredChannels: data.registered_channels,
@@ -67,6 +72,7 @@ export default class extends BaseAPI2 {
     return {
       id: data.id,
       link: data.source,
+      objectName: data.object_name, // Add object_name for presigned URLs
       name: data.additional_properties?.find(param => param.key === 'name').value,
       description: data.additional_properties?.find(param => param.key === 'description').value,
       additionalParameters: data.additional_properties.filter(

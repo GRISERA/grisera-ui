@@ -111,7 +111,7 @@ export default class extends BaseAPI2 {
 
   static store(data, file = null) {
     return RegisteredDataAPI.uploadFile(file).then(response => {
-      data.link = response?.data?.file_url ? response.data.file_url : data.link;
+      data.link = response?.data?.object_name ? response.data.object_name : data.link;
       return RegisteredDataAPI.store(data).then((responseRD) => {
         return Promise.all(data.data.map(channelInfo => {
           return RegisteredChannelsAPI.store({
