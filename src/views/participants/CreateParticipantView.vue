@@ -38,8 +38,9 @@
                 label="Date of birth"
                 prepend-inner-icon="mdi-calendar"
                 readonly
+                clearable
+                @click:clear="birthDate = null"
                 outlined
-                required
                 v-bind="attrs"
                 v-on="on"
               />
@@ -72,7 +73,15 @@
             label="Sex"
             outlined
             :rules="sexRules"
+            clearable
             required
+          />
+          <v-text-field
+            v-model="disorder"
+            label="Disorder"
+            outlined
+            clearable
+            prepend-inner-icon="mdi-medical-bag"
           />
           <CustomParametersComponent
             ref="apc"
@@ -118,6 +127,7 @@ export default {
       surname: '',
       birthDate: '',
       sex: '',
+      disorder: '',
       sexList: ['Female', 'Male'],
       nameRules: [
         n => !!n || 'Name is required',
@@ -143,6 +153,7 @@ export default {
           surname: this.surname,
           birthDate: this.birthDate,
           sex: this.sex,
+          disorder: this.disorder,
           additionalParameters: [],
         };
         this.$refs.apc.parameters?.forEach(param => {

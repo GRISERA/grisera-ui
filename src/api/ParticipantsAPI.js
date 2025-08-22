@@ -12,7 +12,7 @@ export default class extends BaseAPI2 {
       surname: data.surname,
       date_of_birth: data.birthDate,
       sex: data.sex,
-      disorder: data.disorder, // not implemented in frontend
+      disorder: data.disorder,
       additional_properties: data.additionalParameters?.map(e => (
         {
           key: e.name,
@@ -33,7 +33,7 @@ export default class extends BaseAPI2 {
       surname: data.surname,
       birthDate: data.date_of_birth,
       sex: data.sex,
-      disorder: data.disorder, // not implemented in frontend
+      disorder: data.disorder,
       additionalParameters: data.additional_properties?.map(e => (
         {
           ...e,

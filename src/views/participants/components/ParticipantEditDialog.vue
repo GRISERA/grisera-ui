@@ -91,6 +91,17 @@
                 />
               </v-menu>
             </v-col>
+            
+            <v-col
+              cols="12"
+              class="pa-2"
+            >
+              <v-text-field
+                v-model="participant.disorder"
+                label="Disorder"
+                prepend-icon="mdi-medical-bag"
+              />
+            </v-col>
           </v-row>
 
           <v-row 
