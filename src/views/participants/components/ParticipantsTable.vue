@@ -27,6 +27,7 @@
     </base-table>
 
     <participant-edit-dialog
+      v-if="selectedParticipant"
       v-model="editDialog"
       :participant-data="selectedParticipant"
       @saved="onParticipantSaved"
