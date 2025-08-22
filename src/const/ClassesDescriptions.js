@@ -21,4 +21,5 @@ export default {
   TWO_PERSON_ACTIVITY: 'A pattern of an activity done by two participants together within an experiment. This pattern describes an activity which is performed by exactly two participants together.',
   MEASURE: 'An instance of the Measure concept, it is possible to define the datatype, range and unit modeled as datatype properties measureDatatype, measureRange and measureUnit.',
   DATASET: 'TODO',
+  FILES: 'Files related to experiments and recordings, including various types of data files uploaded and managed within the dataset.',
 };

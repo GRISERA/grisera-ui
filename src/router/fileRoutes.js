@@ -1,3 +1,5 @@
+import ClassesDescriptions from '@/const/ClassesDescriptions';
+
 export default [
   {
     path: '/files',
@@ -11,6 +13,7 @@ export default [
       breadcrumbs: [
         { text: 'Files', disabled: true },
       ],
+      infoMessage: ClassesDescriptions.FILES,
     },
   },
 ];
