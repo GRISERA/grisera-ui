@@ -2,13 +2,13 @@
   <v-container class="container--fluid mt-4">
     <v-row>
       <v-col class="headline font-weight-bold my-auto d-flex">
-        <info-tool-tip-component :info-message="$route.meta.infoMessage"/>
-        <app-breadcrumbs/>
+        <info-tool-tip-component :info-message="$route.meta.infoMessage" />
+        <app-breadcrumbs />
       </v-col>
       <v-col class="text-right">
         <v-btn
-            :outlined="true"
-            @click.prevent.stop="$router.push({ name: 'dataset-creation' })"
+          :outlined="true"
+          @click.prevent.stop="$router.push({ name: 'dataset-creation' })"
         >
           Create
         </v-btn>
@@ -17,14 +17,14 @@
         <v-container class="container--fluid">
           <v-row class="fill-height">
             <v-col
-                v-for="dataset in datasets"
-                :key="`dataset_${dataset.id}`"
-                class="col-4 align-self-stretch"
+              v-for="dataset in datasets"
+              :key="`dataset_${dataset.id}`"
+              class="col-4 align-self-stretch"
             >
               <v-card
-                  :elevation="8"
-                  height="100%"
-                  class="d-flex flex-column dataset-card"
+                :elevation="8"
+                class="d-flex flex-column dataset-card"
+                height="100%"
               >
                 <v-card-text class="pa-0 flex-grow-1">
                   <v-container class="container--fluid">
@@ -72,22 +72,22 @@
                     </v-row>
                   </v-container>
                 </v-card-text>
-                <v-divider/>
+                <v-divider />
                 <v-card-actions>
                   <v-icon
-                      color="primary"
-                      @click="() => {
+                    v-if="canEditDataset(dataset.id)"
+                    color="primary"
+                    @click="() => {
                       selectCurrentDataset(dataset);
                       $router.push({
                         name: 'dataset-edit',
                         params: { id: dataset.id}
                       });
                     }"
-                      v-if="canEditDataset(dataset.id)"
                   >
                     mdi-pen
                   </v-icon>
-                  <v-spacer/>
+                  <v-spacer />
                   <v-btn
                     color="primary"
                     @click="selectCurrentDataset(dataset)"
@@ -104,9 +104,9 @@
 
     <input
       ref="fileInput"
-      type="file"
       accept=".owl,.json"
       style="display: none"
+      type="file"
       @change="handleFileSelect"
     />
 
@@ -121,14 +121,13 @@
 </template>
 
 <script>
-import { apiService } from '@/api/BaseAPI2';
+import DatasetAPI from '@/api/DatasetAPI';
+import ImportAPI from '@/api/ImportAPI';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 import AccessRoles from '@/const/AccessRoles';
 import PermissionsService from '@/services/PermissionsService';
-import DatasetAPI from '@/api/DatasetAPI';
-import ImportAPI from '@/api/ImportAPI';
-import {mapMutations, mapState, mapGetters} from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 
 export default {
   name: 'DatasetsView',
@@ -151,7 +150,7 @@ export default {
     };
   },
   created() {
-    DatasetAPI.index().then(({data}) => {
+    DatasetAPI.index().then(({ data }) => {
       this.datasets = data;
     });
     PermissionsService.getUserPermissions(this.getUser().userId).then((response) => {
@@ -167,7 +166,7 @@ export default {
     }),
     selectCurrentDataset(dataset) {
       this.setDataset(dataset);
-      this.$router.push({name: 'main'});
+      this.$router.push({ name: 'main' });
     },
     canEditDataset(datasetId) {
       const permission = this.permissions.find(permission => permission.datasetId == datasetId);
@@ -192,7 +191,9 @@ export default {
     },
     async handleFileSelect(event) {
       const file = event.target.files[0];
-      if (!file) return;
+      if (!file) {
+        return;
+      }
 
       // Validate file extension
       const fileExtension = file.name.split('.').pop().toLowerCase();
@@ -212,7 +213,7 @@ export default {
           file,
           this.selectedDatasetForImport.id,
           fileExtension,
-          `Import from file: ${file.name} for dataset: ${this.selectedDatasetForImport.name}`
+          `Import from file: ${ file.name } for dataset: ${ this.selectedDatasetForImport.name }`,
         );
 
         // Dodaj import do store'a dla monitorowania
@@ -230,7 +231,10 @@ export default {
         console.log('Store imports after adding:', this.$store.state.imports);
         console.log('Has active imports:', this.$store.getters.hasActiveImports);
 
-        this.showSnackbar(`Plik ${file.name} został zaimportowany pomyślnie do datasetu: ${this.selectedDatasetForImport.name}`, 'success');
+        this.showSnackbar(
+          `Plik ${ file.name } został zaimportowany pomyślnie do datasetu: ${ this.selectedDatasetForImport.name }`,
+          'success',
+        );
         console.log('Import result:', response.data);
 
         // Reset file input
@@ -239,7 +243,7 @@ export default {
 
       } catch (error) {
         console.error('Import error:', error);
-        this.showSnackbar(`Błąd podczas importu: ${error.response?.data?.detail || error.message}`, 'error');
+        this.showSnackbar(`Błąd podczas importu: ${ error.response?.data?.detail || error.message }`, 'error');
 
         // Reset file input
         this.$refs.fileInput.value = '';
