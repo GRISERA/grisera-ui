@@ -22,92 +22,19 @@
             <v-col
               v-for="dataset in datasets"
               :key="`dataset_${dataset.id}`"
-              class="col-4 align-self-stretch"
+              class="dataset-col"
+              cols="12"
+              lg="4"
+              md="6"
             >
-              <v-card
-                :elevation="8"
-                class="d-flex flex-column dataset-card"
-                height="100%"
-              >
-                <v-card-text class="pa-0 flex-grow-1">
-                  <v-container class="container--fluid">
-                    <v-row class="wrap">
-                      <v-col class="col-12">
-                        <div class="caption">
-                          Name
-                        </div>
-                        <div
-                          :test-data="dataset.name"
-                          class="black--text font-weight-bold"
-                        >
-                          {{ dataset.name }}
-                        </div>
-                      </v-col>
-                      <v-col class="col-6">
-                        <div class="caption">
-                          Creator
-                        </div>
-                        <div class="black--text">
-                          {{ dataset.creator }}
-                        </div>
-                      </v-col>
-                      <v-col class="col-6">
-                        <div class="caption">
-                          Date
-                        </div>
-                        <div class="black--text">
-                          {{ dataset.date }}
-                        </div>
-                      </v-col>
-                      <v-col class="col-12">
-                        <div class="caption">
-                          Rights
-                        </div>
-                        <div class="black--text">
-                          {{ dataset.rights }}
-                        </div>
-                      </v-col>
-                      <v-col class="col-12">
-                        <div class="caption">
-                          Description
-                        </div>
-                        <div class="black--text">
-                          {{ dataset.description }}
-                        </div>
-                      </v-col>
-                    </v-row>
-                  </v-container>
-                </v-card-text>
-                <v-divider />
-                <v-card-actions>
-                  <div
-                    v-if="canEditDataset(dataset.id)"
-                    class="d-flex"
-                  >
-                    <v-btn
-                      color="primary"
-                      icon
-                      @click="editDataset(dataset)"
-                    >
-                      <v-icon>mdi-pencil</v-icon>
-                    </v-btn>
-                    <v-btn
-                      color="error"
-                      icon
-                      @click="confirmDeleteDataset(dataset)"
-                    >
-                      <v-icon>mdi-delete</v-icon>
-                    </v-btn>
-                  </div>
-                  <v-spacer />
-                  <v-btn
-                    color="primary"
-                    @click="selectCurrentDataset(dataset)"
-                  >
-                    select and proceed
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
+              <dataset-list-card
+                :can-edit="canEditDataset(dataset.id)"
+                :dataset="dataset"
+                @delete="confirmDeleteDataset"
+                @edit="editDataset"
+                @select="selectCurrentDataset"
+                @show-description="openDescriptionDialog"
+              />
             </v-col>
           </v-row>
         </v-container>
@@ -160,6 +87,11 @@
         </p>
       </div>
     </delete-confirm-dialog>
+
+    <description-dialog
+      :dataset="descriptionDialogDataset"
+      :show.sync="showDescriptionDialog"
+    />
   </v-container>
 </template>
 
@@ -168,7 +100,9 @@ import DatasetAPI from '@/api/DatasetAPI';
 import ImportAPI from '@/api/ImportAPI';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import DatasetCreateDialog from '@/components/DatasetCreateDialog.vue';
+import DatasetListCard from '@/components/DatasetListCard.vue';
 import DeleteConfirmDialog from '@/components/dialog/DeleteConfirmDialog.vue';
+import DescriptionDialog from '@/components/dialog/DescriptionDialog.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 import AccessRoles from '@/const/AccessRoles';
 import PermissionsService from '@/services/PermissionsService';
@@ -180,7 +114,9 @@ export default {
     InfoToolTipComponent,
     AppBreadcrumbs,
     DatasetCreateDialog,
+    DatasetListCard,
     DeleteConfirmDialog,
+    DescriptionDialog,
   },
   data: () => {
     return {
@@ -192,6 +128,8 @@ export default {
       datasetToEdit: null,
       showDeleteDialog: false,
       datasetToDelete: null,
+      showDescriptionDialog: false,
+      descriptionDialogDataset: null,
       snackbar: {
         show: false,
         text: '',
@@ -391,6 +329,16 @@ export default {
       this.showDeleteDialog = false;
       this.datasetToDelete = null;
     },
+    openDescriptionDialog(dataset) {
+      this.descriptionDialogDataset = dataset;
+      this.showDescriptionDialog = true;
+    },
   },
 };
 </script>
+
+<style scoped>
+.dataset-col {
+  transition: transform 0.3s ease;
+}
+</style>
