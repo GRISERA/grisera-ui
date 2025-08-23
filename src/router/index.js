@@ -73,6 +73,34 @@ const routes = [
     },
   },
   {
+    path: '/imports',
+    name: 'imports',
+    component: () => import('@/views/imports/ImportsView.vue'),
+    meta: {
+      icon: 'mdi-import',
+      order: 45,
+      name: 'Data Imports',
+      hideFilters: true,
+      breadcrumbs: [
+        { text: 'Data Imports', disabled: true },
+      ],
+      infoMessage: 'Manage and monitor your data import jobs.',
+    },
+  },
+  {
+    path: '/imports/create',
+    name: 'import-creation',
+    component: () => import('@/views/imports/CreateImportView.vue'),
+    meta: {
+      hideFilters: true,
+      breadcrumbs: [
+        { text: 'Data Imports', disabled: false, href: '/imports' },
+        { text: 'Create', disabled: true },
+      ],
+      infoMessage: 'Upload a new file to create a data import job.',
+    },
+  },
+  {
     path: '/settings',
     name: 'settings',
     component: () => import('@/views/settings/SettingsView.vue'),

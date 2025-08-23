@@ -45,6 +45,7 @@ export default {
   data() {
     return {
       headers: [
+        { text: 'External ID', value: 'external_id', sortable: false },
         { text: 'Name', value: 'name' },
         { text: 'Description', value: 'description' },
         { text: 'Actions', value: 'actions', sortable: false },

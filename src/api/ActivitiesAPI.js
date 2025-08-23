@@ -46,6 +46,7 @@ export default class extends BaseAPI2 {
       additionalParameters: data.additional_properties?.filter(
         param => !['name', 'description'].includes(param.key),
       ).map(e => {return { ...e, name: e.key };}),
+      external_id: data.external_id,
     };
   }
 }

@@ -40,6 +40,7 @@ export default class extends BaseAPI2 {
           name: e.key,
         }
       )) || [],
+      external_id: data.external_id,
     };
   }
 }

@@ -39,17 +39,17 @@ export default class extends BaseAPI2 {
     
     return {
       id: data.id,
-      name: data.additional_properties?.find(param => param.key === 'name').value,
-      description: data.additional_properties?.find(param => param.key === 'description').value,
+      name: data.additional_properties?.find(param => param.key === 'name')?.value,
+      description: data.additional_properties?.find(param => param.key === 'description')?.value,
       activity: ActivitiesAPI.dTOAPIToFront(data.activity),
       participations: data.participations,
       participants: data.participations?.map(e => ParticipantsAPI.dTOAPIToFront(e.participant_state?.participant)),
       participantStates: data.participations?.map(e => ParticipantStatesAPI.dTOAPIToFront(e.participant_state)),
       arrangement: data.arrangement,
       recordings: recordings,
-      additionalParameters: data.additional_properties.filter(
+      additionalParameters: data.additional_properties?.filter(
         param => !['name', 'description'].includes(param.key),
-      ).map(e => {return { ...e, name: e.key };}),
+      )?.map(e => {return { ...e, name: e.key };}) || [],
     };
   }
 

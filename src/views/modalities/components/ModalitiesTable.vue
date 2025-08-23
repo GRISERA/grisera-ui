@@ -45,6 +45,7 @@ export default {
   data() {
     return {
       headers: [
+        { text: 'External ID', value: 'external_id', sortable: false },
         { text: 'Name', value: 'name' },
         { text: 'Description', value: 'description' },
         { text: 'Actions', value: 'actions', sortable: false },
@@ -60,9 +61,9 @@ export default {
   methods: {
     fetchModalities() {
       ModalitiesAPI.index()
-        .then(({ data }) => {
-          this.modalities = data;
-        });
+      .then(({ data }) => {
+        this.modalities = data;
+      });
     },
     openEditDialog(modality) {
       this.selectedModality = { ...modality };

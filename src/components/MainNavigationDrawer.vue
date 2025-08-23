@@ -4,11 +4,11 @@
     color="primary"
     class="main-navigation-drawer white--text rounded-xl"
     :style="{
-      width: collapse ? '64px' : 'auto !important',
+      // width: collapse ? '64px' : 'auto !important',
     }"
     :mini-variant="collapse"
-    :mini-variant-width="80"
-    :width="216"
+    :mini-variant-width="270"
+    :width="270"
   >
     <template #default>
       <v-container class="main-navigation-drawer--content">
@@ -21,19 +21,18 @@
             />
           </v-col>
           <template v-if="!collapse && !localHideFilters">
-            <template
+            <div
               v-for="filter in activeFilters"
+              :key="`active_filter_item_${filter.type}`"
+              style="display: contents;"
             >
-              <vertical-divider
-                :key="`active_filters_divider_${ filter.type }`"
-              />
+              <vertical-divider />
               <component
                 :is="filter.component"
-                :key="`active_filters_filter_${ filter.type }`"
                 :selected.sync="filter.selected"
                 @delete:filter="removeAdditionalFilter($event)"
               />
-            </template>
+            </div>
             <template v-if="availableFilters.length">
               <vertical-divider />
               <additional-filters-list

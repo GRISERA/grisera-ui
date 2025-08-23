@@ -53,12 +53,13 @@ export default class extends BaseAPI2 {
       footnote: data.additional_properties?.find(param => param.key === 'footnote')?.value || '',
       participants_ids: data.additional_properties?.filter(
         param => 'participant_id' === param.key,
-      ).map(e => e.value) || [],
+      )?.map(e => e.value) || [],
       additionalParameters: data.additional_properties?.filter(
         param => !['description', 'creator', 'created_at', 'footnote', 'participant_id'].includes(param.key),
-      ).map(e => {return { ...e, name: e.key };}) || [],
+      )?.map(e => {return { ...e, name: e.key };}) || [],
       scenarios: data.scenarios?.map(e => ScenariosAPI.dTOAPIToFront(e)),
       scenarioExecutions: scenarioExecutions,
+      external_id: data.external_id,
     };
   }
 
