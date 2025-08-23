@@ -35,7 +35,7 @@ export default class extends BaseAPI2 {
       measureId: data.measure_id,
       type: data.type,
       link: data.source,
-      spacing: data.additional_properties?.find(param => param.key === 'spacing').value,
+      spacing: data.additional_properties?.find(param => param.key === 'spacing')?.value || 'Regular',
       additionalParameters: data.additional_properties?.filter(
         param => !['spacing'].includes(param.key),
       ).map(e => {return { ...e, name: e.key };}),
