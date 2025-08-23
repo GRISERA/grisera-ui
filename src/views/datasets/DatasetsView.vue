@@ -7,10 +7,13 @@
       </v-col>
       <v-col class="text-right">
         <v-btn
-          :outlined="true"
-          @click.prevent.stop="$router.push({ name: 'dataset-creation' })"
+          color="primary"
+          @click="createDataset"
         >
-          Create
+          <v-icon left>
+            mdi-plus
+          </v-icon>
+          Create Dataset
         </v-btn>
       </v-col>
       <v-col class="col-12">
@@ -33,7 +36,10 @@
                         <div class="caption">
                           Name
                         </div>
-                        <div :test-data="dataset.name" class="black--text font-weight-bold">
+                        <div
+                          :test-data="dataset.name"
+                          class="black--text font-weight-bold"
+                        >
                           {{ dataset.name }}
                         </div>
                       </v-col>
@@ -74,19 +80,25 @@
                 </v-card-text>
                 <v-divider />
                 <v-card-actions>
-                  <v-icon
+                  <div
                     v-if="canEditDataset(dataset.id)"
-                    color="primary"
-                    @click="() => {
-                      selectCurrentDataset(dataset);
-                      $router.push({
-                        name: 'dataset-edit',
-                        params: { id: dataset.id}
-                      });
-                    }"
+                    class="d-flex"
                   >
-                    mdi-pen
-                  </v-icon>
+                    <v-btn
+                      color="primary"
+                      icon
+                      @click="editDataset(dataset)"
+                    >
+                      <v-icon>mdi-pencil</v-icon>
+                    </v-btn>
+                    <v-btn
+                      color="error"
+                      icon
+                      @click="confirmDeleteDataset(dataset)"
+                    >
+                      <v-icon>mdi-delete</v-icon>
+                    </v-btn>
+                  </div>
                   <v-spacer />
                   <v-btn
                     color="primary"
@@ -108,7 +120,7 @@
       style="display: none"
       type="file"
       @change="handleFileSelect"
-    />
+    >
 
     <v-snackbar
       v-model="snackbar.show"
@@ -117,6 +129,37 @@
     >
       {{ snackbar.text }}
     </v-snackbar>
+
+    <dataset-create-dialog
+      v-model="showCreateDialog"
+      :edit-dataset="datasetToEdit"
+      @input="onDialogClose"
+      @dataset-created="onDatasetCreated"
+      @dataset-updated="onDatasetUpdated"
+      @dataset-error="onDatasetError"
+    />
+
+    <delete-confirm-dialog
+      :active.sync="showDeleteDialog"
+      title="Delete Dataset"
+      @cancel="cancelDelete"
+      @submit="deleteDataset"
+    >
+      <div class="py-4">
+        <p class="mb-2">
+          Are you sure you want to delete this dataset?
+        </p>
+        <div
+          v-if="datasetToDelete"
+          class="error--text font-weight-bold text-h6"
+        >
+          {{ datasetToDelete.name }}
+        </div>
+        <p class="mt-3 caption grey--text">
+          This action cannot be undone. All data associated with this dataset will be permanently deleted.
+        </p>
+      </div>
+    </delete-confirm-dialog>
   </v-container>
 </template>
 
@@ -124,6 +167,8 @@
 import DatasetAPI from '@/api/DatasetAPI';
 import ImportAPI from '@/api/ImportAPI';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
+import DatasetCreateDialog from '@/components/DatasetCreateDialog.vue';
+import DeleteConfirmDialog from '@/components/dialog/DeleteConfirmDialog.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 import AccessRoles from '@/const/AccessRoles';
 import PermissionsService from '@/services/PermissionsService';
@@ -134,6 +179,8 @@ export default {
   components: {
     InfoToolTipComponent,
     AppBreadcrumbs,
+    DatasetCreateDialog,
+    DeleteConfirmDialog,
   },
   data: () => {
     return {
@@ -141,6 +188,10 @@ export default {
       datasets: [],
       selectedDatasetForImport: null,
       isUploading: false,
+      showCreateDialog: false,
+      datasetToEdit: null,
+      showDeleteDialog: false,
+      datasetToDelete: null,
       snackbar: {
         show: false,
         text: '',
@@ -252,10 +303,93 @@ export default {
         this.isUploading = false;
       }
     },
+    createDataset() {
+      this.datasetToEdit = null;
+      this.showCreateDialog = true;
+    },
+    editDataset(dataset) {
+      this.datasetToEdit = dataset;
+      this.showCreateDialog = true;
+    },
+    async onDatasetCreated() {
+      try {
+        // Refresh both datasets and permissions
+        const [datasetsResponse, permissionsResponse] = await Promise.all([
+          DatasetAPI.index(),
+          PermissionsService.getUserPermissions(this.getUser().userId),
+        ]);
+
+        this.datasets = datasetsResponse.data;
+        this.permissions = permissionsResponse.data;
+      } catch (error) {
+        console.error('Error refreshing data:', error);
+      }
+
+      this.datasetToEdit = null;
+    },
+    async onDatasetUpdated() {
+      try {
+        // Refresh both datasets and permissions
+        const [datasetsResponse, permissionsResponse] = await Promise.all([
+          DatasetAPI.index(),
+          PermissionsService.getUserPermissions(this.getUser().userId),
+        ]);
+
+        this.datasets = datasetsResponse.data;
+        this.permissions = permissionsResponse.data;
+      } catch (error) {
+        console.error('Error refreshing data:', error);
+      }
+
+      this.datasetToEdit = null;
+    },
+    onDatasetError(errorMessage) {
+      this.showSnackbar(errorMessage, 'error');
+    },
+    onDialogClose(isOpen) {
+      if (!isOpen) {
+        this.datasetToEdit = null;
+      }
+    },
     showSnackbar(text, color = 'info') {
       this.snackbar.text = text;
       this.snackbar.color = color;
       this.snackbar.show = true;
+    },
+    confirmDeleteDataset(dataset) {
+      this.datasetToDelete = dataset;
+      this.showDeleteDialog = true;
+    },
+    async deleteDataset() {
+      if (!this.datasetToDelete) {
+        return;
+      }
+
+      try {
+        await DatasetAPI.delete(this.datasetToDelete.id);
+
+        // Refresh both datasets and permissions after deletion
+        const [datasetsResponse, permissionsResponse] = await Promise.all([
+          DatasetAPI.index(),
+          PermissionsService.getUserPermissions(this.getUser().userId),
+        ]);
+
+        this.datasets = datasetsResponse.data;
+        this.permissions = permissionsResponse.data;
+      } catch (error) {
+        console.error('Error deleting dataset:', error);
+        this.showSnackbar(
+          error.response?.data?.message || 'An error occurred while deleting the dataset',
+          'error',
+        );
+      } finally {
+        this.showDeleteDialog = false;
+        this.datasetToDelete = null;
+      }
+    },
+    cancelDelete() {
+      this.showDeleteDialog = false;
+      this.datasetToDelete = null;
     },
   },
 };
