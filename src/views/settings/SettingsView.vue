@@ -55,8 +55,8 @@ export default {
     return {
       tab: 0,
       tabs: [
-        { id: 1, name: 'Parameters' },
-        { id: 2, name: 'Access permissions' },
+        { id: 1, name: 'Additional Parameters' },
+        { id: 2, name: 'Access Permissions' },
       ],
     };
   },
