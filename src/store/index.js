@@ -1,3 +1,4 @@
+import roles from '@/acl/roles';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
@@ -10,6 +11,7 @@ const store = new Vuex.Store({
     dataset: undefined,
     user: undefined,
     data: undefined,
+    scopes: {},
   },
   mutations: {
     setDatasets(state, values) {
@@ -20,6 +22,13 @@ const store = new Vuex.Store({
     },
     setUser(state, value) {
       state.user = { ...value };
+    },
+    setScopes(state, { permissions } = {}) {
+      if (!Array.isArray(permissions)) {
+        console.error('Permissions should be an array of { datasetId, role } objects');
+      }
+
+      permissions.forEach(({ datasetId, role }) => state.scopes[datasetId] = roles[role] || []);
     },
     setData(state, value) {
       state.data = { ...value };

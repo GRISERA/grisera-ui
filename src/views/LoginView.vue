@@ -21,7 +21,9 @@
               <span class="caption">Log in to your account</span>
             </v-col>
             <v-col class="col-8 mx-auto pb-16">
-              <transition name="fade">
+              <transition
+                name="fade"
+              >
                 <div v-if="formNumber === 1">
                   <v-form
                     ref="form"
@@ -30,24 +32,24 @@
                   >
                     <v-text-field
                       v-model="login"
-                      :rules="required"
                       label="Login"
                       outlined
+                      :rules="required"
                     />
                     <v-text-field
                       v-model="password"
-                      :rules="validationRules"
                       label="Password"
                       outlined
                       type="password"
+                      :rules="validationRules"
                     />
                     <v-row>
                       <v-col cols="6">
                         <v-btn
                           v-if="showComponent"
-                          class="text-left"
                           color="primary"
                           outlined
+                          class="text-left"
                           @click="formNumber++"
                         >
                           Forgot your password?
@@ -96,9 +98,9 @@
                     outlined
                   />
                   <v-text-field
-                    :rules="required"
                     label="Repeat password"
                     outlined
+                    :rules="required"
                   />
                   <v-btn
                     class="text-right"
@@ -156,32 +158,34 @@ export default {
       return new Date().getTime() + config.sessionDurationMinutes * 60000;
     },
     validationRules() {
-      return [
-        v => !!v || (
-          this.showComponent ? 'The password is incorrect' : 'This field is required'
-        ),
-      ];
+      return [v => !!v || (this.showComponent ? 'The password is incorrect' : 'This field is required')];
     },
   },
   methods: {
     ...mapMutations({
       setUser: 'setUser',
+      setScopes: 'setScopes',
     }),
     submit() {
       this.showComponent = false;
       if (this.$refs.form.validate()) {
         AuthService.login(this.login, this.password)
-          .then(({ data }) => {
-            const token = data.token;
-            localStorage.setItem('token', token);
-            localStorage.setItem('tokenExpiration', this.tokenExpiration);
-            this.setUser(jwt_decode(token));
-            this.$router.push({ name: 'datasets' });
-          })
-          .catch(error => {
-            this.password = undefined;
-            this.showComponent = true;
-          });
+            .then(({ data }) => {
+              const token = data.token;
+              localStorage.setItem('token', token);
+              localStorage.setItem('tokenExpiration', this.tokenExpiration);
+
+              const decoded = jwt_decode(token);
+              this.setUser(decoded);
+              this.setScopes(decoded);
+              this.$router.push({ name: 'datasets' });
+            })
+            .catch(error => {
+              //this.$refs.form.reset();
+              //this.$refs.form.validate();
+              this.password = undefined;
+              this.showComponent = true;
+            });
       }
     },
   },
