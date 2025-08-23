@@ -10,9 +10,9 @@
       />
       <v-combobox
         v-model="param.value"
-        :label="param.properties.name"
-        :items="param.properties.options"
         :disabled="!param.selected"
+        :items="param.properties.options"
+        :label="param.properties.name"
         outlined
         @input.native="param.value = $event.target.value;"
       />
@@ -21,8 +21,8 @@
 </template>
 
 <script>
-import ParametersAPI from '@/api/ParametersAPI';
 import DatasetAPI from '@/api/DatasetAPI';
+import ParametersAPI from '@/api/ParametersAPI';
 import Vue from 'vue';
 
 export default {
@@ -34,7 +34,9 @@ export default {
     },
     dataset: {
       type: Object,
-      default: () => ({}),
+      default: () => (
+        {}
+      ),
     },
   },
   data: () => {
@@ -54,12 +56,12 @@ export default {
     },
     getParameters() {
       DatasetAPI.show(Vue.prototype.$store.state?.dataset?.id)
-          .then(({ data }) => {
-            this.parameters = data.parameters?.filter(param => param.type == this.type)
-                .map(param => {
-                  return { properties: param, value: '', selected: true };
-                });
-          });
+        .then(({ data }) => {
+          this.parameters = data.parameters?.filter(param => param.type == this.type)
+            .map(param => {
+              return { properties: param, value: '', selected: true };
+            }) || [];
+        });
     },
   },
 };
