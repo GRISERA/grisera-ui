@@ -29,6 +29,7 @@ export default class extends BaseAPI2 {
       sex: data.sex,
       disorder: data.disorder, //not implemented in frontend
       additionalParameters: data.additional_properties?.map(e => {return { ...e, name: e.key };}),
+      external_id: data.external_id,
     };
   }
 }

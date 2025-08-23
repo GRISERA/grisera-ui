@@ -3,7 +3,7 @@
     <v-row>
       <v-col class="headline font-weight-bold my-auto d-flex">
         <info-tool-tip-component :info-message="infoMessage" />
-        <app-breadcrumbs />
+        <app-breadcrumbs :items="{ activity }" />
       </v-col>
       <v-col class="col-12">
         <template>

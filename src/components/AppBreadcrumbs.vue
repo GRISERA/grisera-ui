@@ -1,10 +1,10 @@
 <template>
   <v-breadcrumbs
-    class="pa-0"
     :items="breadcrumbs"
     :large="true"
+    class="pa-0"
   >
-    <template #item="{item}">
+    <template #item="{ item }">
       <div
         :class="[
           'clear-link',
@@ -13,8 +13,8 @@
         ]"
       >
         <a
-          style="line-height: 36px"
           :href="item.href || undefined"
+          style="line-height: 36px"
         >
           {{ item.text }}
         </a>
@@ -32,9 +32,32 @@
 
 export default {
   name: 'AppBreadcrumbs',
+  props: {
+    items: {
+      type: Object,
+      default: () => (
+        {}
+      ),
+    },
+  },
   computed: {
     breadcrumbs() {
-      return this.$root.breadcrumbs;
+      return (
+        this.$root.breadcrumbs || []
+      ).map(config => {
+        if (!config.replaceable) {
+          return config;
+        }
+
+        const newText = this.items[config.entity]?.[config.key] ?? '';
+
+        return {
+          ...config,
+          text: config.text.replace('[value]', newText ? `(${ newText })` : newText).trim(),
+        };
+
+        return config;
+      });
     },
   },
 };

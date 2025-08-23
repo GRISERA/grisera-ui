@@ -1,5 +1,5 @@
-import ClassesDescriptions from '@/const/ClassesDescriptions';
 import AccessRoles from '@/const/AccessRoles';
+import ClassesDescriptions from '@/const/ClassesDescriptions';
 
 export default [
   {
@@ -24,7 +24,7 @@ export default [
       hideFilters: true,
       breadcrumbs: [
         { text: 'Experiments', href: '/experiments' },
-        { text: 'Experiment :id', disabled: true },
+        { text: 'Experiment :id', disabled: true, replaceable: true, entity: 'experiment', key: 'external_id' },
       ],
       infoMessage: ClassesDescriptions.EXPERIMENT,
     },

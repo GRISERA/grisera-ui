@@ -74,7 +74,6 @@ export default {
   data() {
     return {
       headers: [
-        { text: 'Registered Data ID', value: 'registeredDataId', sortable: false },
         { text: 'Name', value: 'name' },
         { text: 'Scenario Execution', value: 'scenarioExecution_name' },
         { text: 'Activity Execution', value: 'activityExecution_name' },

@@ -2,14 +2,14 @@
   <v-container class="container--fluid mt-4">
     <v-row>
       <v-col class="headline font-weight-bold my-auto d-flex">
-        <info-tool-tip-component :info-message="$route.meta.infoMessage || 'Manage your data imports'"/>
-        <app-breadcrumbs/>
+        <info-tool-tip-component :info-message="$route.meta.infoMessage || 'Manage your data imports'" />
+        <app-breadcrumbs />
       </v-col>
       <v-col class="text-right">
         <v-btn
-            :outlined="true"
-            @click="$router.push({ name: 'import-creation' })"
-            :disabled="!currentDatasetId"
+          :disabled="!currentDatasetId"
+          :outlined="true"
+          @click="$router.push({ name: 'import-creation' })"
         >
           {{ currentDatasetId ? 'Create' : 'Select Dataset First' }}
         </v-btn>
@@ -21,12 +21,12 @@
               <p class="title grey--text">Please select a dataset first to see its imports.</p>
             </v-col>
           </v-row>
-          <v-row v-else-if="isLoading" class="fill-height" align-content="center" justify="center">
+          <v-row v-else-if="isLoading" align-content="center" class="fill-height" justify="center">
             <v-col class="subtitle-1 text-center" cols="12">
               Loading imports...
             </v-col>
             <v-col cols="6">
-              <v-progress-linear indeterminate rounded height="6"></v-progress-linear>
+              <v-progress-linear height="6" indeterminate rounded></v-progress-linear>
             </v-col>
           </v-row>
           <v-row v-else-if="imports.length === 0">
@@ -36,11 +36,11 @@
           </v-row>
           <v-row v-else class="fill-height">
             <v-col
-                v-for="importJob in imports"
-                :key="`import_${importJob.id}`"
-                class="col-md-4 col-sm-6 col-12 align-self-stretch"
+              v-for="importJob in imports"
+              :key="`import_${importJob.id}`"
+              class="col-md-4 col-sm-6 col-12 align-self-stretch"
             >
-              <v-card :elevation="4" height="100%" class="d-flex flex-column">
+              <v-card :elevation="4" class="d-flex flex-column" height="100%">
                 <v-card-title class="pb-0 mb-5">
                   <v-icon left>{{ getFileIcon(importJob.file_name) }}</v-icon>
                   <span class="subtitle-1 font-weight-medium">{{ importJob.file_name }}</span>
@@ -49,28 +49,28 @@
                   <span class="d-block">ID: <span class="import-id-ellipsis">{{ importJob.id }}</span></span>
                   <span class="d-block">Created: {{ formatDate(importJob.created_at) }}</span>
                 </v-card-subtitle>
-                  <v-card-text class="flex-grow-1">
-                    <div class="caption">Description:</div>
-                    <div class="black--text text-body-2">{{ importJob.description || '-' }}</div>
-                    <div class="caption mt-2">Status:</div>
-                    <v-chip :color="getStatusColor(importJob.status)" small label text-color="white"
-                            class="font-weight-bold">
-                      {{ importJob.status }}
-                    </v-chip>
-                  </v-card-text>
-                  <v-divider/>
-                  <v-card-actions>
-                    <v-btn icon small @click="refreshSingleImportStatus(importJob)"
-                           :loading="isRefreshing[importJob.id]">
-                      <v-icon>mdi-refresh</v-icon>
-                    </v-btn>
-                    <v-spacer/>
-                    <v-btn small color="red" text @click="deleteImport(importJob.id)"
-                           :disabled="true">
-                      <v-icon left small>mdi-delete</v-icon>
-                      Cancel
-                    </v-btn>
-                  </v-card-actions>
+                <v-card-text class="flex-grow-1">
+                  <div class="caption">Description:</div>
+                  <div class="black--text text-body-2">{{ importJob.description || '-' }}</div>
+                  <div class="caption mt-2">Status:</div>
+                  <v-chip :color="getStatusColor(importJob.status)" class="font-weight-bold" label small
+                          text-color="white">
+                    {{ importJob.status }}
+                  </v-chip>
+                </v-card-text>
+                <v-divider />
+                <v-card-actions>
+                  <v-btn :loading="isRefreshing[importJob.id]" icon small
+                         @click="refreshSingleImportStatus(importJob)">
+                    <v-icon>mdi-refresh</v-icon>
+                  </v-btn>
+                  <v-spacer />
+                  <v-btn :disabled="true" color="red" small text
+                         @click="deleteImport(importJob.id)">
+                    <v-icon left small>mdi-delete</v-icon>
+                    Cancel
+                  </v-btn>
+                </v-card-actions>
               </v-card>
             </v-col>
           </v-row>
@@ -86,10 +86,10 @@
 </template>
 
 <script>
+import ImportAPI from '@/api/ImportAPI';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
-import ImportAPI from '@/api/ImportAPI';
-import {mapState, mapGetters, mapActions} from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 export default {
   name: 'ImportsView',
@@ -97,16 +97,18 @@ export default {
     InfoToolTipComponent,
     AppBreadcrumbs,
   },
-  data: () => ({
-    isLoading: false,
-    isRefreshing: {},
-    snackbar: {
-      show: false,
-      text: '',
-      color: 'info',
-      timeout: 4000,
-    },
-  }),
+  data: () => (
+    {
+      isLoading: false,
+      isRefreshing: {},
+      snackbar: {
+        show: false,
+        text: '',
+        color: 'info',
+        timeout: 4000,
+      },
+    }
+  ),
   computed: {
     ...mapState({
       currentDatasetId: state => state.dataset?.id,
@@ -132,7 +134,9 @@ export default {
       'fetchImports',
     ]),
     async loadImportsForDataset() {
-      if (!this.currentDatasetId) return;
+      if (!this.currentDatasetId) {
+        return;
+      }
       this.isLoading = true;
       await this.fetchImports();
       this.isLoading = false;
@@ -152,18 +156,18 @@ export default {
         const response = await ImportAPI.getStatus(importJob.id, this.currentDatasetId);
         this.$store.commit('updateImportStatus', {
           importId: importJob.id,
-          status: response.data.status
+          status: response.data.status,
         });
-        this.showSnackbar(`Status for ${importJob.file_name} updated.`, 'info');
+        this.showSnackbar(`Status for ${ importJob.file_name } updated.`, 'info');
       } catch (error) {
         console.error('Error refreshing import status:', error);
-        this.showSnackbar(`Error refreshing status: ${error.response?.data?.detail || error.message}`, 'error');
+        this.showSnackbar(`Error refreshing status: ${ error.response?.data?.detail || error.message }`, 'error');
       } finally {
         this.$set(this.isRefreshing, importJob.id, false);
       }
     },
     deleteImport(importId) {
-      console.warn('deleteImport not implemented yet for ImportsView', importId)
+      console.warn('deleteImport not implemented yet for ImportsView', importId);
       this.showSnackbar('Delete functionality to be implemented.', 'warning');
     },
     showSnackbar(text, color = 'info') {
@@ -186,14 +190,22 @@ export default {
       }
     },
     getFileIcon(fileName) {
-      if (!fileName) return 'mdi-file';
+      if (!fileName) {
+        return 'mdi-file';
+      }
       const ext = fileName.split('.').pop().toLowerCase();
-      if (ext === 'owl') return 'mdi-owl';
-      if (ext === 'json') return 'mdi-code-json';
+      if (ext === 'owl') {
+        return 'mdi-owl';
+      }
+      if (ext === 'json') {
+        return 'mdi-code-json';
+      }
       return 'mdi-file-document-outline';
     },
     formatDate(dateString) {
-      if (!dateString) return '-';
+      if (!dateString) {
+        return '-';
+      }
       try {
         return new Date(dateString).toLocaleString();
       } catch (e) {
@@ -202,7 +214,7 @@ export default {
     },
     isPermanentStatus(status) {
       return ['completed', 'failed'].includes(status);
-    }
+    },
   },
 };
 </script>

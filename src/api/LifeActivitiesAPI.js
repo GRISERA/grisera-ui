@@ -21,6 +21,7 @@ export default class extends BaseAPI2 {
       }).join(''),
       name: formated,
       description: formated,
+      external_id: data.external_id,
     };
   }
 }

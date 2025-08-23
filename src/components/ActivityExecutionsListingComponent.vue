@@ -92,7 +92,6 @@
       return {
         activityExecutionNames: {},
         headers: [
-        { text: 'ID', value: 'id', sortable: false },
         { text: 'Name', value: 'name', sortable: true },
         { text: 'Type', value: 'type', sortable: true },
       ],

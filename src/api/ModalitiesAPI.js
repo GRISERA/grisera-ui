@@ -6,13 +6,13 @@ export default class extends BaseAPI2 {
     return DatabaseName.MODALITIES;
   }
 
-  static dTOFrontToAPI(data){
+  static dTOFrontToAPI(data) {
     return {
       modality: data.name,
     };
   }
 
-  static dTOAPIToFront(data){
+  static dTOAPIToFront(data) {
     const formated = data.modality.charAt(0).toUpperCase() + data.modality.slice(1) || '';
     return {
       id: data.id,
@@ -21,6 +21,7 @@ export default class extends BaseAPI2 {
       }).join(''),
       name: formated,
       description: formated,
+      external_id: data.external_id,
     };
   }
 }
