@@ -23,9 +23,9 @@
           />
           <v-text-field
             v-model="dataset.rights"
+            :rules="[ v => requiredRule(v)]"
             label="Rights"
             outlined
-            :rules="[ v => requiredRule(v)]"
             required
           />
           <v-dialog
@@ -40,9 +40,9 @@
                 v-model="dataset.date"
                 :rules="[ v => requiredRule(v)]"
                 label="Date"
+                outlined
                 prepend-inner-icon="mdi-calendar"
                 readonly
-                outlined
                 required
                 v-bind="attrs"
                 v-on="on"
@@ -54,15 +54,15 @@
             >
               <v-spacer />
               <v-btn
-                text
                 color="primary"
+                text
                 @click="modal = false"
               >
                 Cancel
               </v-btn>
               <v-btn
-                text
                 color="primary"
+                text
                 @click="$refs.dialog.save(dataset.date)"
               >
                 OK
@@ -72,8 +72,8 @@
           <v-textarea
             v-model="dataset.description"
             label="Description"
-            outlined
             no-resize
+            outlined
           />
           <v-btn
             :outlined="true"
@@ -82,8 +82,8 @@
             Cancel
           </v-btn>
           <v-btn
-            style="float: right;"
             color="primary"
+            style="float: right;"
             @click="validate"
           >
             {{ buttonText }}
@@ -98,11 +98,10 @@
 import DatasetAPI from '@/api/DatasetAPI';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
-import config from '../../../config.js';
-import { mapState } from 'vuex';
-
-import PermissionsService from '@/services/PermissionsService';
 import Roles from '@/const/AccessRoles';
+import PermissionsService from '@/services/PermissionsService';
+import { mapState } from 'vuex';
+import config from '../../../config.js';
 
 export default {
   name: 'DatasetDetailedView',
@@ -138,7 +137,9 @@ export default {
   watch: {
     '$route.params.id': {
       handler(newValue) {
-        if (!newValue) return;
+        if (!newValue) {
+          return;
+        }
         const value = DatasetAPI.show(newValue).then(({ data }) => {
           this.dataset = { ...data };
           this.editMode = true;
