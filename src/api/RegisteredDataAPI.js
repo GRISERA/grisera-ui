@@ -40,7 +40,7 @@ export default class extends BaseAPI2 {
         description: data.additional_properties?.find(param => param.key === 'description').value,
         registeredChannels: data.registered_channels,
 
-        additionalParameters: data.additional_properties.filter(
+        additionalParameters: data.additional_properties?.filter(
             param => !['name', 'description'].includes(param.key),
           ).map(e => {return { ...e, name: e.key };}),
       };
@@ -51,7 +51,7 @@ export default class extends BaseAPI2 {
         link: data.source,
         name: data.additional_properties?.find(param => param.key === 'name').value,
         description: data.additional_properties?.find(param => param.key === 'description').value,
-        additionalParameters: data.additional_properties.filter(
+        additionalParameters: data.additional_properties?.filter(
             param => !['name', 'description'].includes(param.key),
           ).map(e => {return { ...e, name: e.key };}),
     };

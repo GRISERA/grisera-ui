@@ -19,20 +19,20 @@ function mapRecordings(recordings){
         name: recording.name,
         description: recording.description,
         chosenAE: recording.chosenAE,
-        registeredDataId: recording.registeredDataId,
-        registeredData: recording.registeredChannel.registeredData,
+        registeredDataId: recording?.registeredDataId,
+        registeredData: recording?.registeredChannel?.registeredData,
         data: [],
       };
     }
     acc[recording.registeredDataId].id.push(recording.id);
     
-    var dataOfRecording = acc[recording.registeredDataId].data.find(obj => obj.registeredChannel.id === recording.registeredChannel.id);
+    var dataOfRecording = acc[recording.registeredDataId].data.find(obj => obj?.registeredChannel?.id === recording?.registeredChannel?.id);
     if(dataOfRecording){
       dataOfRecording.participants.push({ ...recording.participant, recording_id: recording.id });
       dataOfRecording.participations.push(recording.participation);
     } else {
       acc[recording.registeredDataId].data.push({
-        channel: recording.registeredChannel.channel,
+        channel: recording.registeredChannel?.channel,
         registeredChannel: recording.registeredChannel,
         participants: [{
           ...recording.participant,
