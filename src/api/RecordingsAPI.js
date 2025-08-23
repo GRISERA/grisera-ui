@@ -6,12 +6,13 @@ import ActivityExecutionsAPI from './ActivityExecutionsAPI';
 import ChannelsAPI from './ChannelsAPI';
 import ParticipantsAPI from './ParticipantsAPI';
 
-function mapRecordings(recordings){
-  if(!recordings){
+
+function mapRecordings(recordings) {
+  if (!recordings) {
     return recordings;
   }
 
-  const srot =  Object.values(recordings.reduce((acc, recording) => {
+  const srot = Object.values(recordings.reduce((acc, recording) => {
     if (!acc[recording.registeredDataId]) {
       acc[recording.registeredDataId] = {
         id: [],
@@ -25,9 +26,9 @@ function mapRecordings(recordings){
       };
     }
     acc[recording.registeredDataId].id.push(recording.id);
-    
+
     var dataOfRecording = acc[recording.registeredDataId].data.find(obj => obj.registeredChannel.id === recording.registeredChannel.id);
-    if(dataOfRecording){
+    if (dataOfRecording) {
       dataOfRecording.participants.push({ ...recording.participant, recording_id: recording.id });
       dataOfRecording.participations.push(recording.participation);
     } else {
@@ -54,7 +55,8 @@ export default class extends BaseAPI2 {
     return DatabaseName.RECORDINGS;
   }
 
-  static dTOFrontToAPI(data){
+
+  static dTOFrontToAPI(data) {
     return {
       id: data.id,
       participation_id: data.participation.id || data.participationId,
@@ -65,26 +67,31 @@ export default class extends BaseAPI2 {
     };
   }
 
-  static dTOAPIToFront(data){
-    if(!data)
+
+  static dTOAPIToFront(data) {
+    if (!data) {
       return;
-    
-    if(Array.isArray(data)){
-      if(!data[0]){
+    }
+
+    if (Array.isArray(data)) {
+      if (!data[0]) {
         return [];
       }
       return mapRecordings(data.map(recording => this.dTOAPIToFront(recording)));
     }
-    
+
     var registeredChannel = data.registered_channel ? RegisteredChannelsAPI.dTOAPIToFront(data.registered_channel) : null;
     var dataOfRecording = [];
-    if(data.links){
+    if (data.links) {
       dataOfRecording.push({
         channel: data.registered_channel.channel ? ChannelsAPI.dTOAPIToFront(data.registered_channel.channel) : null,
         participants: [ParticipantsAPI.dTOAPIToFront(data.participation.participant_state.participant)],
       });
     }
-    var chosenAE = data.participation?.activity_execution ? { ...ActivityExecutionsAPI.dTOAPIToFront(data.participation?.activity_execution), participants: [ParticipantsAPI.dTOAPIToFront(data.participation.participant_state.participant)] } : null;
+    var chosenAE = data.participation?.activity_execution ? {
+      ...ActivityExecutionsAPI.dTOAPIToFront(data.participation?.activity_execution),
+      participants: [ParticipantsAPI.dTOAPIToFront(data.participation.participant_state.participant)],
+    } : null;
     return {
       id: data.id,
       name: registeredChannel?.registeredData?.name,
@@ -101,37 +108,47 @@ export default class extends BaseAPI2 {
     };
   }
 
-  static store(data) {
-    return RegisteredDataAPI.store(data).then((responseRD) => {
-      return Promise.all(data.data.map(channelInfo => {
-        return RegisteredChannelsAPI.store({ channelId: channelInfo.channel.id, registeredDataId: responseRD.data.id }).then(responseRC => {
-          return Promise.all(channelInfo.participants.map(participant => {
-            super.store(
-              {
-                participation: data.chosenAE.participations.find(participation => participation.participant_state.participant.id === participant.id),
-                registeredChannel: responseRC.data, 
-              },
-            );
+
+  static store(data, file = null) {
+    return RegisteredDataAPI.uploadFile(file).then(response => {
+      data.link = response?.data?.object_name ? response.data.object_name : data.link;
+      return RegisteredDataAPI.store(data).then((responseRD) => {
+        return Promise.all(data.data.map(channelInfo => {
+          return RegisteredChannelsAPI.store({
+            channelId: channelInfo.channel.id,
+            registeredDataId: responseRD.data.id,
+          }).then(responseRC => {
+            return Promise.all(channelInfo.participants.map(participant => {
+              super.store(
+                {
+                  participation: data.chosenAE.participations.find(participation => participation.participant_state.participant.id === participant.id),
+                  registeredChannel: responseRC.data,
+                },
+              );
+            }));
+          });
         }));
-        });
-      }));
+      });
     });
   }
 
-  static update(data){
+
+  static update(data, file = null) {
     return this.delete(data.id).then(() => {
-      return this.store(data);
+      return this.store(data, file);
     });
   }
 
-  static delete(id){
-    if(Array.isArray(id)){
+
+  static delete(id) {
+    if (Array.isArray(id)) {
       return Promise.all(id.map(e => this.delete(e)));
     }
     return super.delete(id);
   }
 
-  static index(){
+
+  static index() {
     return super.index()
       .then(({ data }) => {
         return Promise.all(data.map(recording => {

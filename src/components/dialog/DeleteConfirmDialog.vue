@@ -3,6 +3,7 @@
     :value="active"
     :persistent="true"
     :width="500"
+    data-testid="delete-confirm-dialog"
   >
     <v-card>
       <v-card-title class="primary white--text">
@@ -24,6 +25,7 @@
       <v-card-actions>
         <v-btn
           :text="true"
+          data-testid="delete-cancel-button"
           @click="$emit('cancel')"
         >
           Cancel
@@ -31,6 +33,7 @@
         <v-spacer />
         <v-btn
           class="primary"
+          data-testid="delete-submit-button"
           @click="$emit('submit')"
         >
           Submit

@@ -30,10 +30,20 @@
     </template>
     <template #[`item.link`]="{ item }">
       <td v-if="item.link">
-        <a
-          :href="item.link"
-          target="_blank"
-        >{{ item.link }}</a>
+        {{ preparedLink(item.link) }}
+        <v-tooltip top>
+          <template #activator="{ on, attrs }">
+            <v-icon
+              v-bind="attrs"
+              v-on="on"
+              color="primary"
+              @click.stop.prevent="downloadFile(item)"
+            >
+              mdi-file-find
+            </v-icon>
+          </template>
+          <span>Click to preview</span>
+        </v-tooltip>
       </td>
     </template>
     <template #actions="{ item }">
@@ -43,12 +53,13 @@
         @click.stop.prevent="editTimeSeries(item.id)"
       >
         mdi-pen
-      </v-icon>  
+      </v-icon>
     </template>
   </base-table>
 </template>
-    
+
 <script>
+import RegisteredDataAPI from '@/api/RegisteredDataAPI';
 import BaseTable from '@/components/base/BaseTable.vue';
 import TimeSeriesApi from '@/api/TimeSeriesApi';
 import ObservableInformationsTable from '@/views/time-series/components/ObservableInformationsTable.vue';
@@ -56,9 +67,8 @@ import ObservableInformationsTable from '@/views/time-series/components/Observab
 export default {
   name: 'TimeSeriesTable',
   components: {
-  BaseTable,
-  ObservableInformationsTable,
-  ObservableInformationsTable,
+    BaseTable,
+    ObservableInformationsTable,
   },
   data() {
     return {
@@ -66,7 +76,7 @@ export default {
         { text: 'Type', value: 'type' },
         { text: 'Spacing', value: 'spacing' },
         { text: 'Measure', value: 'measure' },
-        { text: 'Link', value: 'link' },
+        { text: 'Linked file', value: 'link' },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
       timeSeries: [],
@@ -97,6 +107,13 @@ export default {
           timeSeriesId: timeSeriesId,
         },
       });
+    },
+    async downloadFile(item) {
+      const response = await RegisteredDataAPI.getPreviewUrl(item.link);
+      window.open(response.data.preview_url, '_blank');
+    },
+    preparedLink(link) {
+      return link.split('/').pop();
     },
   },
 };
