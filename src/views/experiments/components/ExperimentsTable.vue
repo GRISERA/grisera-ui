@@ -34,8 +34,8 @@
 </template>
 
 <script>
-import BaseTable from '@/components/base/BaseTable.vue';
 import ExperimentsAPI from '@/api/ExperimentsAPI';
+import BaseTable from '@/components/base/BaseTable.vue';
 
 export default {
   name: 'ExperimentsTable',
@@ -45,7 +45,7 @@ export default {
   data() {
     return {
       headers: [
-        { text: 'ID', value: 'id', sortable: false, width: '5%' },
+        { text: 'External ID', value: 'external_id', sortable: false },
         { text: 'Name', value: 'name' },
         { text: 'Date', value: 'created_at' },
         { text: 'Author', value: 'creator' },
@@ -56,9 +56,9 @@ export default {
   },
   created() {
     ExperimentsAPI.index()
-        .then(({ data }) => {
-          this.experiments = data;
-        });
+      .then(({ data }) => {
+        this.experiments = data;
+      });
   },
   methods: {
     goToDetails(id) {

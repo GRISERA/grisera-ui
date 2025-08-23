@@ -30,6 +30,7 @@ export default class extends BaseAPI2 {
       type: data.datatype === 'string' ? 'Categorical' : 'Numeric',
       source: data.measure_name?.type,
       name: data.measure_name?.name,
+      external_id: data.external_id,
     };
   }
 

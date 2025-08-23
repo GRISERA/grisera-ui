@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import BaseTable from '@/components/base/BaseTable.vue';
 import ModalitiesAPI from '@/api/ModalitiesAPI';
+import BaseTable from '@/components/base/BaseTable.vue';
 
 export default {
   name: 'ModalitiesTable',
@@ -17,7 +17,7 @@ export default {
   data() {
     return {
       headers: [
-        { text: 'ID', value: 'id', sortable: false, width: '5%' },
+        { text: 'External ID', value: 'external_id', sortable: false },
         { text: 'Name', value: 'name' },
         { text: 'Description', value: 'description' },
       ],
@@ -26,9 +26,9 @@ export default {
   },
   created() {
     ModalitiesAPI.index()
-        .then(({ data }) => {
-          this.modalities = data;
-        });
+      .then(({ data }) => {
+        this.modalities = data;
+      });
   },
 };
 </script>

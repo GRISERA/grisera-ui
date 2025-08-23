@@ -47,7 +47,7 @@ export default {
   data() {
     return {
       headers: [
-        { text: 'ID', value: 'id', sortable: false, width: '5%' },
+        { text: 'External ID', value: 'external_id', sortable: false },
         { text: 'Name', value: 'name' },
         { text: 'Surname', value: 'surname' },
         { text: 'Birth date', value: 'birthDate' },
