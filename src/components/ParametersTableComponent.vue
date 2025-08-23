@@ -76,24 +76,24 @@
       </template>
 
       <template #[`item.options`]="{ item }">
-        <v-chip-group v-if="item.options && item.options.length > 0">
+        <div v-if="item.options && item.options.length > 0" class="d-flex align-center">
           <v-chip
-            v-for="option in item.options.slice(0, 3)"
-            :key="option"
+            color="primary"
             outlined
             small
+            class="mr-2"
           >
-            {{ option }}
+            {{ item.options.length }} {{ item.options.length === 1 ? 'option' : 'options' }}
           </v-chip>
-          <v-chip
-            v-if="item.options.length > 3"
-            color="grey"
-            outlined
+          <v-btn
+            icon
             small
+            @click="viewOptions(item)"
+            color="primary"
           >
-            +{{ item.options.length - 3 }} more
-          </v-chip>
-        </v-chip-group>
+            <v-icon small>mdi-eye</v-icon>
+          </v-btn>
+        </div>
         <span
           v-else
           class="grey--text text-caption"
@@ -233,6 +233,73 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- Options View Dialog -->
+    <v-dialog
+      v-model="optionsDialog"
+      max-width="500px"
+    >
+      <v-card>
+        <v-card-title class="text-h5 primary white--text">
+          <v-icon
+            color="white"
+            left
+          >
+            mdi-format-list-bulleted
+          </v-icon>
+          Parameter Options
+        </v-card-title>
+
+        <v-card-text class="pt-6">
+          <div v-if="selectedParameter">
+            <h3 class="text-h6 mb-3">
+              {{ selectedParameter.name }}
+            </h3>
+            <p class="text-body-2 grey--text mb-4">
+              Key: <code>{{ selectedParameter.key }}</code>
+            </p>
+
+            <v-list v-if="selectedParameter.options && selectedParameter.options.length > 0">
+              <v-list-item
+                v-for="(option, index) in selectedParameter.options"
+                :key="index"
+                class="px-0"
+              >
+                <v-list-item-avatar>
+                  <v-avatar size="32" color="primary lighten-4">
+                    <span class="primary--text font-weight-medium">{{ index + 1 }}</span>
+                  </v-avatar>
+                </v-list-item-avatar>
+                <v-list-item-content>
+                  <v-list-item-title class="font-weight-medium">
+                    {{ option }}
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+
+            <v-alert
+              v-else
+              text
+              color="info"
+              icon="mdi-information"
+            >
+              This parameter has no predefined options.
+            </v-alert>
+          </div>
+        </v-card-text>
+
+        <v-card-actions class="px-6 pb-6">
+          <v-spacer />
+          <v-btn
+            color="primary"
+            @click="optionsDialog = false"
+          >
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -258,9 +325,11 @@ export default {
       parameters: undefined,
       dialog: false,
       dialogDelete: false,
+      optionsDialog: false,
+      selectedParameter: null,
       headers: [
-        { text: 'Index', align: 'start', value: 'id' },
         { text: 'Name', value: 'name' },
+        { text: 'Options', value: 'options', sortable: false },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
       editedIndex: -1,
@@ -278,6 +347,11 @@ export default {
     },
     dialogDelete(val) {
       val || this.close();
+    },
+    optionsDialog(val) {
+      if (!val) {
+        this.selectedParameter = null;
+      }
     },
     params: {
       handler(newParams) {
@@ -372,6 +446,11 @@ export default {
 
     transformParameterName(name) {
       return name.replace(/([A-Z])/g, ' $1').replace(/^\w/, c => c.toUpperCase());
+    },
+
+    viewOptions(item) {
+      this.selectedParameter = item;
+      this.optionsDialog = true;
     },
   },
 };
