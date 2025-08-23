@@ -17,7 +17,7 @@
                   mdi-swap-horizontal-bold
                 </v-icon>
               </v-list-item-avatar>
-              <v-list-item-content>
+              <v-list-item-content v-if="dataset?.name">
                 <v-list-item-title class="caption">
                   Current dataset:
                 </v-list-item-title>

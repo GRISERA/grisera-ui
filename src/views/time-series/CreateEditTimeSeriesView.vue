@@ -10,15 +10,29 @@
           @submit.stop.prevent="create"
         >
           <v-container>
-            <v-text-field
-              v-model="timeSeries.link"
-              label="Link"
+            <v-col v-if="timeSeries.link" class="col-12 my-auto">
+              Currently linked file:
+              {{ preparedLink(timeSeries.link) }}
+              <v-tooltip top>
+                <template #activator="{ on, attrs }">
+                  <v-icon
+                    v-bind="attrs"
+                    color="primary"
+                    v-on="on"
+                    @click.stop.prevent="downloadFile(timeSeries)"
+                  >
+                    mdi-file-find
+                  </v-icon>
+                </template>
+                <span>Click to preview</span>
+              </v-tooltip>
+            </v-col>
+            <v-file-input
+              v-model="timeSeries.file"
+              label="File input"
+              prepend-icon="mdi-paperclip"
               outlined
-              required
-              :rules="[
-                l => !!l || 'This field is required',
-                l => isValidHttpUrl(l) || 'Link has to be valid',
-              ]"
+              @change="onFileChange"
             />
             <v-divider />
             <v-radio-group
@@ -225,38 +239,40 @@
     </v-row>
   </v-container>
 </template>
-  
+
 <script>
+import RegisteredDataAPI from '@/api/RegisteredDataAPI';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import LifeActivitiesAPI from '@/api/LifeActivitiesAPI';
 import MeasuresAPI from '@/api/MeasuresAPI';
 import ModalitiesAPI from '@/api/ModalitiesAPI';
 import RecordingsAPI from '@/api/RecordingsAPI';
 import TimeSeriesApi from '@/api/TimeSeriesApi';
-import IndexedDB from '@/storage/IndexedDB';
 
 export default {
   name: 'CreateEditTimeSeriesView',
   components: {
-      AppBreadcrumbs,
+    AppBreadcrumbs,
   },
-  data () {
+  data() {
     return {
       timeSeries: {
         id: null,
         activityExecutionId: this.$route.params.activityExecution,
         participantId: this.$route.params.id,
         link: '',
+        file: undefined,
         type: null,
         spacing: null,
         measure: null,
-        observableInformations: [ { ... this.observableInformationPrototype }],
+        observableInformations: [{ ...this.observableInformationPrototype }],
       },
       measures: [],
       modalities: [],
       lifeActivities: [],
       filesWithChannels: [],
       isEditMode: false,
+      uploadedFile: undefined,
     };
   },
   watch: {
@@ -276,7 +292,6 @@ export default {
               this.isEditMode = true;
             });
         });
-        
       },
       immediate: true,
     },
@@ -285,8 +300,15 @@ export default {
     this.onCreated();
   },
   methods: {
-    onCreated(){
-      
+    onFileChange(file) {
+      if (!file) {
+        return;
+      }
+
+      this.timeSeries.file = file;
+    },
+    onCreated() {
+
       ModalitiesAPI.index()
         .then(({ data }) => {
           this.modalities = data;
@@ -305,22 +327,21 @@ export default {
       if (!this.$refs.form.validate()) {
         return;
       }
-      const method = this.isEditMode ? 'update' : 'store';
-      TimeSeriesApi[method]({ ...this.timeSeries }).then(() => {
-        this.$router.go(-1);
-      });
+
+      TimeSeriesApi[this.isEditMode ? 'update' : 'store']({ ...this.timeSeries }, this.timeSeries.file)
+        .then(() => this.$router.go(-1));
     },
     getRecordings() {
       return RecordingsAPI.index().then(({ data }) => {
         let recordingsWithChosenAE = data.filter((recording) => recording.chosenAE.id == this.timeSeries.activityExecutionId);
-        
+
         recordingsWithChosenAE.forEach((recording) => {
           const fileWithChannels = {
             recordingName: recording.name,
             link: recording.link,
             channels: [],
           };
-          recording.data.forEach((channelParticipantPair) => {  
+          recording.data.forEach((channelParticipantPair) => {
             channelParticipantPair.participants.forEach((participant) => {
               if (participant.id == this.timeSeries.participantId) {
                 fileWithChannels.channels.push({ ...channelParticipantPair.channel, recording_id: participant.recording_id });
@@ -338,7 +359,7 @@ export default {
       });
     },
     addObservableInformation() {
-      this.timeSeries.observableInformations.push({ ... this.observableInformationPrototype });
+      this.timeSeries.observableInformations.push({ ...this.observableInformationPrototype });
     },
     deleteObservableInformation(info, event) {
       const index = this.timeSeries.observableInformations.indexOf(info);
@@ -347,14 +368,12 @@ export default {
       }
       event.target.blur();
     },
-    isValidHttpUrl(urlToCheck) {
-      let url;
-      try {
-        url = new URL(urlToCheck);
-      } catch (_) {
-        return false;  
-      }
-      return url.protocol === 'http:' || url.protocol === 'https:';
+    async downloadFile(item) {
+      const response = await RegisteredDataAPI.getPreviewUrl(item.link);
+      window.open(response.data.preview_url, '_blank');
+    },
+    preparedLink(link) {
+      return link.split('/').pop();
     },
   },
 };

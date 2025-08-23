@@ -50,15 +50,14 @@
                           color="primary"
                           outlined
                           class="text-left"
-
                           @click="formNumber++"
                         >
                           Forgot your password?
                         </v-btn>
                       </v-col>
                       <v-col
-                        cols="6"
                         class="d-flex justify-end"
+                        cols="6"
                       >
                         <v-btn
                           color="primary"
@@ -77,13 +76,13 @@
                 <div v-if="formNumber === 2">
                   Enter the code we send to your email.
                   <v-text-field
+                    :rules="required"
                     label="Code"
                     outlined
-                    :rules="required"
                   />
                   <v-btn
-                    color="primary"
                     class="text-right"
+                    color="primary"
                     @click="formNumber++"
                   >
                     Send code
@@ -94,9 +93,9 @@
                 <div v-if="formNumber === 3">
                   Enter the new password.
                   <v-text-field
+                    :rules="required"
                     label="Password"
                     outlined
-                    :rules="required"
                   />
                   <v-text-field
                     label="Repeat password"
@@ -136,10 +135,10 @@
 </template>
 
 <script>
-import AuthService from '../services/AuthService';
-import config from '../../config.js';
-import { mapMutations } from 'vuex';
 import jwt_decode from 'jwt-decode';
+import { mapMutations } from 'vuex';
+import config from '../../config.js';
+import AuthService from '../services/AuthService';
 
 export default {
   name: 'LoginView',
@@ -192,6 +191,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .bg--primary {
   background-color: #043865;
@@ -216,8 +216,9 @@ export default {
 .fade-enter-active, .fade-leave-active {
   transition: opacity .5s;
 }
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */
+{
   opacity: 0;
 }
-
 </style>

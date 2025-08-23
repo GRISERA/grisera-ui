@@ -24,7 +24,7 @@
               <v-card
                 :elevation="8"
                 height="100%"
-                class="d-flex flex-column"
+                class="d-flex flex-column dataset-card"
               >
                 <v-card-text class="pa-0 flex-grow-1">
                   <v-container class="container--fluid">
@@ -33,7 +33,7 @@
                         <div class="caption">
                           Name
                         </div>
-                        <div class="black--text font-weight-bold">
+                        <div :test-data="dataset.name" class="black--text font-weight-bold">
                           {{ dataset.name }}
                         </div>
                       </v-col>
@@ -105,6 +105,7 @@
 </template>
 
 <script>
+import { apiService } from '@/api/BaseAPI2';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 import AccessRoles from '@/const/AccessRoles';

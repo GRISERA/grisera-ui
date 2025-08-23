@@ -4,6 +4,7 @@ import VueRouter from 'vue-router';
 import activityRoutes from '@/router/activityRoutes';
 import channelRoutes from '@/router/channelRoutes';
 import experimentRoutes from '@/router/experimentRoutes';
+import fileRoutes from '@/router/fileRoutes';
 import modalityRoutes from '@/router/modalityRoutes';
 import participantRoutes from '@/router/participantRoutes';
 import measureRoutes from '@/router/measureRoutes';
@@ -20,6 +21,7 @@ const routes = [
   ...channelRoutes,
   ...datasetRoutes,
   ...experimentRoutes,
+  ...fileRoutes,
   ...measureRoutes,
   ...modalityRoutes,
   ...participantRoutes,

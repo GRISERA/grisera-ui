@@ -10,7 +10,7 @@ export default class extends BaseAPI2 {
     return '';
   }
 
-  static dTOFrontToAPI(data){
+  static dTOFrontToAPI(data) {
     return {
       id: data.id,
       name: data.name,
@@ -22,7 +22,7 @@ export default class extends BaseAPI2 {
     };
   }
 
-  static dTOAPIToFront(data){
+  static dTOAPIToFront(data) {
     return {
       id: data.id,
       name: data.name,
@@ -31,6 +31,7 @@ export default class extends BaseAPI2 {
       date: data.date,
       description: data.description,
       additional_properties: data.additional_properties,
+      parameters: data.parameters,
     };
   }
 }
