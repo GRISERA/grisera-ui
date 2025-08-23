@@ -149,3 +149,12 @@ node_modules
 /dist
 .env.local
 .env.*.local
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# E2E Test Authentication
+/e2e-tests/auth-state.json
