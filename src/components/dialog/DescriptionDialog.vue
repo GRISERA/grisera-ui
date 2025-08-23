@@ -2,6 +2,7 @@
   <v-dialog
     :value="show"
     max-width="600px"
+    v-bind="$attrs"
     @input="$emit('update:show', $event)"
   >
     <v-card rounded="lg">
@@ -16,6 +17,7 @@
         <v-spacer />
         <v-btn
           icon
+          data-testid="description-dialog-close-btn"
           @click="$emit('update:show', false)"
         >
           <v-icon color="white">
@@ -28,10 +30,16 @@
           v-if="dataset"
           class="mb-4"
         >
-          <h3 class="text-h6 mb-2">
+          <h3
+            class="text-h6 mb-2"
+            data-testid="description-dialog-title"
+          >
             {{ dataset.name }}
           </h3>
-          <div class="description-full-text">
+          <div
+            class="description-full-text"
+            data-testid="description-dialog-content"
+          >
             {{ dataset.description }}
           </div>
         </div>
@@ -41,6 +49,7 @@
         <v-spacer />
         <v-btn
           color="primary"
+          data-testid="description-dialog-close-action-btn"
           @click="$emit('update:show', false)"
         >
           Close
@@ -53,6 +62,7 @@
 <script>
 export default {
   name: 'DescriptionDialog',
+  inheritAttrs: false,
   props: {
     show: {
       type: Boolean,

@@ -4,6 +4,7 @@
     height="100%"
     hover
     rounded="lg"
+    v-bind="$attrs"
   >
     <!-- Header -->
     <div class="card-header">
@@ -16,7 +17,10 @@
         </v-icon>
       </div>
       <div class="dataset-info flex-grow-1">
-        <h3 class="dataset-title">
+        <h3
+          class="dataset-title"
+          data-testid="dataset-name"
+        >
           {{ dataset.name }}
         </h3>
         <div class="dataset-meta">
@@ -51,6 +55,7 @@
         >
           <v-list-item
             class="menu-item"
+            data-testid="dataset-edit-btn"
             @click="$emit('edit', dataset)"
           >
             <v-list-item-icon class="menu-icon">
@@ -70,6 +75,7 @@
           <v-divider class="my-1" />
           <v-list-item
             class="menu-item delete-item"
+            data-testid="dataset-delete-btn"
             @click="$emit('delete', dataset)"
           >
             <v-list-item-icon class="menu-icon">
@@ -152,6 +158,7 @@
             class="expand-btn"
             icon
             small
+            data-testid="dataset-description-expand-btn"
             @click="$emit('show-description', dataset)"
           >
             <v-icon size="16">
@@ -168,6 +175,7 @@
         class="select-btn"
         color="primary"
         large
+        data-testid="dataset-select-btn"
         @click="$emit('select', dataset)"
       >
         <v-icon left>
@@ -182,6 +190,7 @@
 <script>
 export default {
   name: 'DatasetListCard',
+  inheritAttrs: false,
   props: {
     dataset: {
       type: Object,

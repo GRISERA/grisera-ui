@@ -1,24 +1,34 @@
 <template>
   <v-container class="container--fluid mt-4">
+    <page-header
+      :description="$route.meta.infoMessage"
+      action-icon="mdi-plus"
+      action-text="Create Dataset"
+      data-testid="datasets-page-header"
+      title="Datasets"
+      @action="createDataset"
+    />
     <v-row>
-      <v-col class="headline font-weight-bold my-auto d-flex">
-        <info-tool-tip-component :info-message="$route.meta.infoMessage" />
-        <app-breadcrumbs />
-      </v-col>
-      <v-col class="text-right">
-        <v-btn
-          color="primary"
-          @click="createDataset"
-        >
-          <v-icon left>
-            mdi-plus
-          </v-icon>
-          Create Dataset
-        </v-btn>
-      </v-col>
       <v-col class="col-12">
         <v-container class="container--fluid">
-          <v-row class="fill-height">
+          <!-- Empty State -->
+          <empty-state
+            v-if="datasets.length === 0"
+            action-icon="mdi-plus"
+            action-text="Create Your First Dataset"
+            data-testid="datasets-empty-state"
+            description="You haven't created any datasets yet. Start by creating your first dataset to organize your research data."
+            icon="mdi-database-outline"
+            title="No Datasets Found"
+            @action="createDataset"
+          />
+
+          <!-- Datasets Grid -->
+          <v-row
+            v-else
+            class="fill-height"
+            data-testid="datasets-grid"
+          >
             <v-col
               v-for="dataset in datasets"
               :key="`dataset_${dataset.id}`"
@@ -29,6 +39,7 @@
             >
               <dataset-list-card
                 :can-edit="canEditDataset(dataset.id)"
+                :data-testid="`dataset-card-${dataset.id}`"
                 :dataset="dataset"
                 @delete="confirmDeleteDataset"
                 @edit="editDataset"
@@ -41,14 +52,6 @@
       </v-col>
     </v-row>
 
-    <input
-      ref="fileInput"
-      accept=".owl,.json"
-      style="display: none"
-      type="file"
-      @change="handleFileSelect"
-    >
-
     <v-snackbar
       v-model="snackbar.show"
       :color="snackbar.color"
@@ -60,6 +63,7 @@
     <dataset-create-dialog
       v-model="showCreateDialog"
       :edit-dataset="datasetToEdit"
+      data-testid="dataset-create-dialog"
       @input="onDialogClose"
       @dataset-created="onDatasetCreated"
       @dataset-updated="onDatasetUpdated"
@@ -68,6 +72,7 @@
 
     <delete-confirm-dialog
       :active.sync="showDeleteDialog"
+      data-testid="dataset-delete-dialog"
       title="Delete Dataset"
       @cancel="cancelDelete"
       @submit="deleteDataset"
@@ -91,19 +96,19 @@
     <description-dialog
       :dataset="descriptionDialogDataset"
       :show.sync="showDescriptionDialog"
+      data-testid="dataset-description-dialog"
     />
   </v-container>
 </template>
 
 <script>
 import DatasetAPI from '@/api/DatasetAPI';
-import ImportAPI from '@/api/ImportAPI';
-import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import DatasetCreateDialog from '@/components/DatasetCreateDialog.vue';
 import DatasetListCard from '@/components/DatasetListCard.vue';
 import DeleteConfirmDialog from '@/components/dialog/DeleteConfirmDialog.vue';
 import DescriptionDialog from '@/components/dialog/DescriptionDialog.vue';
-import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
+import EmptyState from '@/components/EmptyState.vue';
+import PageHeader from '@/components/PageHeader.vue';
 import AccessRoles from '@/const/AccessRoles';
 import PermissionsService from '@/services/PermissionsService';
 import { mapGetters, mapMutations } from 'vuex';
@@ -111,10 +116,10 @@ import { mapGetters, mapMutations } from 'vuex';
 export default {
   name: 'DatasetsView',
   components: {
-    InfoToolTipComponent,
-    AppBreadcrumbs,
     DatasetCreateDialog,
     DatasetListCard,
+    EmptyState,
+    PageHeader,
     DeleteConfirmDialog,
     DescriptionDialog,
   },
@@ -160,86 +165,6 @@ export default {
     canEditDataset(datasetId) {
       const permission = this.permissions.find(permission => permission.datasetId == datasetId);
       return permission && permission.role != AccessRoles.READER;
-    },
-    openFileDialog(dataset) {
-      this.selectedDatasetForImport = dataset;
-      this.$nextTick(() => {
-        try {
-          const fileInput = this.$refs.fileInput;
-          if (fileInput && typeof fileInput.click === 'function') {
-            fileInput.click();
-          } else {
-            console.error('File input not available or click method not found');
-            this.showSnackbar('Nie można otworzyć dialogu wyboru pliku', 'error');
-          }
-        } catch (error) {
-          console.error('Error opening file dialog:', error);
-          this.showSnackbar('Błąd podczas otwierania dialogu wyboru pliku', 'error');
-        }
-      });
-    },
-    async handleFileSelect(event) {
-      const file = event.target.files[0];
-      if (!file) {
-        return;
-      }
-
-      // Validate file extension
-      const fileExtension = file.name.split('.').pop().toLowerCase();
-      if (!['owl', 'json'].includes(fileExtension)) {
-        this.showSnackbar('Dozwolone są tylko pliki .owl i .json', 'error');
-        return;
-      }
-
-      this.isUploading = true;
-
-      console.log('Selected dataset for import:', this.selectedDatasetForImport);
-      console.log('Dataset ID:', this.selectedDatasetForImport?.id);
-      console.log('File extension:', fileExtension);
-
-      try {
-        const response = await ImportAPI.uploadFile(
-          file,
-          this.selectedDatasetForImport.id,
-          fileExtension,
-          `Import from file: ${ file.name } for dataset: ${ this.selectedDatasetForImport.name }`,
-        );
-
-        // Dodaj import do store'a dla monitorowania
-        console.log('Full response:', response);
-        console.log('Response data:', response.data);
-
-        this.$store.commit('addImport', {
-          id: response.data.id,
-          status: response.data.status,
-          fileName: file.name,
-          datasetId: this.selectedDatasetForImport.id,
-        });
-
-        console.log('Import added to store');
-        console.log('Store imports after adding:', this.$store.state.imports);
-        console.log('Has active imports:', this.$store.getters.hasActiveImports);
-
-        this.showSnackbar(
-          `Plik ${ file.name } został zaimportowany pomyślnie do datasetu: ${ this.selectedDatasetForImport.name }`,
-          'success',
-        );
-        console.log('Import result:', response.data);
-
-        // Reset file input
-        this.$refs.fileInput.value = '';
-        this.selectedDatasetForImport = null;
-
-      } catch (error) {
-        console.error('Import error:', error);
-        this.showSnackbar(`Błąd podczas importu: ${ error.response?.data?.detail || error.message }`, 'error');
-
-        // Reset file input
-        this.$refs.fileInput.value = '';
-        this.selectedDatasetForImport = null;
-      } finally {
-        this.isUploading = false;
-      }
     },
     createDataset() {
       this.datasetToEdit = null;
@@ -306,7 +231,6 @@ export default {
       try {
         await DatasetAPI.delete(this.datasetToDelete.id);
 
-        // Refresh both datasets and permissions after deletion
         const [datasetsResponse, permissionsResponse] = await Promise.all([
           DatasetAPI.index(),
           PermissionsService.getUserPermissions(this.getUser().userId),
@@ -336,9 +260,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.dataset-col {
-  transition: transform 0.3s ease;
-}
-</style>
