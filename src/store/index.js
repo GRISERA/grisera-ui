@@ -122,22 +122,6 @@ const store = new Vuex.Store({
     },
   },
   actions: {
-    async fetchImports({ commit, rootState }) {
-      if (!rootState.dataset || !rootState.dataset.id) {
-        console.warn('Store fetchImports: No dataset selected, cannot fetch imports.');
-        return;
-      }
-      const datasetId = rootState.dataset.id;
-      console.log(`Store fetchImports: Fetching imports for dataset ID: ${ datasetId }`);
-      try {
-        const response = await ImportAPI.getImportsByDataset(datasetId);
-        console.log('Store fetchImports: Received imports from API:', response.data);
-        commit('setImports', response.data);
-      } catch (error) {
-        console.error(`Store fetchImports: Error fetching imports for dataset ${ datasetId }:`, error);
-        commit('setImports', []);
-      }
-    },
     async fetchExports({ commit, rootState }) {
       if (!rootState.dataset || !rootState.dataset.id) {
         console.warn('Store fetchExports: No dataset selected, cannot fetch exports.');

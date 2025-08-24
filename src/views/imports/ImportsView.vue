@@ -149,7 +149,7 @@ import ImportAPI from '@/api/ImportAPI';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
-import { mapActions, mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
   name: 'ImportsView',
@@ -168,14 +168,12 @@ export default {
         color: 'info',
         timeout: 4000,
       },
+      imports: [],
     }
   ),
   computed: {
     ...mapState({
       currentDatasetId: state => state.dataset?.id,
-    }),
-    ...mapGetters({
-      imports: 'getAllImports',
     }),
   },
   watch: {
@@ -191,9 +189,10 @@ export default {
     },
   },
   methods: {
-    ...mapActions([
-      'fetchImports',
-    ]),
+    async fetchImports() {
+      const { data } = await ImportAPI.getImportsByDataset(this.currentDatasetId);
+      this.imports = data;
+    },
     async loadImportsForDataset() {
       if (!this.currentDatasetId) {
         return;
