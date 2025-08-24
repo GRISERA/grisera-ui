@@ -4,11 +4,11 @@
     color="primary"
     class="main-navigation-drawer white--text rounded-xl"
     :style="{
-      // width: collapse ? '64px' : 'auto !important',
+      width: collapse ? '64px' : 'auto !important',
     }"
     :mini-variant="collapse"
-    :mini-variant-width="270"
-    :width="270"
+    :mini-variant-width="80"
+    :width="216"
   >
     <template #default>
       <v-container class="main-navigation-drawer--content">

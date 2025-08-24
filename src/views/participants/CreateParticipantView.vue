@@ -39,9 +39,9 @@
                 prepend-inner-icon="mdi-calendar"
                 readonly
                 clearable
-                @click:clear="birthDate = null"
                 outlined
                 v-bind="attrs"
+                @click:clear="birthDate = null"
                 v-on="on"
               />
             </template>

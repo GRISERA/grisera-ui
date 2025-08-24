@@ -128,5 +128,9 @@ export default class extends BaseAPI2 {
     });
   }
 
-
+  static count() {
+    return apiService.get(`/${ this.getBasePath() }?${ this.getDatasetName() }`).then(({ data }) => {
+      return data[this.getReturnValues()].length;
+    });
+  }
 }

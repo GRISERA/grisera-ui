@@ -35,8 +35,8 @@
           <template #activator="{ on, attrs }">
             <v-icon
               v-bind="attrs"
-              v-on="on"
               color="primary"
+              v-on="on"
               @click.stop.prevent="downloadFile(item)"
             >
               mdi-file-find

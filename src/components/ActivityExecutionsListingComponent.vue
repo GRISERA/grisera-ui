@@ -62,14 +62,14 @@
       </td>
     </template>
     <template
-      #actions="{ item }"
       v-if="canEditActivityExecution"
+      #actions="{ item }"
     >
       <v-icon
         class="mr-2"
         color="primary"
-        @click.stop.prevent="$emit('activity-execution:edit', item)"
         :data-testid="'edit-activity-execution'"
+        @click.stop.prevent="$emit('activity-execution:edit', item)"
       >
         mdi-pen
       </v-icon>

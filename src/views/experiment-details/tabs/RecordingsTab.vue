@@ -3,8 +3,8 @@
     <v-container class="container--fluid">
       <v-row>
         <v-col 
-          class="col-12 text-right"
           v-if="!isReadOnly"
+          class="col-12 text-right"
         >
           <v-row justify="end">
             <v-btn
@@ -23,8 +23,8 @@
           <recordings-table
             :data-to-display="dataToDisplay"
             :experiment="experiment"
+            :can-edit-and-delete="!isReadOnly"
             @recordings:delete="openDeleteConfirmDialog"
-            :canEditAndDelete="!isReadOnly"
           />
         </v-col>
       </v-row>

@@ -79,8 +79,8 @@
                     prepend-icon="mdi-calendar"
                     readonly
                     clearable
-                    @click:clear="participant.birthDate = null"
                     v-bind="attrs"
+                    @click:clear="participant.birthDate = null"
                     v-on="on"
                   />
                 </template>

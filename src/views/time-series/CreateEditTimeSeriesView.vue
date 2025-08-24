@@ -10,7 +10,10 @@
           @submit.stop.prevent="create"
         >
           <v-container>
-            <v-col v-if="timeSeries.link" class="col-12 my-auto">
+            <v-col
+              v-if="timeSeries.link"
+              class="col-12 my-auto"
+            >
               Currently linked file:
               {{ preparedLink(timeSeries.link) }}
               <v-tooltip top>

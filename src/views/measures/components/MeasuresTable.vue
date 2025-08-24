@@ -73,7 +73,6 @@
         <v-icon
           color="error"
           @click.stop.prevent="openDeleteConfirmDialog(item)"
-
         >
           mdi-delete
         </v-icon>

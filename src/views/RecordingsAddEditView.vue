@@ -77,7 +77,10 @@
                 ]"
                 label="Description"
               />
-              <v-col v-if="item.link" class="col-12 my-auto">
+              <v-col
+                v-if="item.link"
+                class="col-12 my-auto"
+              >
                 <v-divider class="pt-4" />
                 Currently linked file:
                 {{ preparedLink(item.link) }}

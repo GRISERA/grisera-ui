@@ -161,13 +161,15 @@
                           v-model="appearanceOclusionValues[i]"
                           class="ma-0 pa-0"
                         >
-                          <template v-slot:label>
-                            <div style="font-size: 16px;">{{ appearanceOclusionItem.title }}</div>
+                          <template #label>
+                            <div style="font-size: 16px;">
+                              {{ appearanceOclusionItem.title }}
+                            </div>
                           </template>
                           <div v-if="i < 2">
                             <v-radio
                               v-for="value in appearanceValues"
-                              v-bind:key="value"
+                              :key="value"
                               :label="value"
                               :value="value"
                             />

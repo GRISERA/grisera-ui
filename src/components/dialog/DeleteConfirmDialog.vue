@@ -36,7 +36,9 @@
           data-testid="delete-submit-button"
           @click="$emit('submit')"
         >
-          <v-icon left>mdi-delete</v-icon>
+          <v-icon left>
+            mdi-delete
+          </v-icon>
           Delete
         </v-btn>
       </v-card-actions>

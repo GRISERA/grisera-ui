@@ -2,20 +2,20 @@
   <v-container class="container--fluid mt-4">
     <v-row>
       <v-col
-        class="headline font-weight-bold my-auto d-flex"
         :cols="12"
+        class="headline font-weight-bold my-auto d-flex"
       >
         <app-breadcrumbs />
       </v-col>
       <v-col
         v-for="score in scores"
         :key="`score_${ score.title }`"
-        class="col-4"
+        class="col-3"
         @click="$router.push(score.url);"
       >
         <dashboard-info-card
-          :title="score.title"
           :score="score.score"
+          :title="score.title"
         />
       </v-col>
       <v-col class="col-12">
@@ -32,9 +32,10 @@
 import ActivitiesAPI from '@/api/ActivitiesAPI';
 import ExperimentsAPI from '@/api/ExperimentsAPI';
 import ParticipantsAPI from '@/api/ParticipantsAPI';
-import DatasetCard from '@/components/DatasetCard.vue';
-import DashboardInfoCard from '@/components/DashboardInfoCard.vue';
+import TimeSeriesAPI from '@/api/TimeSeriesApi';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
+import DashboardInfoCard from '@/components/DashboardInfoCard.vue';
+import DatasetCard from '@/components/DatasetCard.vue';
 
 export default {
   name: 'MainView',
@@ -65,6 +66,11 @@ export default {
         title: 'Total participants',
         url: '/participants',
         score: await ParticipantsAPI.count(),
+      },
+      {
+        title: 'Total time series',
+        url: '/time-series',
+        score: await TimeSeriesAPI.count(),
       },
     ];
   },
