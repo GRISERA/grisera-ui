@@ -35,12 +35,17 @@
       @close="editDialog = false"
       @saved="onParticipantSaved"
     />
+    <participant-create-dialog
+      v-model="createDialog"
+      @participant-created="onParticipantCreated"
+    />
   </div>
 </template>
 
 <script>
 import ParticipantsAPI from '@/api/ParticipantsAPI';
 import BaseTable from '@/components/base/BaseTable.vue';
+import ParticipantCreateDialog from '@/components/ParticipantCreateDialog.vue';
 import aclMixin from '@/mixins/acl-mixin';
 import ParticipantEditDialog from './ParticipantEditDialog.vue';
 
@@ -49,6 +54,7 @@ export default {
   components: {
     BaseTable,
     ParticipantEditDialog,
+    ParticipantCreateDialog,
   },
   mixins: [
     aclMixin,
@@ -66,6 +72,7 @@ export default {
       participants: [],
       editDialog: false,
       selectedParticipant: null,
+      createDialog: false,
     };
   },
   created() {
@@ -87,6 +94,11 @@ export default {
       if (index !== -1) {
         this.$set(this.participants, index, updatedParticipant);
       }
+    },
+    onParticipantCreated() {
+      console.log('Participant created, refreshing list...');
+      // this.fetchParticipants();
+      // this.createDialog = false;
     },
   },
 };
