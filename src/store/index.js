@@ -1,3 +1,4 @@
+import roles from '@/acl/roles';
 import ImportAPI from '@/api/ImportAPI';
 import Vue from 'vue';
 import Vuex from 'vuex';
