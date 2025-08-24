@@ -5,7 +5,7 @@
     :style="{
       width: collapse ? '64px' : 'auto !important',
     }"
-    :width="228"
+    :width="216"
     app
     class="main-navigation-drawer white--text rounded-xl"
     color="primary"
@@ -184,26 +184,6 @@ export default {
   display: flex;
   align-items: center;
   height: 100%;
-}
-
-.scrollable-navigation {
-  max-height: 50vh;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-}
-
-.scrollable-navigation::-webkit-scrollbar {
-  width: 6px;
-}
-
-.scrollable-navigation::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 3px;
-}
-
-.scrollable-navigation::-webkit-scrollbar-track {
-  background-color: transparent;
 }
 
 .navbar-copyrights {
