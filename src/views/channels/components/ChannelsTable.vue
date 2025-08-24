@@ -19,6 +19,7 @@
     </base-table>
 
     <channel-edit-dialog
+      v-if="selectedChannel"
       v-model="editDialog"
       :channel-data="selectedChannel"
       @close="editDialog = false"

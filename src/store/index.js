@@ -202,7 +202,7 @@ const store = new Vuex.Store({
       return hasActive;
     },
   },
-  // plugins: [createPersistedState()], // Commented out - will be added back if needed
+  plugins: [createPersistedState()], // Commented out - will be added back if needed
 });
 
 Vue.prototype.$store = store;
