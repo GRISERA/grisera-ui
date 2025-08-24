@@ -24,12 +24,21 @@
 
     <v-card-text class="card-content text-center">
       <div class="score-display">
-        <h1 class="score-number">
-          {{ formatScore(score) }}
-        </h1>
-        <div class="score-label">
-          entries
-        </div>
+        <v-progress-circular
+          v-if="loading"
+          :size="48"
+          :width="4"
+          color="grey lighten-2"
+          indeterminate
+        />
+        <template v-else>
+          <h1 class="score-number">
+            {{ formatScore(score) }}
+          </h1>
+          <div class="score-label">
+            {{ score === 'Error' ? 'Error' : pluralizeEntries(score) }}
+          </div>
+        </template>
       </div>
     </v-card-text>
   </v-card>
@@ -44,33 +53,64 @@ export default {
       default: undefined,
     },
     score: {
-      type: Number,
+      type: [Number, String],
       default: 0,
+    },
+    loading: {
+      type: Boolean,
+      default: false,
     },
   },
   methods: {
     formatScore(num) {
       if (num >= 1000000) {
-        return (num / 1000000).toFixed(1) + 'M';
+        return (
+          num / 1000000
+        ).toFixed(1) + 'M';
       }
       if (num >= 1000) {
-        return (num / 1000).toFixed(1) + 'K';
+        return (
+          num / 1000
+        ).toFixed(1) + 'K';
       }
       return num.toString();
     },
     getIcon() {
-      if (this.title?.includes('experiment')) return 'mdi-flask';
-      if (this.title?.includes('activities')) return 'mdi-run';
-      if (this.title?.includes('participant')) return 'mdi-account-group';
-      if (this.title?.includes('time series')) return 'mdi-chart-line';
+      if (this.title?.includes('experiment')) {
+        return 'mdi-flask';
+      }
+      if (this.title?.includes('activities')) {
+        return 'mdi-run';
+      }
+      if (this.title?.includes('participant')) {
+        return 'mdi-account-group';
+      }
+      if (this.title?.includes('time series')) {
+        return 'mdi-chart-line';
+      }
       return 'mdi-information';
     },
     getIconColor() {
-      if (this.title?.includes('experiment')) return '#FF6B35';
-      if (this.title?.includes('activities')) return '#4CAF50';
-      if (this.title?.includes('participant')) return '#2196F3';
-      if (this.title?.includes('time series')) return '#9C27B0';
+      if (this.title?.includes('experiment')) {
+        return '#FF6B35';
+      }
+      if (this.title?.includes('activities')) {
+        return '#4CAF50';
+      }
+      if (this.title?.includes('participant')) {
+        return '#2196F3';
+      }
+      if (this.title?.includes('time series')) {
+        return '#9C27B0';
+      }
       return '#757575';
+    },
+    pluralizeEntries(num) {
+      if (num === 'Error') {
+        return 'entries';
+      }
+      const intNum = parseInt(num);
+      return intNum === 1 ? 'entry' : 'entries';
     },
   },
 };
