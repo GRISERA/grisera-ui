@@ -84,7 +84,6 @@ export default class extends BaseAPI2 {
     });
   }
 
-
   static store(data, file = null) {
     return Promise.all(data?.observableInformations
       .map(observableInformation =>
@@ -99,9 +98,7 @@ export default class extends BaseAPI2 {
     });
   }
 
-
   static update(data, file = null) {
-
     return this.show(data.id, 4).then(oldTimeSeries => {
       oldTimeSeries = oldTimeSeries.data;
 
