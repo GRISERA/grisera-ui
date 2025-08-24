@@ -5,37 +5,54 @@
         <info-tool-tip-component :info-message="$route.meta.infoMessage" />
         <app-breadcrumbs />
       </v-col>
-      <v-col 
+      <v-col
+        v-if="!isReadOnly"
         class="text-right"
-        v-if="!isReadOnly"  
       >
         <v-btn
-          :outlined="true"
-          @click.prevent.stop="$router.push({ name: 'participant-creation' })"
+          class="text-none font-weight-medium"
+          color="primary"
+          rounded
+          @click.prevent.stop="createParticipant()"
         >
-          Create
+          <v-icon left>
+            mdi-plus
+          </v-icon>
+          Create New Participant
         </v-btn>
       </v-col>
       <v-col class="col-12">
         <participants-table />
       </v-col>
     </v-row>
+
+    <participant-create-dialog
+      v-model="showCreateDialog"
+      @participant-created="onParticipantCreated"
+    />
   </v-container>
 </template>
 
 <script>
-import ParticipantsTable from '@/views/participants/components/ParticipantsTable.vue';
-import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
-import { mapGetters } from 'vuex';
+import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
+import ParticipantCreateDialog from '@/components/ParticipantCreateDialog.vue';
 import AccessRoles from '@/const/AccessRoles';
+import ParticipantsTable from '@/views/participants/components/ParticipantsTable.vue';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'ParticipantsView',
   components: {
-    AppBreadcrumbs,
     ParticipantsTable,
     InfoToolTipComponent,
+    AppBreadcrumbs,
+    ParticipantCreateDialog,
+  },
+  data() {
+    return {
+      showCreateDialog: false,
+    };
   },
   computed: {
     ...mapGetters({
@@ -43,6 +60,14 @@ export default {
     }),
     isReadOnly() {
       return this.getPermission.role == AccessRoles.READER;
+    },
+  },
+  methods: {
+    createParticipant() {
+      this.showCreateDialog = true;
+    },
+    onParticipantCreated() {
+      this.showCreateDialog = false;
     },
   },
 };

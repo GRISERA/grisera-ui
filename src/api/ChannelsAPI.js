@@ -22,6 +22,7 @@ export default class extends BaseAPI2 {
       key: 'channel' + keyValue,
       name: data.type,
       description: data.description,
+      external_id: data.external_id,
     };
   }
 }

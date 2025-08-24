@@ -3,15 +3,15 @@
     <v-row v-if="experiment">
       <v-col class="headline font-weight-bold my-auto d-flex">
         <info-tool-tip-component :info-message="$route.meta.infoMessage" />
-        <app-breadcrumbs />
+        <app-breadcrumbs :items="{ experiment }" />
       </v-col>
       <v-col class="col-12">
         <v-tabs
           v-model="tab"
+          background-color="primary"
           class="rounded-xl"
           color="primary"
           dark
-          background-color="primary"
           grow
         >
           <v-tab
@@ -24,21 +24,21 @@
           <v-tabs-items v-model="tab">
             <overview-tab
               :experiment="experiment"
-            />            
+            />
             <participants-tab
-              :participants="experiment.participants"
               :experiment="experiment"
+              :participants="experiment.participants"
               @participant:added="getExperiment"
             />
             <scenarios-tab
-              :scenarios="experiment.scenarios"
               :experiment="experiment"
+              :scenarios="experiment.scenarios"
               @scenario:delete="getExperiment"
             />
             <scenario-execution-tab
-              :scenarios="experiment.scenarios"
-              :scenarioExecutions="experiment.scenarioExecutions"
               :experiment="experiment"
+              :scenario-executions="experiment.scenarioExecutions"
+              :scenarios="experiment.scenarios"
               @scenario-execution:delete="getExperiment"
             />
             <recordings-tab
@@ -59,18 +59,19 @@
 
 <script>
 import ExperimentsAPI from '@/api/ExperimentsAPI';
-import ScenariosTab from '@/views/experiment-details/tabs/ScenariosTab.vue';
-import OverviewTab from '@/views/experiment-details/tabs/OverviewTab.vue';
-import ParticipantsTab from '@/views/experiment-details/tabs/ParticipantsTab.vue';
-import ScenarioExecutionTab from '@/views/experiment-details/tabs/ScenarioExecutionTab.vue';
-import RecordingsTab from '@/views/experiment-details/tabs/RecordingsTab.vue';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
+import OverviewTab from '@/views/experiment-details/tabs/OverviewTab.vue';
+import ParticipantsTab from '@/views/experiment-details/tabs/ParticipantsTab.vue';
+import RecordingsTab from '@/views/experiment-details/tabs/RecordingsTab.vue';
+import ScenarioExecutionTab from '@/views/experiment-details/tabs/ScenarioExecutionTab.vue';
+import ScenariosTab from '@/views/experiment-details/tabs/ScenariosTab.vue';
 
 export default {
   name: 'ExperimentDetailedView',
   components: {
-    InfoToolTipComponent, AppBreadcrumbs,
+    InfoToolTipComponent,
+    AppBreadcrumbs,
     ParticipantsTab,
     OverviewTab,
     ScenariosTab,
@@ -96,9 +97,9 @@ export default {
   methods: {
     getExperiment() {
       ExperimentsAPI.show(this.$route.params.id)
-          .then(({ data }) => {
-            this.experiment = data;
-          });
+        .then(({ data }) => {
+          this.experiment = data;
+        });
     },
   },
 };

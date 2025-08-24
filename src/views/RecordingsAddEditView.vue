@@ -17,16 +17,16 @@
                   <v-row>
                     <v-autocomplete
                       v-model="item.chosenScenarioExecution"
-                      class="ma-2"
                       :items="scenarioExecutions"
-                      label="Scenario Executions"
-                      item-text="name"
-                      item-value="id"
                       :return-object="true"
-                      outlined
                       :rules="[
                         v => !!v || 'This field is required'
                       ]"
+                      class="ma-2"
+                      item-text="name"
+                      item-value="id"
+                      label="Scenario Executions"
+                      outlined
                       @change="resetAE"
                     >
                       <template #selection="{ item }">
@@ -39,16 +39,16 @@
 
                     <v-autocomplete
                       v-model="item.chosenAE"
-                      class="ma-2"
                       :items="activityExecutions"
-                      label="Activity Execution"
-                      item-text="name"
-                      item-value="id"
                       :return-object="true"
-                      outlined
                       :rules="[
                         v => !!v || 'This field is required'
                       ]"
+                      class="ma-2"
+                      item-text="name"
+                      item-value="id"
+                      label="Activity Execution"
+                      outlined
                       @change="updateParticipantsList"
                     >
                       <template #selection="{ item }">
@@ -63,43 +63,53 @@
               </v-row>
               <v-text-field
                 v-model="item.name"
-                label="Name"
                 :outlined="true"
                 :rules="[
                   v => !!v || 'This field is required'
                 ]"
+                label="Name"
               />
               <v-textarea
                 v-model="item.description"
                 :outlined="true"
-                label="Description"
                 :rules="[
                   v => !!v || 'This field is required'
                 ]"
+                label="Description"
               />
-              <v-text-field
-                v-model="item.link"
-                label="Link"
-                outlined
-                required
-                :rules="[
-                  l => !!l || 'This field is required',
-                  l => isValidHttpUrl(l) || 'Link has to be valid',
-                ]"
-              />
-              <!-- it no longer is a file but source link
+              <v-col
+                v-if="item.link"
+                class="col-12 my-auto"
+              >
+                <v-divider class="pt-4" />
+                Currently linked file:
+                {{ preparedLink(item.link) }}
+                <v-tooltip top>
+                  <template #activator="{ on, attrs }">
+                    <v-icon
+                      color="primary"
+                      v-bind="attrs"
+                      v-on="on"
+                      @click.stop.prevent="downloadFile(item)"
+                    >
+                      mdi-file-find
+                    </v-icon>
+                  </template>
+                  <span>Click to preview</span>
+                </v-tooltip>
+              </v-col>
               <v-col :flex="5">
                 <v-file-input
                   v-model="item.file"
                   label="File input"
-                  prepend-icon="mdi-paperclip"
                   outlined
+                  prepend-icon="mdi-paperclip"
                   @change="onFileChange(item)"
                 />
-              </v-col> -->
+              </v-col>
               <horizontal-text-divider
-                text="Channel info"
                 class="mb-2"
+                text="Channel info"
               />
               <v-col
                 v-for="(file, i) in item.data"
@@ -109,14 +119,14 @@
                 <v-row>
                   <v-autocomplete
                     v-model="file.channel"
-                    class="ma-2 pa-2"
-                    :items="availableChannels(file.channel)"
-                    label="Channel"
                     :item-text="'name'"
+                    :items="availableChannels(file.channel)"
+                    :return-object="true"
                     :rules="[
                       v => !!v || 'This field is required'
                     ]"
-                    :return-object="true"
+                    class="ma-2 pa-2"
+                    label="Channel"
                   />
                   <v-icon
                     v-if="moreThanOne"
@@ -133,16 +143,16 @@
                   <v-autocomplete
                     ref="participantsAutocomplete"
                     v-model="file.participants"
-                    class="ma-2 pa-2"
-                    label="Participants"
-                    :items="participants"
                     :item-text="item => '${item.name} ${item.surname}'"
-                    item-value="id"
-                    :return-object="true"
+                    :items="participants"
                     :multiple="true"
+                    :return-object="true"
                     :rules="[
                       v => !!(Array.isArray(v) && v.length) || !!(!Array.isArray(v) && v) || 'This field is required'
                     ]"
+                    class="ma-2 pa-2"
+                    item-value="id"
+                    label="Participants"
                   >
                     <template #selection="{ item }">
                       <v-chip>
@@ -186,14 +196,13 @@
 </template>
 
 <script>
-import ExperimentsAPI from '@/api/ExperimentsAPI';
 import ChannelsAPI from '@/api/ChannelsAPI';
+import ExperimentsAPI from '@/api/ExperimentsAPI';
 import RecordingsAPI from '@/api/RecordingsAPI';
-import HorizontalTextDivider from '@/components/divider/HorizontalTextDivider.vue';
-import IndexedDB from '@/storage/IndexedDB';
-import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
-import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 import RegisteredDataAPI from '@/api/RegisteredDataAPI';
+import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
+import HorizontalTextDivider from '@/components/divider/HorizontalTextDivider.vue';
+import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 
 export default {
   name: 'RecordingsAddEditView',
@@ -214,6 +223,7 @@ export default {
         description: undefined,
         data: [],
         link: '',
+        file: undefined,
       },
       dataProtoType: {
         channel: undefined,
@@ -239,10 +249,10 @@ export default {
           return;
         }
         this.onCreation().then(() => {
-          for(const scenarioExecution of this.experiment.scenarioExecutions){
-            for(const activityExecution of scenarioExecution.activityExecutions){
+          for (const scenarioExecution of this.experiment.scenarioExecutions) {
+            for (const activityExecution of scenarioExecution.activityExecutions) {
               const recording = activityExecution.recordings.find(recording => recording.registeredDataId === newValue);
-              if(recording){
+              if (recording) {
                 this.item = recording;
                 this.item.chosenScenarioExecution = scenarioExecution;
                 this.activityExecutions = this.item.chosenScenarioExecution.activityExecutions;
@@ -252,8 +262,9 @@ export default {
                 break;
               }
             }
-            if(this.item.chosenAE)
+            if (this.item.chosenAE) {
               break;
+            }
           }
         });
       },
@@ -264,23 +275,30 @@ export default {
     this.onCreation();
   },
   methods: {
+    onFileChange(file) {
+      if (!file || !file.file) {
+        return;
+      }
+
+      this.item.file = file.file;
+    },
     availableChannels(element) {
       let propertiesArray = this.item.data.filter(item => !!item.channel);
       propertiesArray = propertiesArray.map(object => object.channel.id);
-      let res = this.channels.filter(item => !propertiesArray.includes(item.id) || (!!element && item.id == element.id));
-      return res;
+
+      return this.channels.filter(item => !propertiesArray.includes(item.id) || (
+        !!element && item.id == element.id
+      ));
     },
-    onCreation(){
+    onCreation() {
       this.item.data.push(this.createDataPrototype());
-      ChannelsAPI.index()
-          .then(({ data }) => {
-            this.channels = data;
-          });
+      ChannelsAPI.index().then(({ data }) => this.channels = data);
+
       return ExperimentsAPI.show(this.$route.params.experiment)
         .then(async ({ data }) => {
           this.experiment = data;
           this.scenarioExecutions = this.experiment.scenarioExecutions.reverse();
-        }); 
+        });
     },
     deleteItem(file, event) {
       const index = this.item.data.indexOf(file);
@@ -302,8 +320,9 @@ export default {
         this.participants = [];
       }
       this.item.data.forEach(obj => {
-        if (obj.participants)
+        if (obj.participants) {
           obj.participants = [];
+        }
       });
       this.$refs.form.resetValidation();
     },
@@ -320,18 +339,15 @@ export default {
       }
       const method = this.isEditMode ? 'update' : 'store';
 
-      RecordingsAPI[method](this.item).then(() => {
-        this.$router.go(-1);
-      });
+      RecordingsAPI[method](this.item, this.item.file)
+        .then(() => this.$router.go(-1));
     },
-    isValidHttpUrl(urlToCheck) {
-      let url;
-      try {
-        url = new URL(urlToCheck);
-      } catch (_) {
-        return false;  
-      }
-      return url.protocol === 'http:' || url.protocol === 'https:';
+    async downloadFile(item) {
+      const response = await RegisteredDataAPI.getPreviewUrl(item.link);
+      window.open(response.data.preview_url, '_blank');
+    },
+    preparedLink(link) {
+      return link.split('/').pop();
     },
   },
 };
@@ -354,4 +370,3 @@ export default {
   transform: translateY(+75%);
 }
 </style>
-    

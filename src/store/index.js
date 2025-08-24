@@ -1,7 +1,9 @@
+import roles from '@/acl/roles';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import ImportAPI from '@/api/ImportAPI';
 import ExportAPI from '@/api/ExportAPI';
+import createPersistedState from 'vuex-persistedstate';
 
 Vue.use(Vuex);
 
@@ -23,6 +25,13 @@ const store = new Vuex.Store({
     },
     setUser(state, value) {
       state.user = { ...value };
+    },
+    setScopes(state, { permissions } = {}) {
+      if (!Array.isArray(permissions)) {
+        console.error('Permissions should be an array of { datasetId, role } objects');
+      }
+
+      permissions.forEach(({ datasetId, role }) => state.scopes[datasetId] = roles[role] || []);
     },
     setData(state, value) {
       state.data = { ...value };
@@ -51,7 +60,7 @@ const store = new Vuex.Store({
     },
     clearCompletedImports(state) {
       state.imports = state.imports.filter(imp =>
-        imp.status !== 'completed' && imp.status !== 'failed'
+        imp.status !== 'completed' && imp.status !== 'failed',
       );
     },
     clearAllImports(state) {
@@ -60,10 +69,13 @@ const store = new Vuex.Store({
     },
     setImports(state, imports) {
       console.log('Store: Setting imports:', imports);
-      state.imports = imports.map(imp => ({
-        ...imp,
-        created_at: imp.created_at || new Date().toISOString(),
-      }));
+      state.imports =
+        imports.map(imp => (
+          {
+            ...imp,
+            created_at: imp.created_at || new Date().toISOString(),
+          }
+        ));
     },
     // Export mutations
     addExport(state, exportData) {
@@ -116,13 +128,13 @@ const store = new Vuex.Store({
         return;
       }
       const datasetId = rootState.dataset.id;
-      console.log(`Store fetchImports: Fetching imports for dataset ID: ${datasetId}`);
+      console.log(`Store fetchImports: Fetching imports for dataset ID: ${ datasetId }`);
       try {
         const response = await ImportAPI.getImportsByDataset(datasetId);
         console.log('Store fetchImports: Received imports from API:', response.data);
         commit('setImports', response.data);
       } catch (error) {
-        console.error(`Store fetchImports: Error fetching imports for dataset ${datasetId}:`, error);
+        console.error(`Store fetchImports: Error fetching imports for dataset ${ datasetId }:`, error);
         commit('setImports', []);
       }
     },
@@ -153,8 +165,8 @@ const store = new Vuex.Store({
       return state.user.permissions.filter(permission => permission.datasetId == state.dataset.id)[0];
     },
     getActiveImports: state => {
-      const activeImports = state.imports.filter(imp => 
-        imp.status === 'pending' || imp.status === 'processing'
+      const activeImports = state.imports.filter(imp =>
+        imp.status === 'pending' || imp.status === 'processing',
       );
       console.log('Store getActiveImports:', activeImports);
       return activeImports;
@@ -164,8 +176,8 @@ const store = new Vuex.Store({
       return state.imports;
     },
     hasActiveImports: state => {
-      const hasActive = state.imports.some(imp => 
-        imp.status === 'pending' || imp.status === 'processing'
+      const hasActive = state.imports.some(imp =>
+        imp.status === 'pending' || imp.status === 'processing',
       );
       console.log('Store hasActiveImports:', hasActive, 'imports:', state.imports);
       return hasActive;

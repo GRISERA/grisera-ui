@@ -1,34 +1,44 @@
-import BaseAPI2 from '@/api/BaseAPI2';
 import DatabaseName from '@/const/relations/DatabaseName';
+import BaseAPI2 from './BaseAPI2';
 
 export default class extends BaseAPI2 {
   static getBasePath() {
     return DatabaseName.PARTICIPANTS;
   }
 
-  static dTOFrontToAPI(data){
+  static dTOFrontToAPI(data) {
     return {
-      name: data.name + ' ' + data.surname,
+      name: data.name,
       date_of_birth: data.birthDate,
       sex: data.sex,
-      disorder: data.disorder, //not implemented in frontend
-      additional_properties: data.additionalParameters.map(e => {return { key: e.name, value: e.value };}),
+      disorder: data.disorder,
+      additional_properties: data.additionalParameters?.map(e => (
+        {
+          key: e.name,
+          value: e.value,
+        }
+      )) || [],
     };
   }
 
-  static dTOAPIToFront(data){
-    if (!data)
+  static dTOAPIToFront(data) {
+    if (!data) {
       return;
-    
-    const nameDivided = data.name?.split(' ');
+    }
+
     return {
       id: data.id,
-      name: nameDivided.slice(0, -1).join(' '),
-      surname: nameDivided[nameDivided.length - 1],
+      name: data.name,
       birthDate: data.date_of_birth,
       sex: data.sex,
-      disorder: data.disorder, //not implemented in frontend
-      additionalParameters: data.additional_properties?.map(e => {return { ...e, name: e.key };}),
+      disorder: data.disorder,
+      additionalParameters: data.additional_properties?.map(e => (
+        {
+          ...e,
+          name: e.key,
+        }
+      )) || [],
+      external_id: data.external_id,
     };
   }
 }

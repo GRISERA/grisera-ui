@@ -1,66 +1,105 @@
 <template>
-  <base-table
-    :headers="headers"
-    :items="participants"
-    :show-expand="true"
-  >
-    <template #[`item.sex`]="{ item }">
-      <v-chip
-        color="primary"
-        :small="true"
-      >
-        {{ item.sex }}
-      </v-chip>
-    </template>
-    <template #expanded-item="{ item }">
-      <td :colspan="6">
-        <horizontal-text-divider text="Additional parameters" />
-        <v-col
-          v-for="additionalParameter in item.additionalParameters"
-          :key="`participant_${item.id}_additional_parameter_${additionalParameter.key}`"
-          class="col-3"
+  <div>
+    <base-table
+      :headers="headers"
+      :items="participants"
+    >
+      <template #[`item.sex`]="{ item }">
+        <v-chip
+          v-if="item.sex"
+          :small="true"
+          color="primary"
         >
-          <div
-            class="caption font-weight-bold"
-            style="color: rgb(0,0,0, .6)"
-          >
-            {{ additionalParameter.name }}
-          </div>
-          {{ additionalParameter.value }}
-        </v-col>
-      </td>
-    </template>
-  </base-table>
+          {{ item.sex }}
+        </v-chip>
+        <span v-else>-</span>
+      </template>
+      <template
+        v-if="aclCan(aclName.PARTICIPANT.EDIT)"
+        #actions="{ item }"
+      >
+        <v-icon
+          class="mr-2"
+          color="primary"
+          @click.stop.prevent="openEditDialog(item)"
+        >
+          mdi-pencil
+        </v-icon>
+      </template>
+    </base-table>
+
+    <participant-edit-dialog
+      v-if="selectedParticipant"
+      v-model="editDialog"
+      :participant-data="selectedParticipant"
+      @close="editDialog = false"
+      @saved="onParticipantSaved"
+    />
+    <participant-create-dialog
+      v-model="createDialog"
+      @participant-created="onParticipantCreated"
+    />
+  </div>
 </template>
 
 <script>
-import BaseTable from '@/components/base/BaseTable.vue';
-import HorizontalTextDivider from '@/components/divider/HorizontalTextDivider.vue';
 import ParticipantsAPI from '@/api/ParticipantsAPI';
+import BaseTable from '@/components/base/BaseTable.vue';
+import ParticipantCreateDialog from '@/components/ParticipantCreateDialog.vue';
+import aclMixin from '@/mixins/acl-mixin';
+import ParticipantEditDialog from './ParticipantEditDialog.vue';
 
 export default {
   name: 'ParticipantsTable',
   components: {
-    HorizontalTextDivider,
     BaseTable,
+    ParticipantEditDialog,
+    ParticipantCreateDialog,
   },
+  mixins: [
+    aclMixin,
+  ],
   data() {
     return {
       headers: [
-        { text: 'ID', value: 'id', sortable: false, width: '5%' },
+        { text: 'External ID', value: 'external_id', sortable: false },
         { text: 'Name', value: 'name' },
-        { text: 'Surname', value: 'surname' },
         { text: 'Birth date', value: 'birthDate' },
         { text: 'Sex', value: 'sex' },
+        { text: 'Disorder', value: 'disorder' },
+        { text: 'Actions', value: 'actions', sortable: false },
       ],
       participants: [],
+      editDialog: false,
+      selectedParticipant: null,
+      createDialog: false,
     };
   },
   created() {
-    ParticipantsAPI.index()
+    this.fetchParticipants();
+  },
+  methods: {
+    fetchParticipants() {
+      ParticipantsAPI.index()
         .then(({ data }) => {
           this.participants = data;
         });
+    },
+    openEditDialog(participant) {
+      this.selectedParticipant = { ...participant };
+      this.editDialog = true;
+    },
+    onParticipantSaved(updatedParticipant) {
+      const index = this.participants.findIndex(p => p.id === updatedParticipant.id);
+      if (index !== -1) {
+        this.$set(this.participants, index, updatedParticipant);
+      }
+    },
+    onParticipantCreated() {
+      console.log('Participant created, refreshing list...');
+      // this.fetchParticipants();
+      // this.createDialog = false;
+    },
   },
 };
 </script>

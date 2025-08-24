@@ -23,7 +23,7 @@
             <v-col class="col-8 mx-auto pb-16">
               <v-form 
                 ref="form"
-                v-on:keyup.native.enter="submit"
+                @keyup.native.enter="submit"
               >
                 <v-text-field
                   v-model="email"

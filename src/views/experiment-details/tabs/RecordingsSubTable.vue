@@ -42,9 +42,6 @@ export default {
       ],          
     };
   },
-  created() {
-      this.onCreation();
-  },
   watch: {
     dataToDisplay: {
       immediate: true,
@@ -52,6 +49,9 @@ export default {
         this.onCreation(newValue);
       },
     },
+  },
+  created() {
+      this.onCreation();
   },     
   methods: {
       onCreation() {                

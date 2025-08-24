@@ -59,6 +59,7 @@ export default class extends BaseAPI2 {
       )?.map(e => {return { ...e, name: e.key };}) || [],
       scenarios: data.scenarios?.map(e => ScenariosAPI.dTOAPIToFront(e)),
       scenarioExecutions: scenarioExecutions,
+      external_id: data.external_id,
     };
   }
 

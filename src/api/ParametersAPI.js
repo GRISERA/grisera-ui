@@ -1,13 +1,34 @@
-import BaseAPI from '@/api/BaseAPI';
+import BaseAPI2 from '@/api/BaseAPI2';
 import DatabaseName from '@/const/relations/DatabaseName';
-import ModelType from '@/const/relations/ModelType';
 
-export default class extends BaseAPI {
+export default class extends BaseAPI2 {
   static getBasePath() {
     return DatabaseName.PARAMETERS;
   }
 
-  static getModelType() {
-    return ModelType.PARAMETER;
+  static getReturnValues() {
+    return 'parameters';
+  }
+
+  static dTOFrontToAPI(data) {
+    return {
+      name: data.name,
+      key: data.key,
+      type: data.type,
+      options: data.options || [],
+    };
+  }
+
+  static dTOAPIToFront(data) {
+    if (!data) return;
+    
+    return {
+      id: data.id,
+      name: data.name,
+      key: data.key,
+      type: data.type,
+      options: data.options || [],
+      dataset_id: data.dataset_id,
+    };
   }
 }

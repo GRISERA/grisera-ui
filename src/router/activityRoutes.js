@@ -23,7 +23,7 @@ export default [
     meta: {
       breadcrumbs: [
         { text: 'Activities', href: '/activities' },
-        { text: 'Activity :id', disabled: true },
+        { text: 'Activity [value]', disabled: true, replaceable: true, entity: 'activity', key: 'external_id' },
       ],
       infoMessage: ClassesDescriptions.ACTIVITY,
     },

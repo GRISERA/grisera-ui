@@ -6,12 +6,7 @@
   >
     <template #[`item.type`]="{ item }">
       <td>
-        <v-chip
-          :color="getActivityTypeChipColor(item.type)"
-          :small="true"
-        >
-          {{ item.type }}
-        </v-chip>
+        <activity-type-chip :activity="item" />
       </td>
     </template>
     <template #expanded-item="{ item }">
@@ -29,8 +24,8 @@
             </v-col>
             <template v-if="item.additionalParameters">
               <horizontal-text-divider
-                text="Additional parameters"
                 class="col-12"
+                text="Additional parameters"
               />
               <v-col
                 v-for="additionalParameter in item.additionalParameters"
@@ -65,18 +60,20 @@
 <script>
 import ActivitiesAPI from '@/api/ActivitiesAPI';
 import BaseTable from '@/components/base/BaseTable.vue';
+import ActivityTypeChip from '@/components/chips/ActivityTypeChip.vue';
 import HorizontalTextDivider from '@/components/divider/HorizontalTextDivider.vue';
 
 export default {
   name: 'ActivitiesTable',
   components: {
+    ActivityTypeChip,
     BaseTable,
     HorizontalTextDivider,
   },
   data() {
     return {
       headers: [
-        { text: 'ID', value: 'id', sortable: false, width: '5%' },
+        { text: 'External ID', value: 'external_id', sortable: false },
         { text: 'Name', value: 'name', sortable: true },
         { text: 'Type', value: 'type', sortable: true },
         { text: 'Actions', value: 'actions', sortable: false },
@@ -86,18 +83,9 @@ export default {
   },
   created() {
     ActivitiesAPI.index()
-        .then(({ data }) => {
-          this.activities = data;
-        });
-  },
-  methods: {
-    getActivityTypeChipColor(type) {
-      return {
-        ['Individual']: 'accent',
-        ['Two persons activity']: 'primary',
-        ['Group activity']: 'success',
-      }[type];
-    },
+      .then(({ data }) => {
+        this.activities = data;
+      });
   },
 };
 </script>

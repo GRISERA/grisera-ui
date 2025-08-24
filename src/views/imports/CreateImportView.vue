@@ -2,57 +2,60 @@
   <v-container class="container--fluid mt-4">
     <v-row>
       <v-col class="headline font-weight-bold my-auto d-flex">
-        <info-tool-tip-component :info-message="$route.meta.infoMessage || 'Create a new data import'"/>
-        <app-breadcrumbs/>
+        <info-tool-tip-component :info-message="$route.meta.infoMessage || 'Create a new data import'" />
+        <app-breadcrumbs />
       </v-col>
     </v-row>
     <v-row>
       <v-col class="col-12">
         <v-card>
           <v-card-text>
-            <v-form ref="importForm" v-model="isImportFormValid">
+            <v-form
+              ref="importForm"
+              v-model="isImportFormValid"
+            >
               <v-file-input
                 v-model="selectedFile"
-                label="Select .owl or .json file"
-                accept=".owl,.json"
                 :rules="[rules.required, rules.fileType]"
-                show-size
-                outlined
-                dense
+                accept=".owl,.json"
                 class="mb-4"
-              ></v-file-input>
-<!--              <v-select-->
-<!--                v-model="selectedExperimentId"-->
-<!--                :items="experimentItems"-->
-<!--                item-text="name" -->
-<!--                item-value="id"-->
-<!--                label="Associate with existing Experiment (optional)"-->
-<!--                outlined-->
-<!--                dense-->
-<!--                clearable-->
-<!--                class="mb-4"-->
-<!--              ></v-select>-->
+                dense
+                label="Select .owl or .json file"
+                outlined
+                show-size
+              />
+              <!--              <v-select-->
+              <!--                v-model="selectedExperimentId"-->
+              <!--                :items="experimentItems"-->
+              <!--                item-text="name" -->
+              <!--                item-value="id"-->
+              <!--                label="Associate with existing Experiment (optional)"-->
+              <!--                outlined-->
+              <!--                dense-->
+              <!--                clearable-->
+              <!--                class="mb-4"-->
+              <!--              ></v-select>-->
               <v-textarea
                 v-model="importDescription"
-                label="Description (optional)"
-                rows="3"
-                outlined
                 dense
-              ></v-textarea>
+                label="Description (optional)"
+                outlined
+                rows="3"
+              />
             </v-form>
           </v-card-text>
           <v-card-actions class="pa-4">
-            <v-btn 
+            <v-btn
               :outlined="true"
               @click="cancelCreation"
             >
               Cancel
             </v-btn>
-            <v-spacer></v-spacer>
-            <v-btn 
-              color="#043865" 
+            <v-spacer />
+            <v-btn
               :disabled="!isImportFormValid || isUploading || !currentDatasetId"
               :loading="isUploading"
+              color="#043865"
               @click="handleFileUpload"
             >
               <span style="color: white;">
@@ -65,17 +68,21 @@
     </v-row>
 
     <!-- Snackbar for notifications -->
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="snackbar.timeout">
+    <v-snackbar
+      v-model="snackbar.show"
+      :color="snackbar.color"
+      :timeout="snackbar.timeout"
+    >
       {{ snackbar.text }}
     </v-snackbar>
   </v-container>
 </template>
 
 <script>
+import ExperimentsAPI from '@/api/ExperimentsAPI';
+import ImportAPI from '@/api/ImportAPI';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
-import ImportAPI from '@/api/ImportAPI';
-import ExperimentsAPI from '@/api/ExperimentsAPI';
 import { mapState } from 'vuex';
 
 export default {
@@ -84,39 +91,43 @@ export default {
     InfoToolTipComponent,
     AppBreadcrumbs,
   },
-  data: () => ({
-    isImportFormValid: false,
-    selectedFile: null,
-    importDescription: '',
-    selectedExperimentId: null,
-    experiments: [],
-    isUploading: false,
-    snackbar: {
-      show: false,
-      text: '',
-      color: 'info',
-      timeout: 4000,
-    },
-    rules: {
-      required: value => !!value || 'This field is required.',
-      fileType: value => {
-        if (!value) return true;
-        const allowedTypes = ['owl', 'json'];
-        const extension = value.name.split('.').pop().toLowerCase();
-        return allowedTypes.includes(extension) || 'Only .owl and .json files are allowed.';
+  data: () => (
+    {
+      isImportFormValid: false,
+      selectedFile: null,
+      importDescription: '',
+      selectedExperimentId: null,
+      experiments: [],
+      isUploading: false,
+      snackbar: {
+        show: false,
+        text: '',
+        color: 'info',
+        timeout: 4000,
       },
-    },
-  }),
+      rules: {
+        required: value => !!value || 'This field is required.',
+        fileType: value => {
+          if (!value) {
+            return true;
+          }
+          const allowedTypes = ['owl', 'json'];
+          const extension = value.name.split('.').pop().toLowerCase();
+          return allowedTypes.includes(extension) || 'Only .owl and .json files are allowed.';
+        },
+      },
+    }
+  ),
   computed: {
     ...mapState({
       currentDatasetId: state => state.dataset?.id,
     }),
     experimentItems() {
       return [
-        { id: null, name: 'None - Associate later or create new' }, 
-        ...this.experiments
+        { id: null, name: 'None - Associate later or create new' },
+        ...this.experiments,
       ];
-    }
+    },
   },
   created() {
     this.fetchExperiments();
@@ -125,14 +136,19 @@ export default {
     async fetchExperiments() {
       try {
         const { data } = await ExperimentsAPI.index();
-        this.experiments = data.map(exp => ({ id: exp.id, name: exp.name || exp.experiment_name || exp.id }));
+        this.experiments =
+          data.map(exp => (
+            { id: exp.id, name: exp.name || exp.experiment_name || exp.id }
+          ));
       } catch (error) {
         console.error('Error fetching experiments:', error);
         this.showSnackbar('Failed to load experiments.', 'error');
       }
     },
     async handleFileUpload() {
-      if (!this.$refs.importForm.validate()) return;
+      if (!this.$refs.importForm.validate()) {
+        return;
+      }
       if (!this.selectedFile || !this.currentDatasetId) {
         this.showSnackbar('Please select a file and ensure a dataset is chosen.', 'warning');
         return;
@@ -147,7 +163,7 @@ export default {
           this.currentDatasetId,
           fileExtension,
           this.importDescription,
-          this.selectedExperimentId
+          this.selectedExperimentId,
         );
         this.$store.commit('addImport', {
           id: response.data.id,
@@ -156,13 +172,13 @@ export default {
           dataset_id: response.data.dataset_id,
           description: response.data.description,
           created_at: response.data.created_at,
-          // import_type: response.data.import_type
+          import_type: response.data.import_type,
         });
-        this.showSnackbar(`Import ${this.selectedFile.name} created successfully.`, 'success');
+        this.showSnackbar(`Import ${ this.selectedFile.name } created successfully.`, 'success');
         this.$router.push({ name: 'imports' });
       } catch (error) {
         console.error('Error uploading file:', error);
-        this.showSnackbar(`Error creating import: ${error.response?.data?.detail || error.message}`, 'error');
+        this.showSnackbar(`Error creating import: ${ error.response?.data?.detail || error.message }`, 'error');
       } finally {
         this.isUploading = false;
       }

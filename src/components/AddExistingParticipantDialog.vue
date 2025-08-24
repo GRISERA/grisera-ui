@@ -4,11 +4,12 @@
       v-model="dialog"
       max-width="500px"
     >
-      <template 
-        #activator="{ on, attrs }"
+      <template
         v-if="canAddParticipant"
+        #activator="{ on, attrs }"
       >
         <v-btn
+          data-testid="experiment-participant-add-button"
           class="ma-1"
           v-bind="attrs"
           :outlined="true"
@@ -81,59 +82,59 @@ import ExperimentsAPI from '@/api/ExperimentsAPI';
 import ParticipantsAPI from '@/api/ParticipantsAPI';
 
 export default {
-    name: 'AddExistingParticipantDialog',
-    props: ['addedParticipants', 'experiment', 'canAddParticipant'],
-    data: () => ({
-      participants: undefined,
-      participantId: null,
-      dialog: false,
-    }),
-    watch: {
-        dialog(val) {
-        val || this.close();
-        },
-        dialogDelete(val) {
-        val || this.close();
-        },
+  name: 'AddExistingParticipantDialog',
+  props: ['addedParticipants', 'experiment', 'canAddParticipant'],
+  data: () => ({
+    participants: undefined,
+    participantId: null,
+    dialog: false,
+  }),
+  watch: {
+    dialog(val) {
+      val || this.close();
     },
-    created() {
-      this.getParticipants();
+    dialogDelete(val) {
+      val || this.close();
     },
-    methods: {
-        close() {
-          this.dialog = false;
-          this.dialogDelete = false;
-          this.participantId = null;
-        },
-
-        save() {
-          this.addParticipantToExperiment(this.findParticipant(this.participantId));
-          this.close();
-        },
-        
-        findParticipant(id) {
-          return this.participants.find((participant) => participant.id === id);
-        },
-
-        addParticipantToExperiment(participant) {
-          const participantsCopy = [...(this.experiment?.participants || [])];
-          participantsCopy.push(participant);
-          this.participants = this.participants.filter((particip) => particip.id != participant.id);
-          ExperimentsAPI.update({ ...this.experiment, participants: participantsCopy })
-            .then(() => {this.$emit('participant:added'); });
-        },
-
-        getParticipants() {
-            ParticipantsAPI.index()
-                .then(({ data }) => {
-                  if (this.addedParticipants != undefined) {
-                    const addedParticipantsIds = this.addedParticipants.map((participant) => participant.id);
-                    this.participants = data.filter((participant) => !addedParticipantsIds.includes(participant.id));
-                  } else {
-                    this.participants = data;
-                  }
-                });
-        },
+  },
+  created() {
+    this.getParticipants();
+  },
+  methods: {
+    close() {
+      this.dialog = false;
+      this.dialogDelete = false;
+      this.participantId = null;
     },
+
+    save() {
+      this.addParticipantToExperiment(this.findParticipant(this.participantId));
+      this.close();
+    },
+
+    findParticipant(id) {
+      return this.participants.find((participant) => participant.id === id);
+    },
+
+    addParticipantToExperiment(participant) {
+      const participantsCopy = [...(this.experiment?.participants || [])];
+      participantsCopy.push(participant);
+      this.participants = this.participants.filter((particip) => particip.id != participant.id);
+      ExperimentsAPI.update({ ...this.experiment, participants: participantsCopy })
+        .then(() => {this.$emit('participant:added'); });
+    },
+
+    getParticipants() {
+      ParticipantsAPI.index()
+        .then(({ data }) => {
+          if (this.addedParticipants != undefined) {
+            const addedParticipantsIds = this.addedParticipants.map((participant) => participant.id);
+            this.participants = data.filter((participant) => !addedParticipantsIds.includes(participant.id));
+          } else {
+            this.participants = data;
+          }
+        });
+    },
+  },
 };
 </script>

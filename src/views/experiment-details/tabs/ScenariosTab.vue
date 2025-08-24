@@ -5,10 +5,10 @@
         <v-col class="col-12 text-right">
           <v-row justify="end">
             <v-btn
+              v-if="!isReadOnly"
               :outlined="true"
               class="ma-4"
               @click="$router.push({ name: 'experiment-scenario-add', params: { experiment: experiment.id } })"
-              v-if="!isReadOnly"
             >
               Create
             </v-btn>
@@ -20,9 +20,9 @@
         >
           <scenarios-listing-component
             :scenarios="scenarios"
+            :can-perform-actions="!isReadOnly"
             @scenario:edit="editScenario"
             @scenario:delete="openDeleteConfirmDialog"
-            :canPerformActions="!isReadOnly"
           />
         </v-col>
       </v-row>

@@ -6,23 +6,23 @@
         <app-breadcrumbs />
       </v-col>
       <v-col class="col-12 headline font-weight-bold">
-        Manage Participant "{{ participant.name }} {{ participant.surname }}" in Activity Execution "{{ item.name }}"              
+        Manage Participant "{{ participant.name }} {{ participant.surname }}" in Activity Execution "{{ item.name }}"
       </v-col>
       <v-col class="col-12">
         <v-card>
           <v-card-text>
             <v-form
               ref="form"
-              v-model="valid"  
+              v-model="valid"
+              :disabled="isReadOnly"
               @submit.stop.prevent="performAction"
-              :disabled="isReadOnly"      
             >
               <v-expansion-panels
-                multiple
-                accordion
-                popout
-                focusable
                 v-model="panel"
+                accordion
+                focusable
+                multiple
+                popout
               >
                 <v-expansion-panel>
                   <v-expansion-panel-header>Personality models:</v-expansion-panel-header>
@@ -36,11 +36,11 @@
                         v-for="(bigFiveItem, i) in bigFive"
                         :key="i"
                         v-model="bigFiveValues[i]"
-                        class="align-center"
                         :max="bigFiveMax"
                         :min="bigFiveMin"
-                        step="0.01"
+                        class="align-center"
                         hide-details
+                        step="0.01"
                       >
                         <template #append>
                           <span
@@ -49,18 +49,18 @@
                           </span>
                           <v-text-field
                             v-model="bigFiveValues[i]"
-                            class="mt-0 pt-0"
-                            hide-details
-                            single-line
-                            type="number"
-                            style="width: 60px"
-                            :readonly="false"
-                            step="0.01"
                             :max="bigFiveMax"
                             :min="bigFiveMin"
+                            :readonly="false"
                             :rules="[
                               v => (v<=1 && v>=0) || 'This field is required'
                             ]"
+                            class="mt-0 pt-0"
+                            hide-details
+                            single-line
+                            step="0.01"
+                            style="width: 60px"
+                            type="number"
                           />
                         </template>
                       </v-slider>
@@ -68,17 +68,17 @@
                     <v-checkbox
                       v-model="selected.panas"
                       :label="`PANAS Model (min: ${bigFiveMin}, max: ${bigFiveMax})`"
-                    /> 
+                    />
                     <v-container>
                       <v-slider
                         v-for="(panasItem, i) in panas"
                         :key="i"
                         v-model="panasValues[i]"
-                        class="align-center"
                         :max="bigFiveMax"
                         :min="bigFiveMin"
-                        step="0.01"
+                        class="align-center"
                         hide-details
+                        step="0.01"
                       >
                         <template #append>
                           <span
@@ -87,18 +87,18 @@
                           </span>
                           <v-text-field
                             v-model="panasValues[i]"
-                            class="mt-0 pt-0"
-                            hide-details
-                            single-line
-                            type="number"
-                            style="width: 60px"
-                            :readonly="false"
-                            step="0.01"
                             :max="bigFiveMax"
                             :min="bigFiveMin"
+                            :readonly="false"
                             :rules="[
                               v => (v<=1 && v>=0) || 'This field is required'
                             ]"
+                            class="mt-0 pt-0"
+                            hide-details
+                            single-line
+                            step="0.01"
+                            style="width: 60px"
+                            type="number"
                           />
                         </template>
                       </v-slider>
@@ -117,11 +117,11 @@
                         v-for="(appearanceSomatotypeItem, i) in apperanceSomatotype"
                         :key="i"
                         v-model="apperanceSomatotypeValues[i]"
-                        class="align-center"
                         :max="appearanceSomatotypeMax"
                         :min="appearanceSomatotypeMin"
-                        step="1"
+                        class="align-center"
                         hide-details
+                        step="1"
                       >
                         <template #append>
                           <span
@@ -130,19 +130,19 @@
                           </span>
                           <v-text-field
                             v-model="apperanceSomatotypeValues[i]"
-                            class="mt-0 pt-0"
-                            hide-details
-                            single-line
-                            type="number"
-                            style="width: 60px"
-                            :readonly="false"
-                            step="1"
+                            :filled="true"
                             :max="appearanceSomatotypeMax"
                             :min="appearanceSomatotypeMin"
-                            :filled="true"
+                            :readonly="false"
                             :rules="[
                               v => (v<=7 && v>=1) || 'This field is required'
                             ]"
+                            class="mt-0 pt-0"
+                            hide-details
+                            single-line
+                            step="1"
+                            style="width: 60px"
+                            type="number"
                           />
                         </template>
                       </v-slider>
@@ -161,25 +161,27 @@
                           v-model="appearanceOclusionValues[i]"
                           class="ma-0 pa-0"
                         >
-                          <template v-slot:label>
-                            <div style="font-size: 16px;">{{ appearanceOclusionItem.title }}</div>
+                          <template #label>
+                            <div style="font-size: 16px;">
+                              {{ appearanceOclusionItem.title }}
+                            </div>
                           </template>
                           <div v-if="i < 2">
                             <v-radio
                               v-for="value in appearanceValues"
-                              v-bind:key="value"
+                              :key="value"
                               :label="value"
                               :value="value"
                             />
                           </div>
                           <div v-else>
                             <v-radio
-                              label="yes"
                               :value="true"
+                              label="yes"
                             />
                             <v-radio
-                              label="no"
                               :value="false"
+                              label="no"
                             />
                           </div>
                         </v-radio-group>
@@ -210,9 +212,9 @@
                 </v-btn>
                 <v-spacer />
                 <v-btn
+                  v-if="!isReadOnly"
                   color="primary"
-                  type="submit" 
-                  v-if="!isReadOnly"                 
+                  type="submit"
                 >
                   {{ isEditMode ? 'Update' : 'Create' }}
                 </v-btn>
@@ -227,17 +229,17 @@
 
 <script>
 import ActivityExecutionsAPI from '@/api/ActivityExecutionsAPI';
+import ApperancesAPI from '@/api/ApperancesAPI';
 import ParticipantsAPI from '@/api/ParticipantsAPI';
 import ParticipantStatesAPI from '@/api/ParticipantStatesAPI';
-import Models from '@/const/ActivityExecutionParticipantManagement.js';
-import CustomParametersComponent from '../components/CustomParametersComponent.vue';
+import PersonatitiesAPI from '@/api/PersonatitiesAPI';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
-import AppearanceValues from '@/const/AppearanceValues';
 import AccessRoles from '@/const/AccessRoles';
+import Models from '@/const/ActivityExecutionParticipantManagement.js';
+import AppearanceValues from '@/const/AppearanceValues';
 import { mapGetters } from 'vuex';
-import PersonatitiesAPI from '@/api/PersonatitiesAPI';
-import ApperancesAPI from '@/api/ApperancesAPI';
+import CustomParametersComponent from '../components/CustomParametersComponent.vue';
 
 export default {
   name: 'ScenarioAddEditView',
@@ -272,7 +274,7 @@ export default {
       appearanceSomatotypeMax: 7,
       appearanceOclusion: Models.appearanceOclusion,
       appearanceOclusionValues: ['some', 'heavy', false],
-      appearanceValues: [ AppearanceValues.APPEARANCE_NO, AppearanceValues.APPEARANCE_SOME, AppearanceValues.APPEARANCE_HEAVY ],
+      appearanceValues: [AppearanceValues.APPEARANCE_NO, AppearanceValues.APPEARANCE_SOME, AppearanceValues.APPEARANCE_HEAVY],
       participantState: Object,
       additionalParameters: [
         {
@@ -304,27 +306,27 @@ export default {
       immediate: true,
     },
   },
-  created() { 
+  created() {
     this.getActivityExecution(this.$route.params.activityExecution).then(data => {
       this.participantState = data.participantStates.find(participantState => participantState.participantId === this.$route.params.id);
       this.id = this.participantState.id;
-      
+
       this.participantState.personalities?.forEach(personality => {
-        if(personality.bigFiveValues){
+        if (personality.bigFiveValues) {
           this.bigFiveValues = personality.bigFiveValues;
           this.selected.bigFive = true;
         }
-        if(personality.panasValues){
+        if (personality.panasValues) {
           this.panasValues = personality.panasValues;
           this.selected.panas = true;
         }
       });
       this.participantState.appearances?.forEach(apperance => {
-        if(apperance.appearanceOclusionValues){
+        if (apperance.appearanceOclusionValues) {
           this.appearanceOclusionValues = apperance.appearanceOclusionValues;
           this.selected.oclusion = true;
         }
-        if(apperance.apperanceSomatotypeValues){
+        if (apperance.apperanceSomatotypeValues) {
           this.apperanceSomatotypeValues = apperance.apperanceSomatotypeValues;
           this.selected.somatotype = true;
         }
@@ -332,78 +334,84 @@ export default {
     });
   },
   methods: {
-    getActivityExecution(id){
+    getActivityExecution(id) {
       return ActivityExecutionsAPI.show(id, 4)
         .then(({ data }) => {
           this.item = data;
-          return data;              
+          return data;
         });
     },
-    getParticipant(id){
+    getParticipant(id) {
       return ParticipantsAPI.show(id)
         .then(({ data }) => {
           this.participant = data;
-          return data;              
+          return data;
         });
     },
     performAction() {
       if (!this.$refs.form.validate()) {
         return;
       }
-      
+
       var appearances = [];
       var personalities = [];
 
-      if(this.selected.bigFive){
+      if (this.selected.bigFive) {
         var personalityAdded = false;
-        for(var personality of (this.participantState.personalities || [])){
-          if(personality.bigFiveValues){
+        for (var personality of
+          (
+            this.participantState.personalities || []
+          )) {
+          if (personality.bigFiveValues) {
             personality.bigFiveValues = this.bigFiveValues;
             personalities.push(PersonatitiesAPI.update(personality));
             personalityAdded = true;
           }
         }
-        if(!personalityAdded){
+        if (!personalityAdded) {
           personalities.push(PersonatitiesAPI.store({ bigFiveValues: this.bigFiveValues }));
         }
       }
-      if(this.selected.panas){
+      if (this.selected.panas) {
         var personalityAdded = false;
-        for(var personality of (this.participantState.personalities || [])){
-          if(personality.panasValues){
+        for (var personality of
+          (
+            this.participantState.personalities || []
+          )) {
+          if (personality.panasValues) {
             personality.panasValues = this.panasValues;
             personalities.push(PersonatitiesAPI.update(personality));
             personalityAdded = true;
           }
         }
-        if(!personalityAdded){
+        if (!personalityAdded) {
           personalities.push(PersonatitiesAPI.store({ panasValues: this.panasValues }));
         }
       }
 
-      if(this.selected.somatotype){
+      if (this.selected.somatotype) {
         var appearanceAdded = false;
-        for(var appearance of this.participantState.appearances || []){
-          if(appearance.panasValues){
+        for (var appearance of this.participantState.appearances || []) {
+          if (appearance.panasValues) {
             appearance.apperanceSomatotypeValues = this.apperanceSomatotypeValues;
             appearances.push(ApperancesAPI.update(appearance));
             appearanceAdded = true;
           }
         }
-        if(!appearanceAdded){
+        if (!appearanceAdded) {
           appearances.push(ApperancesAPI.store({ apperanceSomatotypeValues: this.apperanceSomatotypeValues }));
         }
       }
-      if(this.selected.oclusion){
+      if (this.selected.oclusion) {
         var appearanceAdded = false;
-        for(var appearance of this.participantState.appearances || []){
-          if(appearance.appearanceOclusionValues){
+        for (var appearance of this.participantState.appearances || []) {
+          if (appearance.appearanceOclusionValues) {
             appearance.appearanceOclusionValues = this.appearanceOclusionValues;
             appearances.push(ApperancesAPI.update(appearance));
             appearanceAdded = true;
           }
         }
-        if(!appearanceAdded){
+        if (!appearanceAdded) {
           appearances.push(ApperancesAPI.store({ appearanceOclusionValues: this.appearanceOclusionValues }));
         }
       }
@@ -414,12 +422,13 @@ export default {
 
         const oldAppearances = this.participantState.appearances?.map(e => e.id);
         const newAppearances = appearances.map(e => e.data.id);
-        const appearancesToDelete = oldAppearances?.filter(e => !newAppearances.includes(e)).map(apperance => ApperancesAPI.delete(apperance)) || [];
+        const appearancesToDelete = oldAppearances?.filter(e => !newAppearances.includes(e))
+          .map(apperance => ApperancesAPI.delete(apperance)) || [];
 
         const oldPersonatities = this.participantState.personalities?.map(e => e.id);
         const newPersonatities = personalities.map(e => e.data.id);
-        const personatitiesToDelete = oldPersonatities?.filter(e => !newPersonatities.includes(e)).map(personality => PersonatitiesAPI.delete(personality)) || [];
-
+        const personatitiesToDelete = oldPersonatities?.filter(e => !newPersonatities.includes(e))
+          .map(personality => PersonatitiesAPI.delete(personality)) || [];
 
         const participantStateUpdate = ParticipantStatesAPI.update({
           id: this.participantState.id,
@@ -430,11 +439,11 @@ export default {
           additionalParameters: this.participantState.additionalParameters,
         });
 
-        Promise.all([...appearancesToDelete, ...personatitiesToDelete, participantStateUpdate]).then(({ data }) => {     
+        Promise.all([...appearancesToDelete, ...personatitiesToDelete, participantStateUpdate]).then(({ data }) => {
           this.$router.go(-1);
         });
       });
-       
+
     },
   },
   computed: {

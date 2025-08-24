@@ -59,9 +59,9 @@
           </v-chip>
         </td>
       </template>
-      <template 
-        #actions="{ item }"
+      <template
         v-if="canPerformActions"
+        #actions="{ item }"
       >
         <v-icon
           class="mr-2"
@@ -73,7 +73,6 @@
         <v-icon
           color="error"
           @click.stop.prevent="openDeleteConfirmDialog(item)"
-
         >
           mdi-delete
         </v-icon>
@@ -93,8 +92,8 @@
 </template>
 
 <script>
-import BaseTable from '@/components/base/BaseTable.vue';
 import MeasuresAPI from '@/api/MeasuresAPI';
+import BaseTable from '@/components/base/BaseTable.vue';
 import DeleteConfirmDialog from '@/components/dialog/DeleteConfirmDialog.vue';
 
 export default {
@@ -111,7 +110,7 @@ export default {
       deleteConfirmDialogActive: false,
       current: undefined,
       headers: [
-        { text: 'ID', value: 'id', sortable: false, width: '5%' },
+        { text: 'External ID', value: 'external_id', sortable: false },
         { text: 'Name', value: 'name' },
         { text: 'Source', value: 'source' },
         { text: 'Type', value: 'type' },
@@ -124,7 +123,7 @@ export default {
     };
   },
   created() {
-    if(this.canPerformActions) {
+    if (this.canPerformActions) {
       this.headers.push({ text: 'Actions', value: 'actions', sortable: false });
     }
     this.loadData();
@@ -132,9 +131,9 @@ export default {
   methods: {
     loadData() {
       MeasuresAPI.index()
-          .then(({ data }) => {
-            this.measures = data;
-          });
+        .then(({ data }) => {
+          this.measures = data;
+        });
     },
     edit(item) {
       this.$router.push({
@@ -154,10 +153,10 @@ export default {
     },
     deleteMeasure() {
       MeasuresAPI.delete(this.current.id)
-          .then(async () => {
-            this.closeDeleteConfirmDialog();
-            this.loadData();
-          });
+        .then(async () => {
+          this.closeDeleteConfirmDialog();
+          this.loadData();
+        });
     },
     getSourceChipColor(type) {
       return {

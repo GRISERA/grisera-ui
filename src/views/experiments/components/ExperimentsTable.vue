@@ -4,6 +4,14 @@
     :items="experiments"
     :show-expand="true"
   >
+    <template #[`item.name`]="{ item }">
+      <div
+        test-name="experiment-name"
+        :test-data="item.name"
+      >
+        {{ item.name }}
+      </div>
+    </template>
     <template #expanded-item="{ item }">
       <td :colspan="6">
         <v-container class="container--fluid px-0">
@@ -25,6 +33,7 @@
       <v-btn
         outlined
         small
+        data-testid="go-to-details-button"
         @click.stop.prevent="goToDetails(item.id)"
       >
         Go to details
@@ -34,8 +43,8 @@
 </template>
 
 <script>
-import BaseTable from '@/components/base/BaseTable.vue';
 import ExperimentsAPI from '@/api/ExperimentsAPI';
+import BaseTable from '@/components/base/BaseTable.vue';
 
 export default {
   name: 'ExperimentsTable',
@@ -45,7 +54,7 @@ export default {
   data() {
     return {
       headers: [
-        { text: 'ID', value: 'id', sortable: false, width: '5%' },
+        { text: 'External ID', value: 'external_id', sortable: false },
         { text: 'Name', value: 'name' },
         { text: 'Date', value: 'created_at' },
         { text: 'Author', value: 'creator' },
@@ -56,9 +65,9 @@ export default {
   },
   created() {
     ExperimentsAPI.index()
-        .then(({ data }) => {
-          this.experiments = data;
-        });
+      .then(({ data }) => {
+        this.experiments = data;
+      });
   },
   methods: {
     goToDetails(id) {

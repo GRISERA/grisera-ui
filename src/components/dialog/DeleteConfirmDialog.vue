@@ -3,9 +3,10 @@
     :value="active"
     :persistent="true"
     :width="500"
+    data-testid="delete-confirm-dialog"
   >
     <v-card>
-      <v-card-title class="primary white--text">
+      <v-card-title class="error white--text">
         {{ title }}
         <v-spacer />
         <v-icon
@@ -24,16 +25,21 @@
       <v-card-actions>
         <v-btn
           :text="true"
+          data-testid="delete-cancel-button"
           @click="$emit('cancel')"
         >
           Cancel
         </v-btn>
         <v-spacer />
         <v-btn
-          class="primary"
+          color="error"
+          data-testid="delete-submit-button"
           @click="$emit('submit')"
         >
-          Submit
+          <v-icon left>
+            mdi-delete
+          </v-icon>
+          Delete
         </v-btn>
       </v-card-actions>
     </v-card>
