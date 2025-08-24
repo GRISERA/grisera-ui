@@ -2,7 +2,9 @@
   <v-container class="container--fluid mt-4">
     <div class="text-center">
       <div class="display-1">
-        <v-icon size="100">mdi-cancel</v-icon>
+        <v-icon size="100">
+          mdi-cancel
+        </v-icon>
         Access denied
       </div>
       <div class="mt-3">

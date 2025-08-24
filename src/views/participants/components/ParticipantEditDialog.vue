@@ -34,17 +34,6 @@
               />
             </v-col>
             
-            <v-col
-              cols="12"
-              md="6"
-              class="pa-2"
-            >
-              <v-text-field
-                v-model="participant.surname"
-                label="Surname"
-                prepend-icon="mdi-account-outline"
-              />
-            </v-col>
             
             <v-col
               cols="12"
@@ -79,8 +68,8 @@
                     prepend-icon="mdi-calendar"
                     readonly
                     clearable
-                    @click:clear="participant.birthDate = null"
                     v-bind="attrs"
+                    @click:clear="participant.birthDate = null"
                     v-on="on"
                   />
                 </template>

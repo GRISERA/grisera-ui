@@ -1,8 +1,8 @@
 <template>
   <v-app-bar
+    :elevation="8"
     app
     class="ma-2 rounded-xl"
-    :elevation="8"
   >
     <template #default>
       <v-container class="container--fluid pa-0">
@@ -31,8 +31,8 @@
           <v-col class="shrink pa-0 mr-4">
             <v-list-item class="d-flex">
               <v-list-item-avatar
-                color="accent"
                 class="white--text"
+                color="accent"
               >
                 TT
               </v-list-item-avatar>
@@ -48,7 +48,7 @@
           </v-col>
           <v-col class="shrink pa-0 my-auto mr-4">
             <v-menu>
-              <template v-slot:activator="{ on, attrs }">
+              <template #activator="{ on, attrs }">
                 <v-icon
                   v-bind="attrs"
                   v-on="on"
@@ -59,7 +59,7 @@
               <v-list>
                 <v-list-item @click="logout()">
                   <v-list-item-icon>
-                    <v-icon v-text="'mdi-logout'"></v-icon>
+                    <v-icon v-text="'mdi-logout'" />
                   </v-list-item-icon>
                   <v-list-item-title>Logout</v-list-item-title>
                 </v-list-item>
@@ -73,22 +73,22 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import AuthService from '@/services/AuthService';
+import { mapState } from 'vuex';
 
 export default {
   name: 'MainAppBar',
-  methods: {
-    logout() {
-      AuthService.logout();
-      this.$router.push('/login');
-    },
-  },
   computed: {
     ...mapState({
       dataset: state => state.dataset,
       user: state => state.user,
     }),
+  },
+  methods: {
+    logout() {
+      AuthService.logout();
+      this.$router.push('/login');
+    },
   },
 };
 </script>

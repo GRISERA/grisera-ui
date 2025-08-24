@@ -6,8 +6,8 @@
       </v-row>
     </template>
     <template 
-      #panel-header="{ item }"
       v-if="canPerformActions"
+      #panel-header="{ item }"
     >
       <div class="my-auto font-weight-bold d-flex">
         <div class="my-auto">

@@ -1,11 +1,18 @@
 <template>
-  <v-container fluid class="parameters-view">
+  <v-container
+    fluid
+    class="parameters-view"
+  >
     <!-- Header Section -->
     <v-row class="mb-6">
       <v-col cols="12">
         <div class="d-flex align-center justify-space-between flex-wrap">
           <div class="d-flex align-center mb-3 mb-md-0">
-            <v-icon large color="primary" class="mr-3">
+            <v-icon
+              large
+              color="primary"
+              class="mr-3"
+            >
               mdi-tune-variant
             </v-icon>
             <div>
@@ -30,7 +37,10 @@
     </v-row>
 
     <!-- Tabs Section -->
-    <v-card elevation="2" class="parameters-card">
+    <v-card
+      elevation="2"
+      class="parameters-card"
+    >
       <v-tabs
         v-model="activeTab"
         background-color="grey lighten-4"
@@ -44,7 +54,10 @@
           :key="type.name"
           class="font-weight-medium"
         >
-          <v-icon left class="mr-2">
+          <v-icon
+            left
+            class="mr-2"
+          >
             {{ getTypeIcon(type.name) }}
           </v-icon>
           {{ transformParameterName(type.name) }}

@@ -5,8 +5,8 @@
       max-width="500px"
     >
       <template
-        #activator="{ on, attrs }"
         v-if="canAddParticipant"
+        #activator="{ on, attrs }"
       >
         <v-btn
           data-testid="experiment-participant-add-button"

@@ -30,8 +30,8 @@
       <br>
       <activity-executions-listing-component
         :activity-executions="item.activityExecutions"
+        :can-edit-activity-execution="canPerformActions"
         @activity-execution:edit="editActivityExecution"
-        :canEditActivityExecution="canPerformActions"
       />           
     </template>
   </collapse-listing>

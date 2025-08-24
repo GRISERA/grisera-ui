@@ -76,7 +76,10 @@
       </template>
 
       <template #[`item.options`]="{ item }">
-        <div v-if="item.options && item.options.length > 0" class="d-flex align-center">
+        <div
+          v-if="item.options && item.options.length > 0"
+          class="d-flex align-center"
+        >
           <v-chip
             color="primary"
             outlined
@@ -88,10 +91,12 @@
           <v-btn
             icon
             small
-            @click="viewOptions(item)"
             color="primary"
+            @click="viewOptions(item)"
           >
-            <v-icon small>mdi-eye</v-icon>
+            <v-icon small>
+              mdi-eye
+            </v-icon>
           </v-btn>
         </div>
         <span
@@ -266,7 +271,10 @@
                 class="px-0"
               >
                 <v-list-item-avatar>
-                  <v-avatar size="32" color="primary lighten-4">
+                  <v-avatar
+                    size="32"
+                    color="primary lighten-4"
+                  >
                     <span class="primary--text font-weight-medium">{{ index + 1 }}</span>
                   </v-avatar>
                 </v-list-item-avatar>

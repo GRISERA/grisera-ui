@@ -7,9 +7,9 @@
       </v-col>
       <v-col class="text-right">
         <v-btn
+          v-if="!isReadOnly"
           :outlined="true"
           @click="goToTimeSeriesCreation()"
-          v-if="!isReadOnly"
         >
           Create
         </v-btn>

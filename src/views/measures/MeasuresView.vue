@@ -6,8 +6,8 @@
         <app-breadcrumbs />
       </v-col>
       <v-col 
-        class="text-right"
-        v-if="!isReadOnly"  
+        v-if="!isReadOnly"
+        class="text-right"  
       >
         <v-btn
           :outlined="true"

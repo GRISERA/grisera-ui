@@ -10,7 +10,10 @@
       <v-col class="col-12">
         <v-card>
           <v-card-text>
-            <v-form ref="importForm" v-model="isImportFormValid">
+            <v-form
+              ref="importForm"
+              v-model="isImportFormValid"
+            >
               <v-file-input
                 v-model="selectedFile"
                 :rules="[rules.required, rules.fileType]"
@@ -20,7 +23,7 @@
                 label="Select .owl or .json file"
                 outlined
                 show-size
-              ></v-file-input>
+              />
               <!--              <v-select-->
               <!--                v-model="selectedExperimentId"-->
               <!--                :items="experimentItems"-->
@@ -38,7 +41,7 @@
                 label="Description (optional)"
                 outlined
                 rows="3"
-              ></v-textarea>
+              />
             </v-form>
           </v-card-text>
           <v-card-actions class="pa-4">
@@ -48,7 +51,7 @@
             >
               Cancel
             </v-btn>
-            <v-spacer></v-spacer>
+            <v-spacer />
             <v-btn
               :disabled="!isImportFormValid || isUploading || !currentDatasetId"
               :loading="isUploading"
@@ -65,7 +68,11 @@
     </v-row>
 
     <!-- Snackbar for notifications -->
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="snackbar.timeout">
+    <v-snackbar
+      v-model="snackbar.show"
+      :color="snackbar.color"
+      :timeout="snackbar.timeout"
+    >
       {{ snackbar.text }}
     </v-snackbar>
   </v-container>

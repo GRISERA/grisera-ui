@@ -18,31 +18,56 @@
         <v-container class="container--fluid">
           <v-row v-if="!currentDatasetId">
             <v-col class="col-12 text-center">
-              <p class="title grey--text">Please select a dataset first to see its imports.</p>
+              <p class="title grey--text">
+                Please select a dataset first to see its imports.
+              </p>
             </v-col>
           </v-row>
-          <v-row v-else-if="isLoading" align-content="center" class="fill-height" justify="center">
-            <v-col class="subtitle-1 text-center" cols="12">
+          <v-row
+            v-else-if="isLoading"
+            align-content="center"
+            class="fill-height"
+            justify="center"
+          >
+            <v-col
+              class="subtitle-1 text-center"
+              cols="12"
+            >
               Loading imports...
             </v-col>
             <v-col cols="6">
-              <v-progress-linear height="6" indeterminate rounded></v-progress-linear>
+              <v-progress-linear
+                height="6"
+                indeterminate
+                rounded
+              />
             </v-col>
           </v-row>
           <v-row v-else-if="imports.length === 0">
             <v-col class="col-12 text-center">
-              <p class="title grey--text">No imports found for this dataset.</p>
+              <p class="title grey--text">
+                No imports found for this dataset.
+              </p>
             </v-col>
           </v-row>
-          <v-row v-else class="fill-height">
+          <v-row
+            v-else
+            class="fill-height"
+          >
             <v-col
               v-for="importJob in imports"
               :key="`import_${importJob.id}`"
               class="col-md-4 col-sm-6 col-12 align-self-stretch"
             >
-              <v-card :elevation="4" class="d-flex flex-column" height="100%">
+              <v-card
+                :elevation="4"
+                class="d-flex flex-column"
+                height="100%"
+              >
                 <v-card-title class="pb-0 mb-5">
-                  <v-icon left>{{ getFileIcon(importJob.file_name) }}</v-icon>
+                  <v-icon left>
+                    {{ getFileIcon(importJob.file_name) }}
+                  </v-icon>
                   <span class="subtitle-1 font-weight-medium">{{ importJob.file_name }}</span>
                 </v-card-title>
                 <v-card-subtitle class="pt-0 text-caption">
@@ -50,24 +75,49 @@
                   <span class="d-block">Created: {{ formatDate(importJob.created_at) }}</span>
                 </v-card-subtitle>
                 <v-card-text class="flex-grow-1">
-                  <div class="caption">Description:</div>
-                  <div class="black--text text-body-2">{{ importJob.description || '-' }}</div>
-                  <div class="caption mt-2">Status:</div>
-                  <v-chip :color="getStatusColor(importJob.status)" class="font-weight-bold" label small
-                          text-color="white">
+                  <div class="caption">
+                    Description:
+                  </div>
+                  <div class="black--text text-body-2">
+                    {{ importJob.description || '-' }}
+                  </div>
+                  <div class="caption mt-2">
+                    Status:
+                  </div>
+                  <v-chip
+                    :color="getStatusColor(importJob.status)"
+                    class="font-weight-bold"
+                    label
+                    small
+                    text-color="white"
+                  >
                     {{ importJob.status }}
                   </v-chip>
                 </v-card-text>
                 <v-divider />
                 <v-card-actions>
-                  <v-btn :loading="isRefreshing[importJob.id]" icon small
-                         @click="refreshSingleImportStatus(importJob)">
+                  <v-btn
+                    :loading="isRefreshing[importJob.id]"
+                    icon
+                    small
+                    @click="refreshSingleImportStatus(importJob)"
+                  >
                     <v-icon>mdi-refresh</v-icon>
                   </v-btn>
                   <v-spacer />
-                  <v-btn :disabled="true" color="red" small text
-                         @click="deleteImport(importJob.id)">
-                    <v-icon left small>mdi-delete</v-icon>
+                  <v-btn
+                    :disabled="true"
+                    color="red"
+                    small
+                    text
+                    @click="deleteImport(importJob.id)"
+                  >
+                    <v-icon
+                      left
+                      small
+                    >
+                      mdi-delete
+                    </v-icon>
                     Cancel
                   </v-btn>
                 </v-card-actions>
@@ -79,7 +129,11 @@
     </v-row>
 
     <!-- Snackbar for notifications -->
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="snackbar.timeout">
+    <v-snackbar
+      v-model="snackbar.show"
+      :color="snackbar.color"
+      :timeout="snackbar.timeout"
+    >
       {{ snackbar.text }}
     </v-snackbar>
   </v-container>

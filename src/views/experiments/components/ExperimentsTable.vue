@@ -5,7 +5,10 @@
     :show-expand="true"
   >
     <template #[`item.name`]="{ item }">
-      <div test-name="experiment-name" :test-data="item.name">
+      <div
+        test-name="experiment-name"
+        :test-data="item.name"
+      >
         {{ item.name }}
       </div>
     </template>

@@ -3,8 +3,8 @@
     <v-container class="container--fluid">
       <v-row>
         <v-col 
-          class="col-12 text-right"
           v-if="!isReadOnly"
+          class="col-12 text-right"
         >
           <v-row>
             <v-autocomplete
@@ -48,9 +48,9 @@
         >
           <scenario-executions-listing-component
             :scenario-executions="localScenarioExecutions"
+            :can-perform-actions="!isReadOnly"
             @scenario-executions:delete="openDeleteConfirmDialog"
             @activity-execution:edit="editActivityExecution"
-            :canPerformActions="!isReadOnly"
           />
         </v-col>
       </v-row>

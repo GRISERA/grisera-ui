@@ -1,114 +1,56 @@
 <template>
   <v-container class="container--fluid mt-4">
+    <page-header
+      :description="$route.meta.infoMessage"
+      action-icon="mdi-plus"
+      action-text="Create Dataset"
+      data-testid="datasets-page-header"
+      title="Datasets"
+      @action="createDataset"
+    />
     <v-row>
-      <v-col class="headline font-weight-bold my-auto d-flex">
-        <info-tool-tip-component :info-message="$route.meta.infoMessage"/>
-        <app-breadcrumbs/>
-      </v-col>
-      <v-col class="text-right">
-        <v-btn
-            :outlined="true"
-            @click.prevent.stop="$router.push({ name: 'dataset-creation' })"
-        >
-          Create
-        </v-btn>
-      </v-col>
       <v-col class="col-12">
         <v-container class="container--fluid">
-          <v-row class="fill-height">
+          <!-- Empty State -->
+          <empty-state
+            v-if="datasets.length === 0"
+            action-icon="mdi-plus"
+            action-text="Create Your First Dataset"
+            data-testid="datasets-empty-state"
+            description="You haven't created any datasets yet. Start by creating your first dataset to organize your research data."
+            icon="mdi-database-outline"
+            title="No Datasets Found"
+            @action="createDataset"
+          />
+
+          <!-- Datasets Grid -->
+          <v-row
+            v-else
+            class="fill-height"
+            data-testid="datasets-grid"
+          >
             <v-col
-                v-for="dataset in datasets"
-                :key="`dataset_${dataset.id}`"
-                class="col-4 align-self-stretch"
+              v-for="dataset in datasets"
+              :key="`dataset_${dataset.id}`"
+              class="dataset-col"
+              cols="12"
+              lg="4"
+              md="6"
             >
-              <v-card
-                  :elevation="8"
-                  height="100%"
-                  class="d-flex flex-column dataset-card"
-              >
-                <v-card-text class="pa-0 flex-grow-1">
-                  <v-container class="container--fluid">
-                    <v-row class="wrap">
-                      <v-col class="col-12">
-                        <div class="caption">
-                          Name
-                        </div>
-                        <div :test-data="dataset.name" class="black--text font-weight-bold">
-                          {{ dataset.name }}
-                        </div>
-                      </v-col>
-                      <v-col class="col-6">
-                        <div class="caption">
-                          Creator
-                        </div>
-                        <div class="black--text">
-                          {{ dataset.creator }}
-                        </div>
-                      </v-col>
-                      <v-col class="col-6">
-                        <div class="caption">
-                          Date
-                        </div>
-                        <div class="black--text">
-                          {{ dataset.date }}
-                        </div>
-                      </v-col>
-                      <v-col class="col-12">
-                        <div class="caption">
-                          Rights
-                        </div>
-                        <div class="black--text">
-                          {{ dataset.rights }}
-                        </div>
-                      </v-col>
-                      <v-col class="col-12">
-                        <div class="caption">
-                          Description
-                        </div>
-                        <div class="black--text">
-                          {{ dataset.description }}
-                        </div>
-                      </v-col>
-                    </v-row>
-                  </v-container>
-                </v-card-text>
-                <v-divider/>
-                <v-card-actions>
-                  <v-icon
-                      color="primary"
-                      @click="() => {
-                      selectCurrentDataset(dataset);
-                      $router.push({
-                        name: 'dataset-edit',
-                        params: { id: dataset.id}
-                      });
-                    }"
-                      v-if="canEditDataset(dataset.id)"
-                  >
-                    mdi-pen
-                  </v-icon>
-                  <v-spacer/>
-                  <v-btn
-                    color="primary"
-                    @click="selectCurrentDataset(dataset)"
-                  >
-                    select and proceed
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
+              <dataset-list-card
+                :can-edit="canEditDataset(dataset.id)"
+                :data-testid="`dataset-card-${dataset.id}`"
+                :dataset="dataset"
+                @delete="confirmDeleteDataset"
+                @edit="editDataset"
+                @select="selectCurrentDataset"
+                @show-description="openDescriptionDialog"
+              />
             </v-col>
           </v-row>
         </v-container>
       </v-col>
     </v-row>
-
-    <input
-      ref="fileInput"
-      type="file"
-      accept=".owl,.json"
-      style="display: none"
-      @change="handleFileSelect"
-    />
 
     <v-snackbar
       v-model="snackbar.show"
@@ -117,24 +59,69 @@
     >
       {{ snackbar.text }}
     </v-snackbar>
+
+    <dataset-create-dialog
+      v-model="showCreateDialog"
+      :edit-dataset="datasetToEdit"
+      data-testid="dataset-create-dialog"
+      @input="onDialogClose"
+      @dataset-created="onDatasetCreated"
+      @dataset-updated="onDatasetUpdated"
+      @dataset-error="onDatasetError"
+    />
+
+    <delete-confirm-dialog
+      :active.sync="showDeleteDialog"
+      data-testid="dataset-delete-dialog"
+      title="Delete Dataset"
+      @cancel="cancelDelete"
+      @submit="deleteDataset"
+    >
+      <div class="py-4">
+        <p class="mb-2">
+          Are you sure you want to delete this dataset?
+        </p>
+        <div
+          v-if="datasetToDelete"
+          class="error--text font-weight-bold text-h6"
+        >
+          {{ datasetToDelete.name }}
+        </div>
+        <p class="mt-3 caption grey--text">
+          This action cannot be undone. All data associated with this dataset will be permanently deleted.
+        </p>
+      </div>
+    </delete-confirm-dialog>
+
+    <description-dialog
+      :dataset="descriptionDialogDataset"
+      :show.sync="showDescriptionDialog"
+      data-testid="dataset-description-dialog"
+    />
   </v-container>
 </template>
 
 <script>
-import { apiService } from '@/api/BaseAPI2';
-import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
-import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
+import DatasetAPI from '@/api/DatasetAPI';
+import DatasetCreateDialog from '@/components/DatasetCreateDialog.vue';
+import DatasetListCard from '@/components/DatasetListCard.vue';
+import DeleteConfirmDialog from '@/components/dialog/DeleteConfirmDialog.vue';
+import DescriptionDialog from '@/components/dialog/DescriptionDialog.vue';
+import EmptyState from '@/components/EmptyState.vue';
+import PageHeader from '@/components/PageHeader.vue';
 import AccessRoles from '@/const/AccessRoles';
 import PermissionsService from '@/services/PermissionsService';
-import DatasetAPI from '@/api/DatasetAPI';
-import ImportAPI from '@/api/ImportAPI';
-import {mapMutations, mapState, mapGetters} from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 
 export default {
   name: 'DatasetsView',
   components: {
-    InfoToolTipComponent,
-    AppBreadcrumbs,
+    DatasetCreateDialog,
+    DatasetListCard,
+    EmptyState,
+    PageHeader,
+    DeleteConfirmDialog,
+    DescriptionDialog,
   },
   data: () => {
     return {
@@ -142,6 +129,12 @@ export default {
       datasets: [],
       selectedDatasetForImport: null,
       isUploading: false,
+      showCreateDialog: false,
+      datasetToEdit: null,
+      showDeleteDialog: false,
+      datasetToDelete: null,
+      showDescriptionDialog: false,
+      descriptionDialogDataset: null,
       snackbar: {
         show: false,
         text: '',
@@ -151,7 +144,7 @@ export default {
     };
   },
   created() {
-    DatasetAPI.index().then(({data}) => {
+    DatasetAPI.index().then(({ data }) => {
       this.datasets = data;
     });
     PermissionsService.getUserPermissions(this.getUser().userId).then((response) => {
@@ -167,91 +160,102 @@ export default {
     }),
     selectCurrentDataset(dataset) {
       this.setDataset(dataset);
-      this.$router.push({name: 'main'});
+      this.$router.push({ name: 'main' });
     },
     canEditDataset(datasetId) {
       const permission = this.permissions.find(permission => permission.datasetId == datasetId);
       return permission && permission.role != AccessRoles.READER;
     },
-    openFileDialog(dataset) {
-      this.selectedDatasetForImport = dataset;
-      this.$nextTick(() => {
-        try {
-          const fileInput = this.$refs.fileInput;
-          if (fileInput && typeof fileInput.click === 'function') {
-            fileInput.click();
-          } else {
-            console.error('File input not available or click method not found');
-            this.showSnackbar('Nie można otworzyć dialogu wyboru pliku', 'error');
-          }
-        } catch (error) {
-          console.error('Error opening file dialog:', error);
-          this.showSnackbar('Błąd podczas otwierania dialogu wyboru pliku', 'error');
-        }
-      });
+    createDataset() {
+      this.datasetToEdit = null;
+      this.showCreateDialog = true;
     },
-    async handleFileSelect(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+    editDataset(dataset) {
+      this.datasetToEdit = dataset;
+      this.showCreateDialog = true;
+    },
+    async onDatasetCreated() {
+      try {
+        // Refresh both datasets and permissions
+        const [datasetsResponse, permissionsResponse] = await Promise.all([
+          DatasetAPI.index(),
+          PermissionsService.getUserPermissions(this.getUser().userId),
+        ]);
 
-      // Validate file extension
-      const fileExtension = file.name.split('.').pop().toLowerCase();
-      if (!['owl', 'json'].includes(fileExtension)) {
-        this.showSnackbar('Dozwolone są tylko pliki .owl i .json', 'error');
-        return;
+        this.datasets = datasetsResponse.data;
+        this.permissions = permissionsResponse.data;
+      } catch (error) {
+        console.error('Error refreshing data:', error);
       }
 
-      this.isUploading = true;
-
-      console.log('Selected dataset for import:', this.selectedDatasetForImport);
-      console.log('Dataset ID:', this.selectedDatasetForImport?.id);
-      console.log('File extension:', fileExtension);
-
+      this.datasetToEdit = null;
+    },
+    async onDatasetUpdated() {
       try {
-        const response = await ImportAPI.uploadFile(
-          file,
-          this.selectedDatasetForImport.id,
-          fileExtension,
-          `Import from file: ${file.name} for dataset: ${this.selectedDatasetForImport.name}`
-        );
+        // Refresh both datasets and permissions
+        const [datasetsResponse, permissionsResponse] = await Promise.all([
+          DatasetAPI.index(),
+          PermissionsService.getUserPermissions(this.getUser().userId),
+        ]);
 
-        // Dodaj import do store'a dla monitorowania
-        console.log('Full response:', response);
-        console.log('Response data:', response.data);
-
-        this.$store.commit('addImport', {
-          id: response.data.id,
-          status: response.data.status,
-          fileName: file.name,
-          datasetId: this.selectedDatasetForImport.id,
-        });
-
-        console.log('Import added to store');
-        console.log('Store imports after adding:', this.$store.state.imports);
-        console.log('Has active imports:', this.$store.getters.hasActiveImports);
-
-        this.showSnackbar(`Plik ${file.name} został zaimportowany pomyślnie do datasetu: ${this.selectedDatasetForImport.name}`, 'success');
-        console.log('Import result:', response.data);
-
-        // Reset file input
-        this.$refs.fileInput.value = '';
-        this.selectedDatasetForImport = null;
-
+        this.datasets = datasetsResponse.data;
+        this.permissions = permissionsResponse.data;
       } catch (error) {
-        console.error('Import error:', error);
-        this.showSnackbar(`Błąd podczas importu: ${error.response?.data?.detail || error.message}`, 'error');
+        console.error('Error refreshing data:', error);
+      }
 
-        // Reset file input
-        this.$refs.fileInput.value = '';
-        this.selectedDatasetForImport = null;
-      } finally {
-        this.isUploading = false;
+      this.datasetToEdit = null;
+    },
+    onDatasetError(errorMessage) {
+      this.showSnackbar(errorMessage, 'error');
+    },
+    onDialogClose(isOpen) {
+      if (!isOpen) {
+        this.datasetToEdit = null;
       }
     },
     showSnackbar(text, color = 'info') {
       this.snackbar.text = text;
       this.snackbar.color = color;
       this.snackbar.show = true;
+    },
+    confirmDeleteDataset(dataset) {
+      this.datasetToDelete = dataset;
+      this.showDeleteDialog = true;
+    },
+    async deleteDataset() {
+      if (!this.datasetToDelete) {
+        return;
+      }
+
+      try {
+        await DatasetAPI.delete(this.datasetToDelete.id);
+
+        const [datasetsResponse, permissionsResponse] = await Promise.all([
+          DatasetAPI.index(),
+          PermissionsService.getUserPermissions(this.getUser().userId),
+        ]);
+
+        this.datasets = datasetsResponse.data;
+        this.permissions = permissionsResponse.data;
+      } catch (error) {
+        console.error('Error deleting dataset:', error);
+        this.showSnackbar(
+          error.response?.data?.message || 'An error occurred while deleting the dataset',
+          'error',
+        );
+      } finally {
+        this.showDeleteDialog = false;
+        this.datasetToDelete = null;
+      }
+    },
+    cancelDelete() {
+      this.showDeleteDialog = false;
+      this.datasetToDelete = null;
+    },
+    openDescriptionDialog(dataset) {
+      this.descriptionDialogDataset = dataset;
+      this.showDescriptionDialog = true;
     },
   },
 };

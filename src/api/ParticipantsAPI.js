@@ -9,7 +9,6 @@ export default class extends BaseAPI2 {
   static dTOFrontToAPI(data) {
     return {
       name: data.name,
-      surname: data.surname,
       date_of_birth: data.birthDate,
       sex: data.sex,
       disorder: data.disorder,
@@ -30,7 +29,6 @@ export default class extends BaseAPI2 {
     return {
       id: data.id,
       name: data.name,
-      surname: data.surname,
       birthDate: data.date_of_birth,
       sex: data.sex,
       disorder: data.disorder,
