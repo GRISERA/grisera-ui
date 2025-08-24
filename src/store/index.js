@@ -2,7 +2,7 @@ import roles from '@/acl/roles';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import ImportAPI from '@/api/ImportAPI';
-import ExportAPI from '@/api/ExportAPI';
+// import ExportAPI from '@/api/ExportAPI';
 import createPersistedState from 'vuex-persistedstate';
 
 Vue.use(Vuex);
@@ -106,7 +106,7 @@ const store = new Vuex.Store({
     },
     clearCompletedExports(state) {
       state.exports = state.exports.filter(exp =>
-        exp.status !== 'completed' && exp.status !== 'failed'
+        exp.status !== 'completed' && exp.status !== 'failed',
       );
     },
     clearAllExports(state) {
@@ -184,8 +184,8 @@ const store = new Vuex.Store({
     },
     // Export getters
     getActiveExports: state => {
-      const activeExports = state.exports.filter(exp => 
-        exp.status === 'pending' || exp.status === 'processing'
+      const activeExports = state.exports.filter(exp =>
+        exp.status === 'pending' || exp.status === 'processing',
       );
       console.log('Store getActiveExports:', activeExports);
       return activeExports;
@@ -195,8 +195,8 @@ const store = new Vuex.Store({
       return state.exports;
     },
     hasActiveExports: state => {
-      const hasActive = state.exports.some(exp => 
-        exp.status === 'pending' || exp.status === 'processing'
+      const hasActive = state.exports.some(exp =>
+        exp.status === 'pending' || exp.status === 'processing',
       );
       console.log('Store hasActiveExports:', hasActive, 'exports:', state.exports);
       return hasActive;
