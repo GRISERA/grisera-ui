@@ -17,13 +17,6 @@
             outlined
             required
           />
-          <v-text-field
-            v-model="surname"
-            :rules="surnameRules"
-            label="Surname"
-            outlined
-            required
-          />
           <v-dialog
             ref="dialog"
             v-model="modal"
@@ -124,16 +117,12 @@ export default {
   data: () => {
     return {
       name: '',
-      surname: '',
       birthDate: '',
       sex: '',
       disorder: '',
       sexList: ['Female', 'Male'],
       nameRules: [
         n => !!n || 'Name is required',
-      ],
-      surnameRules: [
-        s => !!s || 'Surname is required',
       ],
       birthDateRules: [
         d => !!d || 'Date of birth is required',
@@ -150,7 +139,6 @@ export default {
       if (this.$refs.form.validate()) {
         const newParticipant = {
           name: this.name,
-          surname: this.surname,
           birthDate: this.birthDate,
           sex: this.sex,
           disorder: this.disorder,

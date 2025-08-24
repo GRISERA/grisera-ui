@@ -34,17 +34,6 @@
               />
             </v-col>
             
-            <v-col
-              cols="12"
-              md="6"
-              class="pa-2"
-            >
-              <v-text-field
-                v-model="participant.surname"
-                label="Surname"
-                prepend-icon="mdi-account-outline"
-              />
-            </v-col>
             
             <v-col
               cols="12"
