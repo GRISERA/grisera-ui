@@ -1,19 +1,19 @@
 <template>
   <v-navigation-drawer
-    app
-    color="primary"
-    class="main-navigation-drawer white--text rounded-xl"
+    :mini-variant="collapse"
+    :mini-variant-width="80"
     :style="{
       width: collapse ? '64px' : 'auto !important',
     }"
-    :mini-variant="collapse"
-    :mini-variant-width="80"
-    :width="216"
+    :width="228"
+    app
+    class="main-navigation-drawer white--text rounded-xl"
+    color="primary"
   >
     <template #default>
       <v-container class="main-navigation-drawer--content">
         <v-row style="display: flex; align-items: center">
-          <v-col style="height: 50vh">
+          <v-col class="scrollable-navigation">
             <main-navigation-list
               :collapse="collapse"
               :hide-filters.sync="localHideFilters"
@@ -47,8 +47,8 @@
     <template #append>
       <div
         v-if="!collapse"
-        style="height: 10vh; width: 200px"
         class="text-center pb-4"
+        style="height: 10vh; width: 200px"
       >
         <v-btn
           :outlined="true"
@@ -56,8 +56,8 @@
           @click="logout()"
         >
           <v-icon
-            left
             class="ma-auto"
+            left
           >
             mdi-arrow-left
           </v-icon>
@@ -181,10 +181,29 @@ export default {
 }
 
 .main-navigation-drawer--content {
-  overflow-y: hidden;
   display: flex;
   align-items: center;
   height: 100%;
+}
+
+.scrollable-navigation {
+  max-height: 50vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.scrollable-navigation::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-navigation::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.scrollable-navigation::-webkit-scrollbar-track {
+  background-color: transparent;
 }
 
 .navbar-copyrights {
