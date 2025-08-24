@@ -94,7 +94,7 @@
             <v-divider />
             <v-card-text>
               <v-col
-                v-for="(observableInformation, i) in timeSeries.observableInformations"
+                v-for="(observableInformation, i) in timeSeries?.observableInformations"
                 :key="i"
                 class="col-12 bordered-container"
               >
@@ -123,7 +123,7 @@
                     </template>
                   </v-autocomplete>
                   <v-icon
-                    v-if="timeSeries.observableInformations.length > 1"
+                    v-if="timeSeries?.observableInformations?.length > 1"
                     ref="deleteIcon"
                     class="mr-5 delete-icon"
                     color="error"
@@ -287,7 +287,7 @@ export default {
         this.onCreated().then(() => {
           TimeSeriesApi.show(newValue, 4)
             .then(({ data }) => {
-              data.observableInformations.forEach(e => {
+              data?.observableInformations.forEach(e => {
                 e.link = this.filesWithChannels.find(obj => obj.channels.some(obj2 => obj2.recording_id === e.channel.recording_id));
               });
 
@@ -362,12 +362,12 @@ export default {
       });
     },
     addObservableInformation() {
-      this.timeSeries.observableInformations.push({ ...this.observableInformationPrototype });
+      this.timeSeries?.observableInformations?.push({ ... this.observableInformationPrototype });
     },
     deleteObservableInformation(info, event) {
-      const index = this.timeSeries.observableInformations.indexOf(info);
+      const index = this.timeSeries?.observableInformations?.indexOf(info);
       if (index > -1) {
-        this.timeSeries.observableInformations.splice(index, 1);
+        this.timeSeries?.observableInformations?.splice(index, 1);
       }
       event.target.blur();
     },

@@ -59,8 +59,8 @@ export default class extends BaseAPI2 {
       type: data.type,
       link: data.source,
       objectName: data.object_name, // Add object_name for presigned URLs
-      spacing: data.additional_properties?.find(param => param.key === 'spacing').value,
-      additionalParameters: data.additional_properties.filter(
+      spacing: data.additional_properties?.find(param => param.key === 'spacing')?.value || 'Regular',
+      additionalParameters: data.additional_properties?.filter(
         param => !['spacing'].includes(param.key),
       ).map(e => {return { ...e, name: e.key };}),
       signalValues: data.signal_values,//not used yet
@@ -69,14 +69,16 @@ export default class extends BaseAPI2 {
     };
   }
 
-
   static index(activityExecutionId, participantId) {
     return super.index().then(({ data }) => {
       return Promise.all(data.map(timeSeries =>
         this.show(timeSeries.id, 4),
       )).then(multipleTimeSeries => {
         multipleTimeSeries = multipleTimeSeries.map(e => e.data);
-        multipleTimeSeries = multipleTimeSeries.filter(timeSeries => timeSeries.observableInformations?.[0].recording.participation.participant_state.participant_id === participantId && timeSeries.observableInformations[0].recording.participation.activity_execution_id === activityExecutionId);
+        multipleTimeSeries = multipleTimeSeries.filter(timeSeries =>
+    timeSeries?.observableInformations?.length > 0 &&
+    timeSeries.observableInformations[0]?.recording?.participation?.participant_state?.participant_id === participantId &&
+            timeSeries.observableInformations[0]?.recording?.participation?.activity_execution_id === activityExecutionId);
         return { data: multipleTimeSeries };
       });
     });
@@ -84,7 +86,7 @@ export default class extends BaseAPI2 {
 
 
   static store(data, file = null) {
-    return Promise.all(data.observableInformations
+    return Promise.all(data?.observableInformations
       .map(observableInformation =>
         ObservableInformationsAPI.store(observableInformation),
       )).then((observableInformations) => {
@@ -103,8 +105,8 @@ export default class extends BaseAPI2 {
     return this.show(data.id, 4).then(oldTimeSeries => {
       oldTimeSeries = oldTimeSeries.data;
 
-      const oldObservableInformations = oldTimeSeries.observableInformations;
-      const newObservableInformations = data.observableInformations;
+      const oldObservableInformations = oldTimeSeries?.observableInformations;
+      const newObservableInformations = data?.observableInformations;
       const observableInformationsToDelete = oldObservableInformations.filter(e => !newObservableInformations.some(newObservableInformation => newObservableInformation.id === e.id))
         .map(observableInformation => ObservableInformationsAPI.delete(observableInformation.id));
       const observableInformationsToAdd = newObservableInformations.filter(e => !e.id)
