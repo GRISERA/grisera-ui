@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import createPersistedState from 'vuex-persistedstate';
 import ImportAPI from '@/api/ImportAPI';
+import ExportAPI from '@/api/ExportAPI';
 
 Vue.use(Vuex);
 
@@ -12,6 +12,7 @@ const store = new Vuex.Store({
     user: undefined,
     data: undefined,
     imports: [],
+    exports: [],
   },
   mutations: {
     setDatasets(state, values) {
@@ -35,7 +36,7 @@ const store = new Vuex.Store({
         dataset_id: importData.dataset_id,
         created_at: importData.created_at || new Date().toISOString(),
         description: importData.description,
-        import_type: importData.import_type,
+        // import_type: importData.import_type,
       });
       console.log('Store: Imports after adding:', state.imports);
     },
@@ -64,6 +65,49 @@ const store = new Vuex.Store({
         created_at: imp.created_at || new Date().toISOString(),
       }));
     },
+    // Export mutations
+    addExport(state, exportData) {
+      console.log('Store: Adding export:', exportData);
+      state.exports.push({
+        id: exportData.id,
+        status: exportData.status,
+        export_format: exportData.export_format,
+        dataset_id: exportData.dataset_id,
+        created_at: exportData.created_at || new Date().toISOString(),
+        description: exportData.description,
+        exported_records: exportData.exported_records || 0,
+        export_filters: exportData.export_filters,
+      });
+      console.log('Store: Exports after adding:', state.exports);
+    },
+    updateExportStatus(state, { exportId, status, exported_records }) {
+      const exportIndex = state.exports.findIndex(exp => exp.id === exportId);
+      if (exportIndex !== -1) {
+        state.exports[exportIndex].status = status;
+        if (exported_records !== undefined) {
+          state.exports[exportIndex].exported_records = exported_records;
+        }
+      }
+    },
+    removeExport(state, exportId) {
+      state.exports = state.exports.filter(exp => exp.id !== exportId);
+    },
+    clearCompletedExports(state) {
+      state.exports = state.exports.filter(exp =>
+        exp.status !== 'completed' && exp.status !== 'failed'
+      );
+    },
+    clearAllExports(state) {
+      console.log('Store: Clearing all exports');
+      state.exports = [];
+    },
+    setExports(state, exports) {
+      console.log('Store: Setting exports:', exports);
+      state.exports = exports.map(exp => ({
+        ...exp,
+        created_at: exp.created_at || new Date().toISOString(),
+      }));
+    },
   },
   actions: {
     async fetchImports({ commit, rootState }) {
@@ -80,6 +124,22 @@ const store = new Vuex.Store({
       } catch (error) {
         console.error(`Store fetchImports: Error fetching imports for dataset ${datasetId}:`, error);
         commit('setImports', []);
+      }
+    },
+    async fetchExports({ commit, rootState }) {
+      if (!rootState.dataset || !rootState.dataset.id) {
+        console.warn('Store fetchExports: No dataset selected, cannot fetch exports.');
+        return;
+      }
+      const datasetId = rootState.dataset.id;
+      console.log(`Store fetchExports: Fetching exports for dataset ID: ${datasetId}`);
+      try {
+        const response = await ExportAPI.getExportsByDataset(datasetId);
+        console.log('Store fetchExports: Received exports from API:', response.data);
+        commit('setExports', response.data);
+      } catch (error) {
+        console.error(`Store fetchExports: Error fetching exports for dataset ${datasetId}:`, error);
+        commit('setExports', []);
       }
     },
   },
@@ -110,8 +170,27 @@ const store = new Vuex.Store({
       console.log('Store hasActiveImports:', hasActive, 'imports:', state.imports);
       return hasActive;
     },
+    // Export getters
+    getActiveExports: state => {
+      const activeExports = state.exports.filter(exp => 
+        exp.status === 'pending' || exp.status === 'processing'
+      );
+      console.log('Store getActiveExports:', activeExports);
+      return activeExports;
+    },
+    getAllExports: state => {
+      console.log('Store getAllExports:', state.exports);
+      return state.exports;
+    },
+    hasActiveExports: state => {
+      const hasActive = state.exports.some(exp => 
+        exp.status === 'pending' || exp.status === 'processing'
+      );
+      console.log('Store hasActiveExports:', hasActive, 'exports:', state.exports);
+      return hasActive;
+    },
   },
-  plugins: [createPersistedState()],
+  // plugins: [createPersistedState()], // Commented out - will be added back if needed
 });
 
 Vue.prototype.$store = store;

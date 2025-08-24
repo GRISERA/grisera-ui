@@ -156,7 +156,7 @@ export default {
           dataset_id: response.data.dataset_id,
           description: response.data.description,
           created_at: response.data.created_at,
-          import_type: response.data.import_type
+          // import_type: response.data.import_type
         });
         this.showSnackbar(`Import ${this.selectedFile.name} created successfully.`, 'success');
         this.$router.push({ name: 'imports' });
