@@ -7,27 +7,27 @@
       >
         <template #[`item.recording`]="{ item }">
           <td>
-            {{ item.recording.name }}
+            {{ item?.recording?.name ?? 'N/A' }}
           </td>
         </template>
         <template #[`item.link`]="{ item }">
           <td>
-            {{ item.recording.link }}
+            {{ item?.recording?.link ?? 'N/A' }}
           </td>
         </template>
         <template #[`item.channel`]="{ item }">
           <td>
-            {{ item.channel.name }}
+            {{ item?.channel?.name ?? 'N/A' }}
           </td>
         </template>
         <template #[`item.modality`]="{ item }">
           <td>
-            {{ item.modality.name }}
+            {{ item?.modality?.name ?? 'N/A' }}
           </td>
         </template>
         <template #[`item.lifeActivity`]="{ item }">
           <td>
-            {{ item.lifeActivity.name }}
+            {{ item?.lifeActivity?.name ?? 'N/A' }}
           </td>
         </template>
       </base-table>
@@ -38,26 +38,28 @@
 import BaseTable from '@/components/base/BaseTable.vue';
 
 export default {
-    name: 'ObservableInformationsTable',
-    components: {
-      BaseTable,
+  name: 'ObservableInformationsTable',
+  components: {
+    BaseTable,
+  },
+  props: {
+    observableInformations: {
+      type: Array,
+      default: () => (
+        []
+      ),
     },
-    props: {
-        observableInformations: {
-        type: Array,
-        default: () => ([]),
-      },
-    },
-    data() {
-        return {
-            headersObservableInformations: [
-            { text: 'Recording', value: 'recording' },    
-            { text: 'Link', value: 'link' },
-            { text: 'Channel', value: 'channel' },
-            { text: 'Modality', value: 'modality' },
-            { text: 'Life activity', value: 'lifeActivity' },
-            ],
-        };
-    },
+  },
+  data() {
+    return {
+      headersObservableInformations: [
+        { text: 'Recording', value: 'recording' },
+        { text: 'Link', value: 'link' },
+        { text: 'Channel', value: 'channel' },
+        { text: 'Modality', value: 'modality' },
+        { text: 'Life activity', value: 'lifeActivity' },
+      ],
+    };
+  },
 };
 </script>
