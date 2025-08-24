@@ -11,7 +11,7 @@
         v-for="score in scores"
         :key="`score_${ score.title }`"
         class="col-3"
-        @click="$router.push(score.url);"
+        @click="score.url ? $router.push(score.url) : () => undefined"
       >
         <dashboard-info-card
           :score="score.score"
@@ -69,7 +69,6 @@ export default {
       },
       {
         title: 'Total time series',
-        url: '/time-series',
         score: await TimeSeriesAPI.count(),
       },
     ];
