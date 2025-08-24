@@ -101,6 +101,34 @@ const routes = [
     },
   },
   {
+    path: '/exports',
+    name: 'exports',
+    component: () => import('@/views/exports/ExportsView.vue'),
+    meta: {
+      icon: 'mdi-export',
+      order: 46,
+      name: 'Data Exports',
+      hideFilters: true,
+      breadcrumbs: [
+        { text: 'Data Exports', disabled: true },
+      ],
+      infoMessage: 'Manage and monitor your data export jobs.',
+    },
+  },
+  {
+    path: '/exports/create',
+    name: 'export-creation',
+    component: () => import('@/views/exports/CreateExportView.vue'),
+    meta: {
+      hideFilters: true,
+      breadcrumbs: [
+        { text: 'Data Exports', disabled: false, href: '/exports' },
+        { text: 'Create', disabled: true },
+      ],
+      infoMessage: 'Configure and start a new data export job.',
+    },
+  },
+  {
     path: '/settings',
     name: 'settings',
     component: () => import('@/views/settings/SettingsView.vue'),

@@ -13,7 +13,7 @@ export default class ImportAPI {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('dataset_id', datasetId);
-    formData.append('import_type', importType);
+    formData.append('file_type', importType);
     if (description) {
       formData.append('description', description);
     }
