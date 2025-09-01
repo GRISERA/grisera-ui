@@ -4,6 +4,21 @@
       :headers="headers"
       :items="measures"
     >
+      <template #[`item.external_id`]="{ item }">
+        <v-tooltip bottom>
+          <template #activator="{ on, attrs }">
+            <span
+              class="text-truncate d-inline-block"
+              style="max-width: 200px;"
+              v-bind="attrs"
+              v-on="on"
+            >
+              {{ item.external_id }}
+            </span>
+          </template>
+          <span>{{ item.external_id }}</span>
+        </v-tooltip>
+      </template>
       <template #[`item.definedValue`]="{ item }">
         <template v-if="item.definedValue">
           <v-chip-group column>
