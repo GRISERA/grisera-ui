@@ -1,40 +1,34 @@
 <template>
   <v-card
-    class="dataset-card elevation-2 d-flex flex-column"
+    class="import-card elevation-2 d-flex flex-column"
     height="100%"
     hover
     rounded="lg"
-    v-bind="$attrs"
   >
-    <!-- Header -->
     <div class="card-header">
-      <div class="dataset-icon">
+      <div class="import-icon">
         <v-icon
           color="primary"
           size="24"
         >
-          mdi-database
+          {{ getFileIcon(importJob.file_name) }}
         </v-icon>
       </div>
-      <div class="dataset-info flex-grow-1">
-        <h3
-          class="dataset-title"
-          data-testid="dataset-name"
-        >
-          {{ dataset.name }}
+      <div class="import-info flex-grow-1">
+        <h3 class="import-title">
+          {{ importJob.file_name }}
         </h3>
-        <div class="dataset-meta">
+        <div class="import-meta">
           <v-icon
             class="mr-1"
             small
           >
-            mdi-account
+            mdi-calendar
           </v-icon>
-          {{ dataset.creator || 'Unknown' }}
+          {{ formatDate(importJob.created_at) }}
         </div>
       </div>
       <v-menu
-        v-if="canEdit"
         bottom
         left
       >
@@ -54,29 +48,8 @@
           dense
         >
           <v-list-item
-            class="menu-item"
-            data-testid="dataset-edit-btn"
-            @click="$emit('edit', dataset)"
-          >
-            <v-list-item-icon class="menu-icon">
-              <v-icon
-                color="primary"
-                size="20"
-              >
-                mdi-pencil
-              </v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title class="menu-text">
-                Edit Dataset
-              </v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-          <v-divider class="my-1" />
-          <v-list-item
             class="menu-item delete-item"
-            data-testid="dataset-delete-btn"
-            @click="$emit('delete', dataset)"
+            @click="$emit('delete', importJob.id)"
           >
             <v-list-item-icon class="menu-icon">
               <v-icon
@@ -88,16 +61,14 @@
             </v-list-item-icon>
             <v-list-item-content>
               <v-list-item-title class="menu-text">
-                Delete Dataset
+                Cancel Import
               </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list>
       </v-menu>
     </div>
-
     <v-card-text class="card-content flex-grow-1">
-      <!-- Metadata Row -->
       <div class="metadata-row">
         <div class="meta-item">
           <div class="meta-label">
@@ -105,83 +76,69 @@
               class="mr-1"
               small
             >
-              mdi-calendar
+              mdi-text
             </v-icon>
-            Created
+            Description
           </div>
           <div class="meta-value">
-            {{ formatDate(dataset.date) }}
+            {{ importJob.description || 'N/A' }}
           </div>
         </div>
-
         <div class="meta-item">
           <div class="meta-label">
             <v-icon
               class="mr-1"
               small
             >
-              mdi-shield-account
+              mdi-flag
             </v-icon>
-            Rights
+            Status
           </div>
           <v-chip
-            :color="getRightsColor(dataset.rights)"
+            :color="getStatusColor(importJob.status)"
             class="meta-chip"
             dark
             small
           >
-            {{ dataset.rights || 'N/A' }}
+            {{ importJob.status }}
           </v-chip>
         </div>
       </div>
-
-      <!-- Description -->
       <div
-        v-if="dataset.description"
-        class="description-section"
+        v-if="importJob.additional_data?.total_time_series && (importJob.status === 'pending' || importJob.status === 'processing')"
+        class="progress-section"
       >
-        <div class="meta-label mb-2">
-          <v-icon
-            class="mr-1"
-            small
-          >
-            mdi-text
-          </v-icon>
-          Description
+        <div class="meta-label mb-1">
+          TimeSeries Progress: {{
+            formatNumber(importJob.additional_data.time_series_count || 0)
+          }}/{{ formatNumber(importJob.additional_data.total_time_series) }} 
+          ({{ getProgressPercentage(importJob).toFixed(2) }}%)
         </div>
-        <div class="description-container">
-          <div class="description-text">
-            {{ dataset.description }}
-          </div>
-          <v-btn
-            v-if="isDescriptionTruncated(dataset.description)"
-            class="expand-btn"
-            data-testid="dataset-description-expand-btn"
-            icon
-            small
-            @click="$emit('show-description', dataset)"
-          >
-            <v-icon size="16">
-              mdi-arrow-expand
-            </v-icon>
-          </v-btn>
-        </div>
+        <v-progress-linear
+          :value="getProgressPercentage(importJob)"
+          color="primary"
+          height="8"
+          rounded
+        />
       </div>
     </v-card-text>
     <v-divider />
-    <v-card-actions class="card-actions">
+    <v-card-actions
+      v-if="importJob.status === 'pending' || importJob.status === 'processing'"
+      class="card-actions"
+    >
       <v-btn
+        :loading="isRefreshing"
         block
-        class="select-btn"
+        class="action-btn"
         color="primary"
-        data-testid="dataset-select-btn"
         large
-        @click="$emit('select', dataset)"
+        @click="$emit('refresh', importJob)"
       >
         <v-icon left>
-          mdi-check-circle
+          mdi-refresh
         </v-icon>
-        Select and Proceed
+        Refresh Status
       </v-btn>
     </v-card-actions>
   </v-card>
@@ -189,58 +146,74 @@
 
 <script>
 export default {
-  name: 'DatasetListCard',
-  inheritAttrs: false,
+  name: 'ImportCard',
   props: {
-    dataset: {
+    importJob: {
       type: Object,
       required: true,
     },
-    canEdit: {
+    isRefreshing: {
       type: Boolean,
       default: false,
     },
   },
   methods: {
+    getStatusColor(status) {
+      switch (status) {
+        case 'pending':
+          return 'orange';
+        case 'processing':
+          return 'blue';
+        case 'completed':
+          return 'green';
+        case 'failed':
+          return 'red';
+        default:
+          return 'grey';
+      }
+    },
+    getFileIcon(fileName) {
+      if (!fileName) {
+        return 'mdi-file';
+      }
+      const ext = fileName.split('.').pop().toLowerCase();
+      if (ext === 'owl') {
+        return 'mdi-owl';
+      }
+      if (ext === 'json') {
+        return 'mdi-code-json';
+      }
+      return 'mdi-file-document-outline';
+    },
     formatDate(dateString) {
       if (!dateString) {
-        return 'N/A';
+        return '-';
       }
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      });
-    },
-    getRightsColor(rights) {
-      const colorMap = {
-        'public': '#4CAF50',
-        'private': '#FF9800',
-        'restricted': '#F44336',
-        'admin': '#2196F3',
-        'read-only': '#9E9E9E',
-        'full': '#4CAF50',
-      };
-      return colorMap[rights?.toLowerCase()] || '#757575';
-    },
-    isDescriptionTruncated(description) {
-      if (!description) {
-        return false;
+      try {
+        return new Date(dateString).toLocaleString();
+      } catch (e) {
+        return dateString;
       }
-      return description.length > 120;
+    },
+    getProgressPercentage(importJob) {
+      const current = importJob.additional_data?.time_series_count || 0;
+      const total = importJob.additional_data?.total_time_series || 0;
+      return total > 0 ? (current / total) * 100 : 0;
+    },
+    formatNumber(number) {
+      return new Intl.NumberFormat().format(number);
     },
   },
 };
 </script>
 
 <style scoped>
-.dataset-card {
+.import-card {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-.dataset-card:hover {
+.import-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
 }
@@ -254,7 +227,7 @@ export default {
   background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
 }
 
-.dataset-icon {
+.import-icon {
   width: 40px;
   height: 40px;
   border-radius: 10px;
@@ -265,7 +238,7 @@ export default {
   flex-shrink: 0;
 }
 
-.dataset-title {
+.import-title {
   font-size: 1.125rem;
   font-weight: 600;
   color: #1a202c;
@@ -276,7 +249,7 @@ export default {
   white-space: nowrap;
 }
 
-.dataset-meta {
+.import-meta {
   color: #718096;
   font-size: 0.875rem;
   margin-top: 0.25rem;
@@ -289,7 +262,7 @@ export default {
   transition: opacity 0.3s ease;
 }
 
-.dataset-card:hover .menu-btn {
+.import-card:hover .menu-btn {
   opacity: 1;
 }
 
@@ -331,19 +304,10 @@ export default {
   height: 22px;
 }
 
-.description-section {
+.progress-section {
   border-top: 1px solid rgba(0, 0, 0, 0.06);
   padding-top: 1rem;
-}
-
-.description-text {
-  font-size: 0.875rem;
-  color: #4a5568;
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  margin-top: 1rem;
 }
 
 .card-actions {
@@ -351,7 +315,7 @@ export default {
   background: #fafafa;
 }
 
-.select-btn {
+.action-btn {
   text-transform: none;
   font-weight: 600;
   letter-spacing: 0.025em;
@@ -394,25 +358,6 @@ export default {
   color: #f44336;
 }
 
-/* Description Styling */
-.description-container {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-}
-
-.expand-btn {
-  flex-shrink: 0;
-  margin-top: -2px;
-  opacity: 0.7;
-  transition: opacity 0.3s ease;
-}
-
-.expand-btn:hover {
-  opacity: 1;
-}
-
-/* Responsive Design */
 @media (max-width: 768px) {
   .metadata-row {
     grid-template-columns: 1fr;

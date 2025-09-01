@@ -65,83 +65,12 @@
             :key="`import_${importJob.id}`"
             class="col-md-4 col-sm-6 col-12 align-self-stretch"
           >
-            <v-card
-              :elevation="4"
-              class="d-flex flex-column"
-              height="100%"
-            >
-              <v-card-title class="pb-0 mb-5">
-                <v-icon left>
-                  {{ getFileIcon(importJob.file_name) }}
-                </v-icon>
-                <span class="subtitle-1 font-weight-medium">{{ importJob.file_name }}</span>
-              </v-card-title>
-              <v-card-subtitle class="pt-0 text-caption">
-                <span class="d-block">ID: <span class="import-id-ellipsis">{{ importJob.id }}</span></span>
-                <span class="d-block">Created: {{ formatDate(importJob.created_at) }}</span>
-              </v-card-subtitle>
-              <v-card-text class="flex-grow-1">
-                <div class="caption">
-                  Description:
-                </div>
-                <div class="black--text text-body-2">
-                  {{ importJob.description || '-' }}
-                </div>
-                <div class="caption mt-2">
-                  Status:
-                </div>
-                <v-chip
-                  :color="getStatusColor(importJob.status)"
-                  class="font-weight-bold"
-                  label
-                  small
-                  text-color="white"
-                >
-                  {{ importJob.status }}
-                </v-chip>
-                <div v-if="importJob.additional_data?.total_time_series && (importJob.status === 'pending' || importJob.status === 'processing')" class="mt-2">
-                  <div class="caption mb-1">
-                    TimeSeries Progress: {{
-                      formatNumber(importJob.additional_data.time_series_count || 0)
-                    }}/{{ formatNumber(importJob.additional_data.total_time_series) }} 
-                    ({{ getProgressPercentage(importJob).toFixed(2) }}%)
-                  </div>
-                  <v-progress-linear
-                    :value="getProgressPercentage(importJob)"
-                    color="primary"
-                    height="6"
-                    rounded
-                  />
-                </div>
-              </v-card-text>
-              <v-divider />
-              <v-card-actions>
-                <v-btn
-                  :loading="isRefreshing[importJob.id]"
-                  icon
-                  small
-                  @click="refreshSingleImportStatus(importJob)"
-                >
-                  <v-icon>mdi-refresh</v-icon>
-                </v-btn>
-                <v-spacer />
-                <v-btn
-                  :disabled="true"
-                  color="red"
-                  small
-                  text
-                  @click="deleteImport(importJob.id)"
-                >
-                  <v-icon
-                    left
-                    small
-                  >
-                    mdi-delete
-                  </v-icon>
-                  Cancel
-                </v-btn>
-              </v-card-actions>
-            </v-card>
+            <import-card
+              :import-job="importJob"
+              :is-refreshing="isRefreshing[importJob.id] || false"
+              @delete="deleteImport"
+              @refresh="refreshSingleImportStatus"
+            />
           </v-col>
         </v-row>
       </v-col>
@@ -162,6 +91,7 @@
 import ImportAPI from '@/api/ImportAPI';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import EmptyState from '@/components/EmptyState.vue';
+import ImportCard from '@/components/ImportCard.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 import { mapState } from 'vuex';
 
@@ -171,6 +101,7 @@ export default {
     InfoToolTipComponent,
     AppBreadcrumbs,
     EmptyState,
+    ImportCard,
   },
   data: () => (
     {
@@ -267,57 +198,12 @@ export default {
       this.snackbar.color = color;
       this.snackbar.show = true;
     },
-    getStatusColor(status) {
-      switch (status) {
-        case 'pending':
-          return 'orange';
-        case 'processing':
-          return 'blue';
-        case 'completed':
-          return 'green';
-        case 'failed':
-          return 'red';
-        default:
-          return 'grey';
-      }
-    },
-    getFileIcon(fileName) {
-      if (!fileName) {
-        return 'mdi-file';
-      }
-      const ext = fileName.split('.').pop().toLowerCase();
-      if (ext === 'owl') {
-        return 'mdi-owl';
-      }
-      if (ext === 'json') {
-        return 'mdi-code-json';
-      }
-      return 'mdi-file-document-outline';
-    },
-    formatDate(dateString) {
-      if (!dateString) {
-        return '-';
-      }
-      try {
-        return new Date(dateString).toLocaleString();
-      } catch (e) {
-        return dateString;
-      }
-    },
     navigateToCreateImport() {
       if (this.currentDatasetId) {
         this.$router.push({ name: 'import-creation' });
       } else {
         this.showSnackbar('Please select a dataset first', 'warning');
       }
-    },
-    getProgressPercentage(importJob) {
-      const current = importJob.additional_data?.time_series_count || 0;
-      const total = importJob.additional_data?.total_time_series || 0;
-      return total > 0 ? (current / total) * 100 : 0;
-    },
-    formatNumber(number) {
-      return new Intl.NumberFormat().format(number);
     },
     startAutoRefresh() {
       console.log('Starting auto-refresh for active imports');
@@ -360,14 +246,6 @@ export default {
 </script>
 
 <style scoped>
-.v-card-title {
-  word-break: break-all;
-}
-
-.v-card-title {
-  word-break: break-all;
-}
-
 .import-id-ellipsis {
   display: inline-block;
   max-width: 180px;
