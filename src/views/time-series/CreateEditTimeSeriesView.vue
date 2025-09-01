@@ -19,8 +19,8 @@
               <v-tooltip top>
                 <template #activator="{ on, attrs }">
                   <v-icon
-                    v-bind="attrs"
                     color="primary"
+                    v-bind="attrs"
                     v-on="on"
                     @click.stop.prevent="downloadFile(timeSeries)"
                   >
@@ -33,8 +33,8 @@
             <v-file-input
               v-model="timeSeries.file"
               label="File input"
-              prepend-icon="mdi-paperclip"
               outlined
+              prepend-icon="mdi-paperclip"
               @change="onFileChange"
             />
             <v-divider />
@@ -71,12 +71,12 @@
             <v-autocomplete
               v-model="timeSeries.measure"
               :items="measures"
-              label="Measure"
-              clearable
-              required
               :rules="[
                 v => !!v || 'This field is required',
               ]"
+              clearable
+              label="Measure"
+              required
             >
               <template
                 slot="selection"
@@ -102,24 +102,26 @@
                   <v-autocomplete
                     v-model="observableInformation.link"
                     :items="filesWithChannels"
-                    label="Recording"
-                    clearable
-                    required
+                    :return-object="true"
                     :rules="[
                       v => !!v || 'This field is required',
                     ]"
+                    clearable
+                    item-value="recordingName"
+                    label="Recording"
+                    required
                   >
                     <template
                       slot="selection"
                       slot-scope="data"
                     >
-                      {{ data.item?.link.name }} (recording name: {{ data.item?.recordingName }})
+                      {{ data.item?.link?.name }} (recording name: {{ data.item?.recordingName }})
                     </template>
                     <template
                       slot="item"
                       slot-scope="data"
                     >
-                      {{ data.item?.link.name }} (recording name: {{ data.item?.recordingName }})
+                      {{ data.item?.link?.name }} (recording name: {{ data.item?.recordingName }})
                     </template>
                   </v-autocomplete>
                   <v-icon
@@ -137,12 +139,12 @@
                   <v-autocomplete
                     v-model="observableInformation.channel"
                     :items="observableInformation.link?.channels"
-                    label="Channel"
-                    clearable
-                    required
                     :rules="[
                       v => !!v || 'This field is required',
                     ]"
+                    clearable
+                    label="Channel"
+                    required
                   >
                     <template
                       slot="selection"
@@ -163,12 +165,14 @@
                     v-if="modalities.length > 0"
                     v-model="observableInformation.modality"
                     :items="modalities"
-                    label="Modality"
-                    clearable
-                    required
+                    :return-object="true"
                     :rules="[
                       v => !!v || 'This field is required',
                     ]"
+                    clearable
+                    item-value="id"
+                    label="Modality"
+                    required
                   >
                     <template
                       slot="selection"
@@ -189,12 +193,14 @@
                     v-if="lifeActivities.length > 0"
                     v-model="observableInformation.lifeActivity"
                     :items="lifeActivities"
-                    label="Live activity"
-                    clearable
-                    required
+                    :return-object="true"
                     :rules="[
                       v => !!v || 'This field is required',
                     ]"
+                    clearable
+                    item-value="id"
+                    label="Live activity"
+                    required
                   >
                     <template
                       slot="selection"
@@ -228,9 +234,9 @@
               </v-btn>
               <v-spacer />
               <v-btn
-                style="float: right;"
                 color="primary"
                 label="Create new time series"
+                style="float: right;"
                 type="submit"
               >
                 {{ isEditMode ? 'Update' : 'Create' }}
@@ -244,13 +250,13 @@
 </template>
 
 <script>
-import RegisteredDataAPI from '@/api/RegisteredDataAPI';
-import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import LifeActivitiesAPI from '@/api/LifeActivitiesAPI';
 import MeasuresAPI from '@/api/MeasuresAPI';
 import ModalitiesAPI from '@/api/ModalitiesAPI';
 import RecordingsAPI from '@/api/RecordingsAPI';
+import RegisteredDataAPI from '@/api/RegisteredDataAPI';
 import TimeSeriesApi from '@/api/TimeSeriesApi';
+import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 
 export default {
   name: 'CreateEditTimeSeriesView',
@@ -299,8 +305,8 @@ export default {
       immediate: true,
     },
   },
-  created() {
-    this.onCreated();
+  async created() {
+    await this.onCreated();
   },
   methods: {
     onFileChange(file) {
@@ -310,20 +316,16 @@ export default {
 
       this.timeSeries.file = file;
     },
-    onCreated() {
+    async onCreated() {
+      const [modalities, lifeActivities, measures] = await Promise.all([
+        ModalitiesAPI.index().then(({ data }) => data),
+        LifeActivitiesAPI.index().then(({ data }) => data),
+        MeasuresAPI.index().then(({ data }) => data),
+      ]);
 
-      ModalitiesAPI.index()
-        .then(({ data }) => {
-          this.modalities = data;
-        });
-      LifeActivitiesAPI.index()
-        .then(({ data }) => {
-          this.lifeActivities = data;
-        });
-      MeasuresAPI.index()
-        .then(({ data }) => {
-          this.measures = data;
-        });
+      this.modalities = modalities;
+      this.lifeActivities = lifeActivities;
+      this.measures = measures;
       return this.getRecordings();
     },
     create() {
@@ -362,7 +364,7 @@ export default {
       });
     },
     addObservableInformation() {
-      this.timeSeries?.observableInformations?.push({ ... this.observableInformationPrototype });
+      this.timeSeries?.observableInformations?.push({ ...this.observableInformationPrototype });
     },
     deleteObservableInformation(info, event) {
       const index = this.timeSeries?.observableInformations?.indexOf(info);

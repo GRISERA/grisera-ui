@@ -34,8 +34,8 @@
         <v-tooltip top>
           <template #activator="{ on, attrs }">
             <v-icon
-              v-bind="attrs"
               color="primary"
+              v-bind="attrs"
               v-on="on"
               @click.stop.prevent="downloadFile(item)"
             >
@@ -60,8 +60,8 @@
 
 <script>
 import RegisteredDataAPI from '@/api/RegisteredDataAPI';
-import BaseTable from '@/components/base/BaseTable.vue';
 import TimeSeriesApi from '@/api/TimeSeriesApi';
+import BaseTable from '@/components/base/BaseTable.vue';
 import ObservableInformationsTable from '@/views/time-series/components/ObservableInformationsTable.vue';
 
 export default {
@@ -85,12 +85,23 @@ export default {
     };
   },
   created() {
-    TimeSeriesApi.index(this.$route.params.activityExecution, this.$route.params.id)
-      .then(({ data }) => {
-        this.timeSeries = data;
-      });
+    this.loadTimeSeries();
   },
   methods: {
+    loadTimeSeries() {
+      this.$emit('loading', true);
+      TimeSeriesApi.indexDetailed(this.$route.params.activityExecution, this.$route.params.id)
+        .then(({ data }) => {
+          this.timeSeries = data;
+        })
+        .catch(error => {
+          console.error('Error loading time series:', error);
+          // Optionally show error message to user
+        })
+        .finally(() => {
+          this.$emit('loading', false);
+        });
+    },
     getSpacingChipColor(type) {
       return {
         ['Irregular']: 'accent',

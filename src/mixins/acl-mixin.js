@@ -8,7 +8,7 @@ export default {
   }, methods: {
     aclCan(permission) {
       const currentDatasetId = this.$store.state.dataset?.id;
-      return this.$store.state.scopes[currentDatasetId]?.includes(permission);
+      return this.$store.state?.scopes?.[currentDatasetId]?.includes(permission);
     },
   },
 };

@@ -1,5 +1,10 @@
 <template>
   <v-container class="container--fluid mt-4">
+    <loading-overlay
+      :visible="isLoading"
+      description="Please wait while we fetch your data..."
+      title="Loading Time Series"
+    />
     <v-row>
       <v-col class="headline font-weight-bold my-auto d-flex">
         <info-tool-tip-component :info-message="$route.meta.infoMessage" />
@@ -15,30 +20,33 @@
         </v-btn>
       </v-col>
       <v-col class="col-12">
-        <time-series-table />
+        <time-series-table @loading="handleLoading" />
       </v-col>
     </v-row>
   </v-container>
 </template>
-  
+
 <script>
-import TimeSeriesTable from '@/views/time-series/components/TimeSeriesTable.vue';
-import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
+import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
+import LoadingOverlay from '@/components/LoadingOverlay.vue';
 import AccessRoles from '@/const/AccessRoles';
+import TimeSeriesTable from '@/views/time-series/components/TimeSeriesTable.vue';
 import { mapGetters } from 'vuex';
 
 export default {
   name: 'TimeSeriesView',
   components: {
-      AppBreadcrumbs,
-      TimeSeriesTable,
-      InfoToolTipComponent,
+    AppBreadcrumbs,
+    TimeSeriesTable,
+    InfoToolTipComponent,
+    LoadingOverlay,
   },
   data() {
     return {
       activityExecutionId: '$route.params.activityExecution',
       participantId: '$route.params.participant',
+      isLoading: false,
     };
   },
   methods: {
@@ -47,6 +55,9 @@ export default {
       const append = '/create';
 
       this.$router.push(currentRoute + append);
+    },
+    handleLoading(loading) {
+      this.isLoading = loading;
     },
   },
   computed: {

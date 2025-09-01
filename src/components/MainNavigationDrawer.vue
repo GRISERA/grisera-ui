@@ -1,14 +1,17 @@
 <template>
   <v-navigation-drawer
-    :mini-variant="collapse"
+    :mini-variant="collapse && !mobile"
     :mini-variant-width="80"
     :style="{
-      width: collapse ? '64px' : 'auto !important',
+      width: collapse && !mobile ? '64px' : 'auto !important',
     }"
     :width="216"
+    :temporary="mobile"
+    :value="mobile ? drawer : true"
     app
     class="main-navigation-drawer white--text rounded-xl"
     color="primary"
+    @input="$emit('update:drawer', $event)"
   >
     <template #default>
       <v-container class="main-navigation-drawer--content">
@@ -100,6 +103,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    mobile: {
+      type: Boolean,
+      default: false,
+    },
+    drawer: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -178,6 +189,15 @@ export default {
   0 6px 30px 5px rgba(0, 0, 0, 0.12);
   height: calc(100vh - 16px) !important;
   margin: 8px !important;
+}
+
+/* Mobile specific styles */
+@media (max-width: 599px) {
+  .main-navigation-drawer {
+    margin: 0 !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+  }
 }
 
 .main-navigation-drawer--content {

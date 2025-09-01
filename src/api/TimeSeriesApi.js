@@ -132,4 +132,17 @@ export default class extends BaseAPI2 {
       return data[this.getReturnValues()].length;
     });
   }
+
+  static indexDetailed(activityExecutionId, participantId) {
+    const params = new URLSearchParams({
+      [this.getDatasetName().split('=')[0]]: this.getDatasetName().split('=')[1],
+      activity_execution_id: activityExecutionId,
+      participant_id: participantId,
+    });
+
+    return apiService.get(`/${this.getBasePath()}/detailed?${params}`)
+      .then(({ data }) => ({
+        data: data.time_series_nodes.map(item => this.dTOAPIToFront(item)),
+      }));
+  }
 }

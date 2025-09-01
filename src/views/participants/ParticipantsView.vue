@@ -22,7 +22,7 @@
         </v-btn>
       </v-col>
       <v-col class="col-12">
-        <participants-table />
+        <participants-table :initial-participants="participants" />
       </v-col>
     </v-row>
 
@@ -34,6 +34,7 @@
 </template>
 
 <script>
+import ParticipantsAPI from '@/api/ParticipantsAPI';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 import ParticipantCreateDialog from '@/components/ParticipantCreateDialog.vue';
@@ -52,6 +53,7 @@ export default {
   data() {
     return {
       showCreateDialog: false,
+      participants: [],
     };
   },
   computed: {
@@ -62,11 +64,21 @@ export default {
       return this.getPermission.role == AccessRoles.READER;
     },
   },
+  created() {
+    this.fetchParticipants();
+  },
   methods: {
+    fetchParticipants() {
+      ParticipantsAPI.index()
+        .then(({ data }) => {
+          this.participants = data;
+        });
+    },
     createParticipant() {
       this.showCreateDialog = true;
     },
     onParticipantCreated() {
+      this.fetchParticipants();
       this.showCreateDialog = false;
     },
   },

@@ -247,9 +247,7 @@ export default {
 
       try {
         await ParticipantsAPI.store(this.participant);
-        console.log('Participant created successfully');
         await this.$emit('participant-created');
-        console.log('event emitted');
         this.dialog = false;
       } catch (error) {
         console.error('Error creating participant:', error);

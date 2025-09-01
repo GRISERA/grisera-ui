@@ -1,81 +1,136 @@
 <template>
-  <v-container v-if="participants">
-    <v-dialog
-      v-model="dialog"
-      max-width="500px"
+  <v-dialog
+    v-model="dialog"
+    max-width="600px"
+    persistent
+  >
+    <template
+      v-if="canAddParticipant"
+      #activator="{ on, attrs }"
     >
-      <template
-        v-if="canAddParticipant"
-        #activator="{ on, attrs }"
+      <v-btn
+        :outlined="true"
+        class="ma-4"
+        data-testid="experiment-participant-add-button"
+        v-bind="attrs"
+        v-on="on"
       >
-        <v-btn
-          data-testid="experiment-participant-add-button"
-          class="ma-1"
-          v-bind="attrs"
-          :outlined="true"
-          v-on="on"
+        Add
+      </v-btn>
+    </template>
+    <v-card
+      class="elevation-4"
+      rounded="lg"
+    >
+      <v-card-title class="primary white--text">
+        <v-icon
+          color="white"
+          left
         >
-          Add
-        </v-btn>
-      </template>
-      <v-card>
-        <v-card-title>
-          <span class="text-h5">Add participant</span>
-        </v-card-title>
+          mdi-account-plus
+        </v-icon>
+        Add Participant to Experiment
+      </v-card-title>
 
-        <v-card-text>
-          <v-container>
-            <v-row>
-              <v-col
-                cols="50"
-                sm="10"
-                md="10"
+      <v-card-text class="pa-6">
+        <v-alert
+          border="left"
+          class="mb-4"
+          color="info"
+          colored-border
+          elevation="2"
+        >
+          <div class="d-flex align-center">
+            <v-icon class="mr-3">
+              mdi-information-outline
+            </v-icon>
+            <div>
+              <strong>Note:</strong> Only participants not yet assigned to this experiment are shown in the list below.
+            </div>
+          </div>
+        </v-alert>
+
+        <v-form
+          ref="form"
+          v-model="formValid"
+          lazy-validation
+        >
+          <v-autocomplete
+            v-model="participantId"
+            :items="participants"
+            :loading="loading"
+            :rules="participantRules"
+            class="mb-4"
+            clearable
+            item-value="id"
+            label="Select Participant"
+            outlined
+            placeholder="Choose a participant to add"
+            prepend-inner-icon="mdi-account"
+          >
+            <template #selection="{ item }">
+              <v-chip
+                color="primary"
+                small
+                text-color="white"
               >
-                <v-autocomplete
-                  v-model="participantId"
-                  :items="participants"
-                  label="Participant"
-                  clearable
-                  item-value="id"
+                <v-icon
+                  left
+                  small
                 >
-                  <template
-                    slot="selection"
-                    slot-scope="data"
-                  >
-                    {{ data.item?.surname }} {{ data.item?.name }}
-                  </template>
-                  <template
-                    slot="item"
-                    slot-scope="data"
-                  >
-                    {{ data.item?.surname }} {{ data.item?.name }}
-                  </template>
-                </v-autocomplete>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card-text>
+                  mdi-account
+                </v-icon>
+                {{ item?.surname }} {{ item?.name }}
+              </v-chip>
+            </template>
+            <template #item="{ item }">
+              <v-list-item-avatar>
+                <v-icon>mdi-account</v-icon>
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title>{{ item?.surname }} {{ item?.name }}</v-list-item-title>
+                <v-list-item-subtitle>{{ item?.sex }} • Born: {{ item?.birthDate || 'Unknown' }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </template>
+            <template #no-data>
+              <v-list-item>
+                <v-list-item-content>
+                  <v-list-item-title>
+                    {{ loading ? 'Loading participants...' : 'No available participants found' }}
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </template>
+          </v-autocomplete>
+        </v-form>
+      </v-card-text>
 
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="close"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="save"
-          >
-            Add
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-container>
+      <v-divider />
+      <v-card-actions class="pa-6">
+        <v-btn
+          outlined
+          @click="close"
+        >
+          <v-icon left>
+            mdi-close
+          </v-icon>
+          Cancel
+        </v-btn>
+        <v-spacer />
+        <v-btn
+          :disabled="!formValid || !participantId"
+          :loading="loading"
+          color="primary"
+          @click="save"
+        >
+          <v-icon left>
+            mdi-plus
+          </v-icon>
+          Add Participant
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 <script>
 import ExperimentsAPI from '@/api/ExperimentsAPI';
@@ -83,57 +138,110 @@ import ParticipantsAPI from '@/api/ParticipantsAPI';
 
 export default {
   name: 'AddExistingParticipantDialog',
-  props: ['addedParticipants', 'experiment', 'canAddParticipant'],
-  data: () => ({
-    participants: undefined,
-    participantId: null,
-    dialog: false,
-  }),
-  watch: {
-    dialog(val) {
-      val || this.close();
-    },
-    dialogDelete(val) {
-      val || this.close();
+  props: ['experiment', 'canAddParticipant'],
+  data() {
+    return {
+      participants: [],
+      participantId: null,
+      dialog: false,
+      loading: false,
+      formValid: false,
+    };
+  },
+  computed: {
+    participantRules() {
+      return [
+        v => !!v || 'Please select a participant',
+      ];
     },
   },
-  created() {
-    this.getParticipants();
+  watch: {
+    dialog(newValue) {
+      if (newValue) {
+        this.getParticipants();
+        this.resetForm();
+      } else {
+        this.close();
+      }
+    },
   },
   methods: {
     close() {
       this.dialog = false;
-      this.dialogDelete = false;
       this.participantId = null;
+      this.resetForm();
     },
 
-    save() {
-      this.addParticipantToExperiment(this.findParticipant(this.participantId));
-      this.close();
+    resetForm() {
+      this.participantId = null;
+      this.formValid = false;
+      if (this.$refs.form) {
+        this.$refs.form.resetValidation();
+      }
+    },
+
+    async save() {
+      if (!this.$refs.form.validate()) {
+        return;
+      }
+
+      this.loading = true;
+      try {
+        const participant = this.findParticipant(this.participantId);
+        await this.addParticipantToExperiment(participant);
+        this.close();
+      } catch (error) {
+        console.error('Error adding participant:', error);
+      } finally {
+        this.loading = false;
+      }
     },
 
     findParticipant(id) {
       return this.participants.find((participant) => participant.id === id);
     },
 
-    addParticipantToExperiment(participant) {
-      const participantsCopy = [...(this.experiment?.participants || [])];
-      participantsCopy.push(participant);
-      this.participants = this.participants.filter((particip) => particip.id != participant.id);
-      ExperimentsAPI.update({ ...this.experiment, participants: participantsCopy })
-        .then(() => {this.$emit('participant:added'); });
+    async addParticipantToExperiment(participant) {
+      // Get current participants IDs and add the new one
+      const participantsIdsCopy = [
+        ...(
+          this.experiment?.participants_ids || []
+        ),
+      ];
+      participantsIdsCopy.push(participant.id);
+
+      // Fetch all participant objects for the API call
+      const participantObjects = await Promise.all(
+        participantsIdsCopy.map(async (participantId) => {
+          if (participantId === participant.id) {
+            return participant; // Use the participant we already have
+          }
+          const { data } = await ParticipantsAPI.show(participantId);
+          return data;
+        }),
+      );
+
+      const updatedExperiment = {
+        ...this.experiment,
+        participants: participantObjects,
+      };
+
+      await ExperimentsAPI.update(updatedExperiment);
+      this.$emit('participant:added');
     },
 
-    getParticipants() {
-      ParticipantsAPI.index()
-        .then(({ data }) => {
-          if (this.addedParticipants != undefined) {
-            const addedParticipantsIds = this.addedParticipants.map((participant) => participant.id);
-            this.participants = data.filter((participant) => !addedParticipantsIds.includes(participant.id));
-          } else {
-            this.participants = data;
-          }
-        });
+    async getParticipants() {
+      this.loading = true;
+      try {
+        const { data } = await ParticipantsAPI.index();
+        const experimentParticipantIds = this.experiment?.participants_ids || [];
+        this.participants = data.filter((participant) => !experimentParticipantIds.includes(participant.id));
+      } catch (error) {
+        console.error('Error fetching participants:', error);
+        this.participants = [];
+      } finally {
+        this.loading = false;
+      }
     },
   },
 };

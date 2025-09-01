@@ -1,6 +1,19 @@
 <template>
   <div>
+    <!-- Empty State -->
+    <empty-state
+      v-if="participants.length === 0"
+      action-icon="mdi-plus"
+      action-text="Create Your First Participant"
+      description="There are no participants in the system yet. Create your first participant to get started."
+      icon="mdi-account-group-outline"
+      title="No Participants Found"
+      @action="createParticipant"
+    />
+
+    <!-- Participants Table -->
     <base-table
+      v-else
       :headers="headers"
       :items="participants"
     >
@@ -45,6 +58,7 @@
 <script>
 import ParticipantsAPI from '@/api/ParticipantsAPI';
 import BaseTable from '@/components/base/BaseTable.vue';
+import EmptyState from '@/components/EmptyState.vue';
 import ParticipantCreateDialog from '@/components/ParticipantCreateDialog.vue';
 import aclMixin from '@/mixins/acl-mixin';
 import ParticipantEditDialog from './ParticipantEditDialog.vue';
@@ -53,12 +67,19 @@ export default {
   name: 'ParticipantsTable',
   components: {
     BaseTable,
+    EmptyState,
     ParticipantEditDialog,
     ParticipantCreateDialog,
   },
   mixins: [
     aclMixin,
   ],
+  props: {
+    initialParticipants: {
+      type: Array,
+      default: () => [],
+    },
+  },
   data() {
     return {
       headers: [
@@ -74,6 +95,14 @@ export default {
       selectedParticipant: null,
       createDialog: false,
     };
+  },
+  watch: {
+    initialParticipants: {
+      immediate: true,
+      handler(participants) {
+        this.participants = participants;
+      },
+    },
   },
   created() {
     this.fetchParticipants();
@@ -95,10 +124,12 @@ export default {
         this.$set(this.participants, index, updatedParticipant);
       }
     },
+    createParticipant() {
+      this.createDialog = true;
+    },
     onParticipantCreated() {
-      console.log('Participant created, refreshing list...');
-      // this.fetchParticipants();
-      // this.createDialog = false;
+      this.fetchParticipants();
+      this.createDialog = false;
     },
   },
 };
