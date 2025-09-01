@@ -99,6 +99,20 @@
                 >
                   {{ importJob.status }}
                 </v-chip>
+                <div v-if="importJob.additional_data?.total_time_series && (importJob.status === 'pending' || importJob.status === 'processing')" class="mt-2">
+                  <div class="caption mb-1">
+                    TimeSeries Progress: {{
+                      formatNumber(importJob.additional_data.time_series_count || 0)
+                    }}/{{ formatNumber(importJob.additional_data.total_time_series) }} 
+                    ({{ getProgressPercentage(importJob).toFixed(2) }}%)
+                  </div>
+                  <v-progress-linear
+                    :value="getProgressPercentage(importJob)"
+                    color="primary"
+                    height="6"
+                    rounded
+                  />
+                </div>
               </v-card-text>
               <v-divider />
               <v-card-actions>
@@ -162,6 +176,7 @@ export default {
     {
       isLoading: false,
       isRefreshing: {},
+      autoRefreshInterval: null,
       snackbar: {
         show: false,
         text: '',
@@ -175,6 +190,9 @@ export default {
     ...mapState({
       currentDatasetId: state => state.dataset?.id,
     }),
+    hasActiveImports() {
+      return this.imports.some(imp => imp.status === 'pending' || imp.status === 'processing');
+    },
   },
   watch: {
     currentDatasetId: {
@@ -187,6 +205,19 @@ export default {
       },
       immediate: true,
     },
+    hasActiveImports: {
+      handler(hasActive) {
+        if (hasActive && !this.autoRefreshInterval) {
+          this.startAutoRefresh();
+        } else if (!hasActive && this.autoRefreshInterval) {
+          this.stopAutoRefresh();
+        }
+      },
+      immediate: true,
+    },
+  },
+  beforeDestroy() {
+    this.stopAutoRefresh();
   },
   methods: {
     async fetchImports() {
@@ -202,9 +233,6 @@ export default {
       this.isLoading = false;
     },
     async refreshSingleImportStatus(importJob) {
-      console.log('Refreshing status for importJob:', JSON.parse(JSON.stringify(importJob)));
-      console.log('Using currentDatasetId for API call:', this.currentDatasetId);
-
       if (!this.currentDatasetId) {
         this.showSnackbar('Error: No dataset selected. Cannot refresh status.', 'error');
         console.error('refreshSingleImportStatus: currentDatasetId is not available.');
@@ -213,11 +241,15 @@ export default {
 
       this.$set(this.isRefreshing, importJob.id, true);
       try {
-        const response = await ImportAPI.getStatus(importJob.id, this.currentDatasetId);
-        this.$store.commit('updateImportStatus', {
-          importId: importJob.id,
-          status: response.data.status,
-        });
+        const { data } = await ImportAPI.getStatus(importJob.id, this.currentDatasetId);
+
+        const importIndex = this.imports.findIndex(imp => imp.id === importJob.id);
+
+        if (importIndex !== -1) {
+          this.imports[importIndex].status = data.status;
+          this.imports[importIndex].additional_data = data.additional_data;
+        }
+
         this.showSnackbar(`Status for ${ importJob.file_name } updated.`, 'info');
       } catch (error) {
         console.error('Error refreshing import status:', error);
@@ -272,14 +304,55 @@ export default {
         return dateString;
       }
     },
-    isPermanentStatus(status) {
-      return ['completed', 'failed'].includes(status);
-    },
     navigateToCreateImport() {
       if (this.currentDatasetId) {
         this.$router.push({ name: 'import-creation' });
       } else {
         this.showSnackbar('Please select a dataset first', 'warning');
+      }
+    },
+    getProgressPercentage(importJob) {
+      const current = importJob.additional_data?.time_series_count || 0;
+      const total = importJob.additional_data?.total_time_series || 0;
+      return total > 0 ? (current / total) * 100 : 0;
+    },
+    formatNumber(number) {
+      return new Intl.NumberFormat().format(number);
+    },
+    startAutoRefresh() {
+      console.log('Starting auto-refresh for active imports');
+      this.autoRefreshInterval = setInterval(async () => {
+        await this.refreshActiveImports();
+      }, 1000);
+    },
+    stopAutoRefresh() {
+      if (this.autoRefreshInterval) {
+        console.log('Stopping auto-refresh');
+        clearInterval(this.autoRefreshInterval);
+        this.autoRefreshInterval = null;
+      }
+    },
+    async refreshActiveImports() {
+      if (!this.currentDatasetId) {
+        return;
+      }
+
+      const activeImports = this.imports.filter(imp =>
+        imp.status === 'pending' || imp.status === 'processing',
+      );
+
+      for (const importJob of activeImports) {
+        try {
+          const { data } = await ImportAPI.getStatus(importJob.id, this.currentDatasetId);
+          const importIndex = this.imports.findIndex(imp => imp.id === importJob.id);
+
+          if (importIndex !== -1) {
+            this.imports[importIndex].status = data.status;
+            this.imports[importIndex].additional_data = data.additional_data;
+          }
+        } catch (error) {
+          console.error('Error refreshing import status:', error);
+        }
       }
     },
   },

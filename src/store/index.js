@@ -48,12 +48,6 @@ const store = new Vuex.Store({
       });
       console.log('Store: Imports after adding:', state.imports);
     },
-    updateImportStatus(state, { importId, status }) {
-      const importIndex = state.imports.findIndex(imp => imp.id === importId);
-      if (importIndex !== -1) {
-        state.imports[importIndex].status = status;
-      }
-    },
     removeImport(state, importId) {
       state.imports = state.imports.filter(imp => imp.id !== importId);
     },
