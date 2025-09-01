@@ -27,7 +27,7 @@
             />
             <participants-tab
               :experiment="experiment"
-              :participants="experiment.participants"
+              :active="tab === 1"
               @participant:added="getExperiment"
             />
             <scenarios-tab

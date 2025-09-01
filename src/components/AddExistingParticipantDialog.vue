@@ -138,7 +138,7 @@ import ParticipantsAPI from '@/api/ParticipantsAPI';
 
 export default {
   name: 'AddExistingParticipantDialog',
-  props: ['addedParticipants', 'experiment', 'canAddParticipant'],
+  props: ['experiment', 'canAddParticipant'],
   data() {
     return {
       participants: [],
@@ -202,14 +202,31 @@ export default {
     },
 
     async addParticipantToExperiment(participant) {
-      const participantsCopy = [
+      // Get current participants IDs and add the new one
+      const participantsIdsCopy = [
         ...(
-          this.experiment?.participants || []
+          this.experiment?.participants_ids || []
         ),
       ];
-      participantsCopy.push(participant);
+      participantsIdsCopy.push(participant.id);
 
-      await ExperimentsAPI.update({ ...this.experiment, participants: participantsCopy });
+      // Fetch all participant objects for the API call
+      const participantObjects = await Promise.all(
+        participantsIdsCopy.map(async (participantId) => {
+          if (participantId === participant.id) {
+            return participant; // Use the participant we already have
+          }
+          const { data } = await ParticipantsAPI.show(participantId);
+          return data;
+        }),
+      );
+
+      const updatedExperiment = {
+        ...this.experiment,
+        participants: participantObjects,
+      };
+
+      await ExperimentsAPI.update(updatedExperiment);
       this.$emit('participant:added');
     },
 
@@ -217,12 +234,8 @@ export default {
       this.loading = true;
       try {
         const { data } = await ParticipantsAPI.index();
-        if (this.addedParticipants != undefined) {
-          const addedParticipantsIds = this.addedParticipants.map((participant) => participant.id);
-          this.participants = data.filter((participant) => !addedParticipantsIds.includes(participant.id));
-        } else {
-          this.participants = data;
-        }
+        const experimentParticipantIds = this.experiment?.participants_ids || [];
+        this.participants = data.filter((participant) => !experimentParticipantIds.includes(participant.id));
       } catch (error) {
         console.error('Error fetching participants:', error);
         this.participants = [];

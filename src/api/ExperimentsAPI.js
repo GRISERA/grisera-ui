@@ -1,22 +1,27 @@
 import BaseAPI2 from '@/api/BaseAPI2';
 import DatabaseName from '@/const/relations/DatabaseName';
-import ParticipantsAPI from './ParticipantsAPI';
-import ScenariosAPI from './ScenariosAPI';
 import ActivitiesAPI from './ActivitiesAPI';
 import ScenarioExecutionsAPI from './ScenarioExecutionsAPI';
+import ScenariosAPI from './ScenariosAPI';
 
 export default class extends BaseAPI2 {
   static getBasePath() {
     return DatabaseName.EXPERIMENTS;
   }
 
-  static dTOFrontToAPI(data){
-    const participants_ids = data.participants?.map(e => ({ key: 'participant_id', value: e.id }));
+  static dTOFrontToAPI(data) {
+    const participants_ids = data.participants?.map(e => (
+      { key: 'participant_id', value: e.id }
+    ));
 
     return {
       experiment_name: data.name,
       additional_properties: [
-        ...(data.additionalParameters?.map(e => ({ key: e.name, value: e.value })) || []),
+        ...(
+          data.additionalParameters?.map(e => (
+            { key: e.name, value: e.value }
+          )) || []
+        ),
         {
           key: 'description',
           value: data.description,
@@ -33,12 +38,14 @@ export default class extends BaseAPI2 {
           key: 'footnote',
           value: data.footnote,
         },
-        ...(participants_ids || []),
+        ...(
+          participants_ids || []
+        ),
       ],
     };
   }
 
-  static dTOAPIToFront(data){
+  static dTOAPIToFront(data) {
     const scenarioExecutions = data.scenarios?.map(scenario => (
       scenario.activity_executions?.map(activity_executions => {
         return ScenarioExecutionsAPI.dTOAPIToFront({ ...scenario, activity_executions: activity_executions });
@@ -65,30 +72,19 @@ export default class extends BaseAPI2 {
 
   static show(id, depth = 6) {
     return super.show(id, depth).then(async ({ data }) => {
-      var participants = [];
-      if (data.participants_ids.length !== 0){
-        participants = Promise.all(data.participants_ids?.map( participant_id => {
-          return ParticipantsAPI.show(participant_id).then(({ data }) => data);
-        }));
-      }
-
-
-      if (data.scenarios){
+      if (data.scenarios) {
         const activities = await ActivitiesAPI.index().then(({ data }) => data);
         for (const scenario of data.scenarios) {
           var scenarioActivities = [];
-          for (const activityId of scenario.activity_ids){
+          for (const activityId of scenario.activity_ids) {
             scenarioActivities.push(activities.find(param => param.id === activityId));
           }
           scenario.activities = scenarioActivities;
         }
       }
 
-      let { participants_ids, ...filteredData } = data;
-      return {
-        ...filteredData,
-        participants: await participants,
-      };
+      // Keep participants_ids for lazy loading, but don't fetch participants automatically
+      return data;
     }).then((finalData) => {
       return { data: finalData };
     });

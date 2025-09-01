@@ -5,25 +5,48 @@
         <v-col class="col-12 text-right">
           <v-row justify="end">
             <add-existing-participant-dialog
-              :added-participants="participants"
-              :experiment="experiment"
+              ref="addDialog"
               :can-add-participant="!isReadOnly"
-              @participant:added="$emit('participant:added')"
+              :experiment="experiment"
+              @participant:added="onParticipantAdded"
             />
           </v-row>
         </v-col>
         <v-col class="col-12 pa-6">
+          <!-- Loading State -->
+          <v-skeleton-loader
+            v-if="loading"
+            class="mx-auto"
+            type="table"
+          />
+
+          <!-- Empty State -->
+          <empty-state
+            v-else-if="localParticipants.length === 0 && !loading"
+            :show-action="!isReadOnly"
+            action-icon="mdi-account-plus"
+            action-text="Add First Participant"
+            description="No participants have been assigned to this experiment yet. Add participants to start collecting data."
+            icon="mdi-account-group-outline"
+            title="No Participants Assigned"
+            @action="openAddDialog"
+          />
+
+          <!-- Participants Table -->
           <base-table
+            v-else
             :headers="headers"
-            :items="participants"
+            :items="localParticipants"
           >
             <template #[`item.sex`]="{ item }">
               <v-chip
-                color="primary"
+                v-if="item.sex"
                 :small="true"
+                color="primary"
               >
                 {{ item.sex }}
               </v-chip>
+              <span v-else>-</span>
             </template>
           </base-table>
         </v-col>
@@ -33,18 +56,32 @@
 </template>
 
 <script>
-import BaseTable from '@/components/base/BaseTable.vue';
+import ParticipantsAPI from '@/api/ParticipantsAPI';
 import AddExistingParticipantDialog from '@/components/AddExistingParticipantDialog.vue';
-import { mapGetters } from 'vuex';
+import BaseTable from '@/components/base/BaseTable.vue';
+import EmptyState from '@/components/EmptyState.vue';
 import AccessRoles from '@/const/AccessRoles';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'ParticipantsTab',
   components: {
     AddExistingParticipantDialog,
     BaseTable,
+    EmptyState,
   },
-  props: ['participants', 'experiment'],
+  props: {
+    experiment: {
+      type: Object,
+      default: () => (
+        {}
+      ),
+    },
+    active: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       headers: [
@@ -54,6 +91,9 @@ export default {
         { text: 'Birth date', value: 'birthDate' },
         { text: 'Sex', value: 'sex' },
       ],
+      localParticipants: [],
+      loading: false,
+      hasLoaded: false,
     };
   },
   computed: {
@@ -62,6 +102,57 @@ export default {
     }),
     isReadOnly() {
       return this.getPermission.role == AccessRoles.READER;
+    },
+  },
+  watch: {
+    active: {
+      immediate: true,
+      handler(isActive) {
+        if (isActive && !this.hasLoaded) {
+          this.fetchParticipants();
+        }
+      },
+    },
+    'experiment.participants_ids': {
+      handler(newIds, oldIds) {
+        if (this.active && this.hasLoaded && JSON.stringify(newIds) !== JSON.stringify(oldIds)) {
+          this.fetchParticipants();
+        }
+      },
+    },
+  },
+  methods: {
+    async fetchParticipants() {
+      if (!this.experiment?.participants_ids?.length) {
+        this.localParticipants = [];
+        this.hasLoaded = true;
+        return;
+      }
+
+      this.loading = true;
+      try {
+        const participants = await Promise.all(
+          this.experiment.participants_ids.map(async (participantId) => {
+            const { data } = await ParticipantsAPI.show(participantId);
+            return data;
+          }),
+        );
+        this.localParticipants = participants;
+        this.hasLoaded = true;
+      } catch (error) {
+        console.error('Error fetching participants:', error);
+        this.localParticipants = [];
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    onParticipantAdded() {
+      this.$emit('participant:added');
+    },
+
+    openAddDialog() {
+      this.$refs.addDialog.dialog = true;
     },
   },
 };
