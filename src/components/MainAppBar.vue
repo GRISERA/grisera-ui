@@ -2,14 +2,22 @@
   <v-app-bar
     :elevation="8"
     app
-    class="ma-2 rounded-xl"
+    :class="mobile ? 'mobile-app-bar' : 'ma-2 rounded-xl'"
   >
     <template #default>
       <v-container class="container--fluid pa-0">
         <v-row>
           <v-col class="shrink pa-0">
             <v-list-item>
-              <v-list-item-avatar v-if="!$route.meta.disableNavigation">
+              <v-list-item-avatar v-if="mobile && !$route.meta.disableNavigation">
+                <v-icon
+                  color="primary"
+                  @click="$emit('toggle-drawer')"
+                >
+                  mdi-menu
+                </v-icon>
+              </v-list-item-avatar>
+              <v-list-item-avatar v-if="!mobile && !$route.meta.disableNavigation">
                 <v-icon
                   color="primary"
                   @click="$router.push({name: 'datasets'})"
@@ -78,6 +86,12 @@ import { mapState } from 'vuex';
 
 export default {
   name: 'MainAppBar',
+  props: {
+    mobile: {
+      type: Boolean,
+      default: false,
+    },
+  },
   computed: {
     ...mapState({
       dataset: state => state.dataset,
@@ -92,3 +106,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.mobile-app-bar {
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+</style>
