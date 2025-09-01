@@ -19,6 +19,7 @@
     </base-table>
 
     <life-activity-edit-dialog
+      v-if="selectedLifeActivity"
       v-model="editDialog"
       :life-activity-data="selectedLifeActivity"
       @close="editDialog = false"
@@ -61,9 +62,9 @@ export default {
   methods: {
     fetchLifeActivities() {
       LifeActivitiesAPI.index()
-      .then(({ data }) => {
-        this.lifeActivities = data;
-      });
+        .then(({ data }) => {
+          this.lifeActivities = data;
+        });
     },
     openEditDialog(lifeActivity) {
       this.selectedLifeActivity = { ...lifeActivity };
