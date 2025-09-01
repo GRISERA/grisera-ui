@@ -19,6 +19,7 @@
     </base-table>
 
     <modality-edit-dialog
+      v-if="selectedModality"
       v-model="editDialog"
       :modality-data="selectedModality"
       @close="editDialog = false"
@@ -61,9 +62,9 @@ export default {
   methods: {
     fetchModalities() {
       ModalitiesAPI.index()
-      .then(({ data }) => {
-        this.modalities = data;
-      });
+        .then(({ data }) => {
+          this.modalities = data;
+        });
     },
     openEditDialog(modality) {
       this.selectedModality = { ...modality };

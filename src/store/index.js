@@ -1,7 +1,6 @@
 import roles from '@/acl/roles';
 import Vue from 'vue';
 import Vuex from 'vuex';
-import ImportAPI from '@/api/ImportAPI';
 // import ExportAPI from '@/api/ExportAPI';
 import createPersistedState from 'vuex-persistedstate';
 
@@ -115,10 +114,13 @@ const store = new Vuex.Store({
     },
     setExports(state, exports) {
       console.log('Store: Setting exports:', exports);
-      state.exports = exports.map(exp => ({
-        ...exp,
-        created_at: exp.created_at || new Date().toISOString(),
-      }));
+      state.exports =
+        exports.map(exp => (
+          {
+            ...exp,
+            created_at: exp.created_at || new Date().toISOString(),
+          }
+        ));
     },
   },
   actions: {
@@ -128,13 +130,13 @@ const store = new Vuex.Store({
         return;
       }
       const datasetId = rootState.dataset.id;
-      console.log(`Store fetchExports: Fetching exports for dataset ID: ${datasetId}`);
+      console.log(`Store fetchExports: Fetching exports for dataset ID: ${ datasetId }`);
       try {
         const response = await ExportAPI.getExportsByDataset(datasetId);
         console.log('Store fetchExports: Received exports from API:', response.data);
         commit('setExports', response.data);
       } catch (error) {
-        console.error(`Store fetchExports: Error fetching exports for dataset ${datasetId}:`, error);
+        console.error(`Store fetchExports: Error fetching exports for dataset ${ datasetId }:`, error);
         commit('setExports', []);
       }
     },
