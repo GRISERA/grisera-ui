@@ -23,6 +23,7 @@
                 dense
                 disabled
                 class="mb-4"
+                prepend-icon="mdi-file-export-outline"
               >
                 <template v-slot:item="{ item }">
                   <v-list-item-icon>
@@ -46,6 +47,7 @@
                 rows="3"
                 outlined
                 dense
+                prepend-icon="mdi-text-box-outline"
               ></v-textarea>
             </v-form>
           </v-card-text>
