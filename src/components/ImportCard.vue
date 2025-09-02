@@ -14,10 +14,19 @@
           {{ getFileIcon(importJob.file_name) }}
         </v-icon>
       </div>
-      <div class="import-info flex-grow-1">
-        <h3 class="import-title">
-          {{ importJob.file_name }}
-        </h3>
+      <div class="import-info">
+        <v-tooltip bottom>
+          <template #activator="{ on, attrs }">
+            <h3 
+              class="import-title"
+              v-bind="attrs"
+              v-on="on"
+            >
+              {{ importJob.file_name }}
+            </h3>
+          </template>
+          <span>{{ importJob.file_name }}</span>
+        </v-tooltip>
         <div class="import-meta">
           <v-icon
             class="mr-1"
@@ -236,6 +245,11 @@ export default {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.import-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .import-title {

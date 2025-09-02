@@ -1,7 +1,7 @@
 import roles from '@/acl/roles';
+import ExportAPI from '@/api/ExportAPI';
 import Vue from 'vue';
 import Vuex from 'vuex';
-// import ExportAPI from '@/api/ExportAPI';
 import createPersistedState from 'vuex-persistedstate';
 
 Vue.use(Vuex);
