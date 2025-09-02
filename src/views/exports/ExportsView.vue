@@ -108,6 +108,7 @@ export default {
     {
       isLoading: false,
       isRefreshing: {},
+      autoRefreshInterval: null,
       snackbar: {
         show: false,
         text: '',
@@ -123,6 +124,9 @@ export default {
     ...mapGetters({
       exports: 'getAllExports',
     }),
+    hasActiveExports() {
+      return this.exports.some(exp => exp.status === 'pending' || exp.status === 'processing');
+    },
   },
   watch: {
     currentDatasetId: {
@@ -135,6 +139,19 @@ export default {
       },
       immediate: true,
     },
+    hasActiveExports: {
+      handler(hasActive) {
+        if (hasActive && !this.autoRefreshInterval) {
+          this.startAutoRefresh();
+        } else if (!hasActive && this.autoRefreshInterval) {
+          this.stopAutoRefresh();
+        }
+      },
+      immediate: true,
+    },
+  },
+  beforeDestroy() {
+    this.stopAutoRefresh();
   },
   methods: {
     ...mapActions([
@@ -226,6 +243,41 @@ export default {
         this.$router.push({ name: 'export-creation' });
       } else {
         this.showSnackbar('Please select a dataset first', 'warning');
+      }
+    },
+    startAutoRefresh() {
+      console.log('Starting auto-refresh for active exports');
+      this.autoRefreshInterval = setInterval(async () => {
+        await this.refreshActiveExports();
+      }, 1000);
+    },
+    stopAutoRefresh() {
+      if (this.autoRefreshInterval) {
+        console.log('Stopping auto-refresh');
+        clearInterval(this.autoRefreshInterval);
+        this.autoRefreshInterval = null;
+      }
+    },
+    async refreshActiveExports() {
+      if (!this.currentDatasetId) {
+        return;
+      }
+
+      const activeExports = this.exports.filter(exp =>
+        exp.status === 'pending' || exp.status === 'processing',
+      );
+
+      for (const exportJob of activeExports) {
+        try {
+          const response = await ExportAPI.getStatus(exportJob.id, this.currentDatasetId);
+          this.$store.commit('updateExportStatus', {
+            exportId: exportJob.id,
+            status: response.data.status,
+            exported_records: response.data.processed_records || 0,
+          });
+        } catch (error) {
+          console.error('Error refreshing export status:', error);
+        }
       }
     },
   },

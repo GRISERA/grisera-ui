@@ -90,7 +90,7 @@ const store = new Vuex.Store({
       if (exportIndex !== -1) {
         state.exports[exportIndex].status = status;
         if (exported_records !== undefined) {
-          state.exports[exportIndex].exported_records = exported_records;
+          state.exports[exportIndex].processed_records = exported_records;
         }
       }
     },
