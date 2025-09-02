@@ -41,6 +41,7 @@
                 label="Description (optional)"
                 outlined
                 rows="3"
+                prepend-icon="mdi-text-box-outline"
               />
             </v-form>
           </v-card-text>
