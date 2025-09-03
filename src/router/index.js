@@ -1,18 +1,18 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router';
+import ClassesDescriptions from '@/const/ClassesDescriptions';
 
 import activityRoutes from '@/router/activityRoutes';
 import channelRoutes from '@/router/channelRoutes';
+import datasetRoutes from '@/router/datasetRoutes';
 import experimentRoutes from '@/router/experimentRoutes';
 import fileRoutes from '@/router/fileRoutes';
+import measureRoutes from '@/router/measureRoutes';
 import modalityRoutes from '@/router/modalityRoutes';
 import participantRoutes from '@/router/participantRoutes';
-import measureRoutes from '@/router/measureRoutes';
-import datasetRoutes from '@/router/datasetRoutes';
-import ClassesDescriptions from '@/const/ClassesDescriptions';
-import jwt_decode from 'jwt-decode';
 import AuthService from '@/services/AuthService';
 import store from '@/store/index';
+import jwt_decode from 'jwt-decode';
+import Vue from 'vue';
+import VueRouter from 'vue-router';
 
 Vue.use(VueRouter);
 
@@ -100,34 +100,34 @@ const routes = [
       infoMessage: 'Upload a new file to create a data import job.',
     },
   },
-  // {
-  //   path: '/exports',
-  //   name: 'exports',
-  //   component: () => import('@/views/exports/ExportsView.vue'),
-  //   meta: {
-  //     icon: 'mdi-export',
-  //     order: 46,
-  //     name: 'Data Exports',
-  //     hideFilters: true,
-  //     breadcrumbs: [
-  //       { text: 'Data Exports', disabled: true },
-  //     ],
-  //     infoMessage: 'Manage and monitor your data export jobs.',
-  //   },
-  // },
-  // {
-  //   path: '/exports/create',
-  //   name: 'export-creation',
-  //   component: () => import('@/views/exports/CreateExportView.vue'),
-  //   meta: {
-  //     hideFilters: true,
-  //     breadcrumbs: [
-  //       { text: 'Data Exports', disabled: false, href: '/exports' },
-  //       { text: 'Create', disabled: true },
-  //     ],
-  //     infoMessage: 'Configure and start a new data export job.',
-  //   },
-  // },
+  {
+    path: '/exports',
+    name: 'exports',
+    component: () => import('@/views/exports/ExportsView.vue'),
+    meta: {
+      icon: 'mdi-export',
+      order: 46,
+      name: 'Data Exports',
+      hideFilters: true,
+      breadcrumbs: [
+        { text: 'Data Exports', disabled: true },
+      ],
+      infoMessage: 'Manage and monitor your data export jobs.',
+    },
+  },
+  {
+    path: '/exports/create',
+    name: 'export-creation',
+    component: () => import('@/views/exports/CreateExportView.vue'),
+    meta: {
+      hideFilters: true,
+      breadcrumbs: [
+        { text: 'Data Exports', disabled: false, href: '/exports' },
+        { text: 'Create', disabled: true },
+      ],
+      infoMessage: 'Configure and start a new data export job.',
+    },
+  },
   {
     path: '/settings',
     name: 'settings',
@@ -157,17 +157,17 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.name !== 'login' && to.name !== 'register';
-  const isAuthenticated = !!(AuthService.isAuthenticated() || to.params.isAuthenticated);
+  const isAuthenticated = !!(
+    AuthService.isAuthenticated() || to.params.isAuthenticated
+  );
 
-  if(requiresAuth && !isAuthenticated) {
+  if (requiresAuth && !isAuthenticated) {
     next('/login');
-  }
-  else if(!requiresAuth && isAuthenticated) {
+  } else if (!requiresAuth && isAuthenticated) {
     next(from.path);
-  }
-  else {
+  } else {
     const token = localStorage.getItem('token');
-    if(token) {
+    if (token) {
       router.app.$store.commit('setUser', jwt_decode(token));
     }
     next();
@@ -175,7 +175,7 @@ router.beforeEach((to, from, next) => {
 });
 
 router.beforeEach((to, from, next) => {
-  if(to.meta.canEnterRoles && !to.meta.canEnterRoles.find(role => role == store.getters.getPermission.role)) {
+  if (to.meta.canEnterRoles && !to.meta.canEnterRoles.find(role => role == store.getters.getPermission.role)) {
     next('/access-denied');
   }
 
@@ -188,8 +188,8 @@ router.afterEach(({ name, params, meta: { breadcrumbs = [] } }) => {
     let href = entry.href;
 
     Object.entries(params).forEach(([key, value]) => {
-        text = text.replace(`:${key}`, value);
-        href = href?.replace(`:${key}`, value);
+        text = text.replace(`:${ key }`, value);
+        href = href?.replace(`:${ key }`, value);
       },
     );
 

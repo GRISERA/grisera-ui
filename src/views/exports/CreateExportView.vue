@@ -2,8 +2,8 @@
   <v-container class="container--fluid mt-4">
     <v-row>
       <v-col class="headline font-weight-bold my-auto d-flex">
-        <info-tool-tip-component :info-message="$route.meta.infoMessage || 'Create a new data export'"/>
-        <app-breadcrumbs/>
+        <info-tool-tip-component :info-message="$route.meta.infoMessage || 'Create a new data export'" />
+        <app-breadcrumbs />
       </v-col>
     </v-row>
     <v-row>
@@ -15,14 +15,14 @@
               <v-select
                 v-model="selectedFormat"
                 :items="formatItems"
+                :rules="[rules.required]"
+                class="mb-4"
+                dense
+                disabled
                 item-text="label"
                 item-value="value"
                 label="Export Format"
-                :rules="[rules.required]"
                 outlined
-                dense
-                disabled
-                class="mb-4"
                 prepend-icon="mdi-file-export-outline"
               >
                 <template v-slot:item="{ item }">
@@ -37,32 +37,29 @@
               </v-select>
 
 
-
-
-
               <!-- Description -->
               <v-textarea
                 v-model="exportDescription"
-                label="Description (optional)"
-                rows="3"
-                outlined
                 dense
+                label="Description (optional)"
+                outlined
                 prepend-icon="mdi-text-box-outline"
+                rows="3"
               ></v-textarea>
             </v-form>
           </v-card-text>
           <v-card-actions class="pa-4">
-            <v-btn 
+            <v-btn
               :outlined="true"
               @click="cancelCreation"
             >
               Cancel
             </v-btn>
             <v-spacer></v-spacer>
-            <v-btn 
-              color="#043865" 
+            <v-btn
               :disabled="!isExportFormValid || isCreating || !currentDatasetId"
               :loading="isCreating"
+              color="#043865"
               @click="handleExportCreation"
             >
               <span style="color: white;">
@@ -82,9 +79,9 @@
 </template>
 
 <script>
+import ExportAPI from '@/api/ExportAPI';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
-import ExportAPI from '@/api/ExportAPI';
 import { mapState } from 'vuex';
 
 export default {
@@ -93,26 +90,28 @@ export default {
     InfoToolTipComponent,
     AppBreadcrumbs,
   },
-  data: () => ({
-    isExportFormValid: false,
-    selectedFormat: 'json',
-    exportDescription: '',
-    isCreating: false,
-    snackbar: {
-      show: false,
-      text: '',
-      color: 'info',
-      timeout: 4000,
-    },
-    formatItems: [
-      { value: 'json', label: 'JSON', description: 'JavaScript Object Notation' },
-      { value: 'csv', label: 'CSV', description: 'Comma Separated Values' },
-      { value: 'xml', label: 'XML', description: 'Extensible Markup Language' },
-    ],
-    rules: {
-      required: value => !!value || 'This field is required.',
-    },
-  }),
+  data: () => (
+    {
+      isExportFormValid: false,
+      selectedFormat: 'json',
+      exportDescription: '',
+      isCreating: false,
+      snackbar: {
+        show: false,
+        text: '',
+        color: 'info',
+        timeout: 4000,
+      },
+      formatItems: [
+        { value: 'json', label: 'JSON', description: 'JavaScript Object Notation' },
+        { value: 'csv', label: 'CSV', description: 'Comma Separated Values' },
+        { value: 'xml', label: 'XML', description: 'Extensible Markup Language' },
+      ],
+      rules: {
+        required: value => !!value || 'This field is required.',
+      },
+    }
+  ),
   computed: {
     ...mapState({
       currentDatasetId: state => state.dataset?.id,
@@ -120,7 +119,9 @@ export default {
   },
   methods: {
     async handleExportCreation() {
-      if (!this.$refs.exportForm.validate()) return;
+      if (!this.$refs.exportForm.validate()) {
+        return;
+      }
       if (!this.currentDatasetId) {
         this.showSnackbar('Please ensure a dataset is chosen.', 'warning');
         return;
@@ -130,17 +131,17 @@ export default {
 
       try {
         const exportData = {
-          file_name: `export_${this.selectedFormat}_${Date.now()}`,
+          file_name: `export_${ this.selectedFormat }_${ Date.now() }`,
           file_type: this.selectedFormat,
           operation_type: 'export',
           dataset_id: this.currentDatasetId,
-          description: this.exportDescription
+          description: this.exportDescription,
         };
 
         console.log('Creating export with data:', exportData);
 
         const response = await ExportAPI.startExport(exportData);
-        
+
         // FileOperationOut używa file_type zamiast export_format
         this.$store.commit('addExport', {
           id: response.data.id,
@@ -149,14 +150,14 @@ export default {
           dataset_id: response.data.dataset_id,
           description: response.data.description,
           created_at: response.data.created_at,
-          exported_records: response.data.processed_records || 0
+          exported_records: response.data.processed_records || 0,
         });
-        
-        this.showSnackbar(`Export ${this.selectedFormat.toUpperCase()} created successfully.`, 'success');
+
+        this.showSnackbar(`Export ${ this.selectedFormat.toUpperCase() } created successfully.`, 'success');
         this.$router.push({ name: 'exports' });
       } catch (error) {
         console.error('Error creating export:', error);
-        this.showSnackbar(`Error creating export: ${error.response?.data?.detail || error.message}`, 'error');
+        this.showSnackbar(`Error creating export: ${ error.response?.data?.detail || error.message }`, 'error');
       } finally {
         this.isCreating = false;
       }
