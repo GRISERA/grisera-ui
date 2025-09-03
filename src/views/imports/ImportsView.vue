@@ -179,6 +179,7 @@ export default {
         if (importIndex !== -1) {
           this.imports[importIndex].status = data.status;
           this.imports[importIndex].additional_data = data.additional_data;
+          this.imports[importIndex].processed_records = data.processed_records || 0;
         }
 
         this.showSnackbar(`Status for ${ importJob.file_name } updated.`, 'info');
@@ -235,6 +236,7 @@ export default {
           if (importIndex !== -1) {
             this.imports[importIndex].status = data.status;
             this.imports[importIndex].additional_data = data.additional_data;
+            this.imports[importIndex].processed_records = data.processed_records || 0;
           }
         } catch (error) {
           console.error('Error refreshing import status:', error);

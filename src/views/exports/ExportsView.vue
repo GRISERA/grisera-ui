@@ -94,7 +94,7 @@ import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import ExportCard from '@/components/ExportCard.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
-import { mapActions, mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
   name: 'ExportsView',
@@ -115,14 +115,12 @@ export default {
         color: 'info',
         timeout: 4000,
       },
+      exports: [],
     }
   ),
   computed: {
     ...mapState({
       currentDatasetId: state => state.dataset?.id,
-    }),
-    ...mapGetters({
-      exports: 'getAllExports',
     }),
     hasActiveExports() {
       return this.exports.some(exp => exp.status === 'pending' || exp.status === 'processing');
@@ -134,7 +132,7 @@ export default {
         if (newId) {
           this.loadExportsForDataset();
         } else {
-          this.$store.commit('setExports', []);
+          this.exports = [];
         }
       },
       immediate: true,
@@ -154,9 +152,10 @@ export default {
     this.stopAutoRefresh();
   },
   methods: {
-    ...mapActions([
-      'fetchExports',
-    ]),
+    async fetchExports() {
+      const response = await ExportAPI.getExportsByDataset(this.currentDatasetId);
+      this.exports = response.data;
+    },
     async loadExportsForDataset() {
       if (!this.currentDatasetId) {
         return;
@@ -178,11 +177,11 @@ export default {
       this.$set(this.isRefreshing, exportJob.id, true);
       try {
         const response = await ExportAPI.getStatus(exportJob.id, this.currentDatasetId);
-        this.$store.commit('updateExportStatus', {
-          exportId: exportJob.id,
-          status: response.data.status,
-          exported_records: response.data.processed_records || 0,
-        });
+        const exportIndex = this.exports.findIndex(exp => exp.id === exportJob.id);
+        if (exportIndex !== -1) {
+          this.exports[exportIndex].status = response.data.status;
+          this.exports[exportIndex].processed_records = response.data.processed_records || 0;
+        }
         const format = exportJob.file_type || exportJob.export_format || 'json';
         this.showSnackbar(`Status for export ${ format.toUpperCase() } Export updated.`, 'info');
       } catch (error) {
@@ -235,9 +234,6 @@ export default {
       this.snackbar.color = color;
       this.snackbar.show = true;
     },
-    isPermanentStatus(status) {
-      return ['completed', 'failed'].includes(status);
-    },
     navigateToCreateExport() {
       if (this.currentDatasetId) {
         this.$router.push({ name: 'export-creation' });
@@ -270,11 +266,11 @@ export default {
       for (const exportJob of activeExports) {
         try {
           const response = await ExportAPI.getStatus(exportJob.id, this.currentDatasetId);
-          this.$store.commit('updateExportStatus', {
-            exportId: exportJob.id,
-            status: response.data.status,
-            exported_records: response.data.processed_records || 0,
-          });
+          const exportIndex = this.exports.findIndex(exp => exp.id === exportJob.id);
+          if (exportIndex !== -1) {
+            this.exports[exportIndex].status = response.data.status;
+            this.exports[exportIndex].processed_records = response.data.processed_records || 0;
+          }
         } catch (error) {
           console.error('Error refreshing export status:', error);
         }
@@ -283,7 +279,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-</style>
-
