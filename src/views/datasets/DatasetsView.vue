@@ -147,7 +147,7 @@ export default {
     DatasetAPI.index().then(({ data }) => {
       this.datasets = data;
     });
-    PermissionsService.getUserPermissions(this.getUser().userId).then((response) => {
+    PermissionsService.getUserPermissions(this.getUser().sub).then((response) => {
       this.permissions = response.data;
     });
   },
@@ -179,7 +179,7 @@ export default {
         // Refresh both datasets and permissions
         const [datasetsResponse, permissionsResponse] = await Promise.all([
           DatasetAPI.index(),
-          PermissionsService.getUserPermissions(this.getUser().userId),
+          PermissionsService.getUserPermissions(this.getUser().sub),
         ]);
 
         this.datasets = datasetsResponse.data;
@@ -195,7 +195,7 @@ export default {
         // Refresh both datasets and permissions
         const [datasetsResponse, permissionsResponse] = await Promise.all([
           DatasetAPI.index(),
-          PermissionsService.getUserPermissions(this.getUser().userId),
+          PermissionsService.getUserPermissions(this.getUser().sub),
         ]);
 
         this.datasets = datasetsResponse.data;
@@ -233,7 +233,7 @@ export default {
 
         const [datasetsResponse, permissionsResponse] = await Promise.all([
           DatasetAPI.index(),
-          PermissionsService.getUserPermissions(this.getUser().userId),
+          PermissionsService.getUserPermissions(this.getUser().sub),
         ]);
 
         this.datasets = datasetsResponse.data;

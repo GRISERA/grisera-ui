@@ -1,4 +1,3 @@
-
 import activityRoutes from '@/router/activityRoutes';
 import channelRoutes from '@/router/channelRoutes';
 import datasetRoutes from '@/router/datasetRoutes';
@@ -10,7 +9,6 @@ import participantRoutes from '@/router/participantRoutes';
 import ClassesDescriptions from '@/const/ClassesDescriptions';
 import AuthService from '@/services/AuthService';
 import store from '@/store/index';
-import jwt_decode from 'jwt-decode';
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 

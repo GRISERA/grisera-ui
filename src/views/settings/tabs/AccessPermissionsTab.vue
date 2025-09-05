@@ -66,12 +66,40 @@
                 v-model="selectedUser"
                 :items="users"
                 hide-details
-                item-text="username"
                 label="Select User"
                 outlined
                 prepend-inner-icon="mdi-account"
                 return-object
-              />
+              >
+                <template #item="{ item }">
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      {{ item.username }}
+                      <v-chip
+                        v-if="item.id === getUser.sub"
+                        class="ml-2"
+                        color="primary"
+                        outlined
+                        x-small
+                      >
+                        You
+                      </v-chip>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </template>
+                <template #selection="{ item }">
+                  {{ item.username }}
+                  <v-chip
+                    v-if="item.id === getUser.sub"
+                    class="ml-2"
+                    color="primary"
+                    outlined
+                    x-small
+                  >
+                    You
+                  </v-chip>
+                </template>
+              </v-autocomplete>
             </v-col>
             <v-col
               cols="12"
@@ -127,6 +155,18 @@
             :headers="headers"
             :items="permissions"
           >
+            <template #username="{ item }">
+              {{ item.username }}
+              <v-chip
+                v-if="item.userId === getUser.sub"
+                class="ml-2"
+                color="primary"
+                outlined
+                x-small
+              >
+                You
+              </v-chip>
+            </template>
             <template #actions="{ item }">
               <v-btn
                 color="error"
@@ -143,24 +183,104 @@
     </v-container>
     <v-dialog
       v-model="dialog"
-      width="auto"
+      max-width="480px"
+      persistent
     >
-      <v-card class="pa-4">
-        <v-card-text>
-          You have already set a role for this user. Do you want to overwrite it?
-        </v-card-text>
-        <v-card-actions class="d-flex justify-sm-end">
-          <v-btn
-            color="primary"
-            @click="updatePermission()"
+      <v-card
+        class="elevation-4"
+        rounded="lg"
+      >
+        <v-card-title class="warning white--text pa-4">
+          <v-icon
+            color="white"
+            left
           >
-            Confirm
-          </v-btn>
+            mdi-alert
+          </v-icon>
+          Role Already Assigned
+        </v-card-title>
+        <v-card-text class="pa-6">
+          <div class="d-flex align-center mb-3">
+            <v-avatar
+              class="mr-3"
+              color="grey lighten-2"
+              size="40"
+            >
+              <v-icon color="grey darken-1">
+                mdi-account
+              </v-icon>
+            </v-avatar>
+            <div>
+              <div class="font-weight-medium">
+                {{ selectedUser ? selectedUser.username : '' }}
+                <v-chip
+                  v-if="selectedUser && selectedUser.id === getUser.sub"
+                  class="ml-2"
+                  color="primary"
+                  outlined
+                  x-small
+                >
+                  You
+                </v-chip>
+              </div>
+              <div class="text-caption grey--text">
+                Already has role assigned
+              </div>
+            </div>
+          </div>
+          <div class="mb-4">
+            <v-card
+              class="pa-3"
+              color="grey lighten-4"
+              flat
+            >
+              <div class="text-center">
+                <v-chip
+                  color="grey lighten-1"
+                  outlined
+                  small
+                >
+                  {{ getCurrentUserRole() }}
+                </v-chip>
+                <v-icon
+                  class="mx-3"
+                  color="grey"
+                >
+                  mdi-arrow-right
+                </v-icon>
+                <v-chip
+                  color="primary"
+                  small
+                >
+                  {{ selectedRole }}
+                </v-chip>
+              </div>
+            </v-card>
+          </div>
+          <p class="mb-0">
+            This user already has a role assigned. Do you want to overwrite their current role with the new one?
+          </p>
+        </v-card-text>
+        <v-divider />
+        <v-card-actions class="pa-4">
+          <v-spacer />
           <v-btn
-            color="primary"
+            outlined
             @click="dialog = false"
           >
+            <v-icon left>
+              mdi-close
+            </v-icon>
             Cancel
+          </v-btn>
+          <v-btn
+            color="warning"
+            @click="updatePermission()"
+          >
+            <v-icon left>
+              mdi-check
+            </v-icon>
+            Update Role
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -195,21 +315,21 @@ export default {
       dialog: false,
     };
   },
-  created() {
-    this.fetchData();
-  },
   computed: {
     ...mapGetters({
       getDataset: 'getDataset',
       getUser: 'getUser',
     }),
   },
+  created() {
+    this.fetchData();
+  },
   methods: {
     checkPermissions() {
       if (this.selectedUser && this.selectedRole) {
-        const userPermission = this.permissions.filter(per => per.username == this.selectedUser.username)[0];
+        const userPermission = this.permissions.filter(per => per.username === this.selectedUser.username)[0];
         if (userPermission) {
-          if (userPermission.role != this.selectedRole) {
+          if (userPermission.role !== this.selectedRole) {
             this.dialog = true;
           } else {
             this.selectedUser = null;
@@ -233,7 +353,7 @@ export default {
         });
     },
     updatePermission() {
-      let permission = this.permissions.filter(permission => permission.username == this.selectedUser.username)[0];
+      let permission = this.permissions.filter(permission => permission.username === this.selectedUser.username)[0];
       PermissionsService.update(permission._id, this.selectedRole)
         .then(() => {
           this.dialog = false;
@@ -251,7 +371,7 @@ export default {
     fetchData() {
       UsersService.getUsers()
         .then(({ data }) => {
-          this.users = data.users.filter(user => user.id != this.getUser.userId);
+          this.users = data.users;
           this.getPermissions();
         });
     },
@@ -260,7 +380,7 @@ export default {
         .then(({ data }) => {
           this.permissions = [];
           data.forEach(permission => {
-            const user = this.users.find(user => user.id == permission.userId);
+            const user = this.users.find(user => user.id === permission.userId);
             if (user) {
               permission.username = user.username;
               this.permissions.push(permission);
@@ -268,6 +388,13 @@ export default {
           });
         })
         .catch(error => {});
+    },
+    getCurrentUserRole() {
+      if (this.selectedUser) {
+        const userPermission = this.permissions.find(per => per.username === this.selectedUser.username);
+        return userPermission ? userPermission.role : '';
+      }
+      return '';
     },
   },
 };

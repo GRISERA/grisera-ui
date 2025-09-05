@@ -293,7 +293,7 @@ export default {
         } else {
           const { data } = await DatasetAPI.store(this.dataset);
           const permissionResponse = await PermissionsService.add({
-            userId: this.user.userId,
+            userId: this.user.sub,
             datasetId: data.id,
             role: AccessRoles.OWNER,
           });

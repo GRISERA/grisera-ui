@@ -34,8 +34,8 @@
             </v-col>
             <template v-if="item.additionalParameters">
               <horizontal-text-divider
-                text="Additional parameters"
                 class="col-12"
+                text="Additional parameters"
               />
               <v-col
                 v-for="additionalParameter in item.additionalParameters.filter(key => key === 'scenarioExecutionName')"
@@ -66,11 +66,10 @@
       #actions="{ item }"
     >
       <v-icon
+        :data-testid="'edit-activity-execution'"
         class="mr-2"
         color="primary"
-        :data-testid="'edit-activity-execution'"
         @click.stop.prevent="$emit('activity-execution:edit', item)"
-        :data-testid="'edit-activity-execution'"
       >
         mdi-pen
       </v-icon>
@@ -79,8 +78,8 @@
 </template>
 
 <script>
-import BaseTable from '@/components/base/BaseTable.vue';
 import ActivityExecutionsParticipantTableComponent from '@/components/ActivityExecutionsParticipantTableComponent.vue';
+import BaseTable from '@/components/base/BaseTable.vue';
 import HorizontalTextDivider from '@/components/divider/HorizontalTextDivider.vue';
 
 export default {
@@ -93,7 +92,9 @@ export default {
   props: {
     activityExecutions: {
       type: Array,
-      default: () => ([]),
+      default: () => (
+        []
+      ),
     },
     canEditActivityExecution: Boolean,
   },

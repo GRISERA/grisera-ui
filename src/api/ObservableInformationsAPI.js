@@ -23,8 +23,10 @@ export default class extends BaseAPI2 {
         return data.map(e => this.dTOAPIToFront(e));
 
     const recording = data.recording ? RecordingsAPI.dTOAPIToFront(data.recording) : null;
-    let channel = recording.registeredChannel.channel;
-    channel.recording_id = recording.id;
+    let channel = recording?.registeredChannel?.channel || null;
+    if (channel && recording) {
+      channel.recording_id = recording.id;
+    }
     return {
         id: data.id,
         channel: channel,
