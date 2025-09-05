@@ -1,37 +1,41 @@
-import axios from 'axios';
-import config from '../../config.js';
 import LS from '@/storage/LS.js';
 import Vue from 'vue';
-
-const authService = axios.create({
-  baseURL: config.authUrl,
-});
+import keycloak from '@/keycloak/keycloak-config';
 
 export default {
-  register(user, password) {
-    return authService.post('/register', {
-      username: user,
-      password: password,
-    });
-  },
-
-  login(user, password) {
-    return authService.post('/login', {
-      username: user,
-      password: password,
-    });
-  },
 
   logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('tokenExpiration');
-    Vue.prototype.$store.commit('setDataset', null);
-    Vue.prototype.$store.commit('setUser', null);
-    LS.clear('user');
-    LS.clear('dataset');
+    keycloak.logout().then(() => {
+      Vue.prototype.$store.commit('setDataset', null);
+      Vue.prototype.$store.commit('setUser', null);
+      Vue.prototype.$store.commit('setPermissions', null);
+      LS.clear('user');
+      LS.clear('dataset');
+      LS.clear('permissions');
+    });
+  },
+
+  accountManagement() {
+    return keycloak.accountManagement();
   },
 
   isAuthenticated() {
-    return localStorage.getItem('token') !== null && Date.now() < localStorage.getItem('tokenExpiration'); 
+    return keycloak.authenticated;
+  },
+
+  async getToken() {
+    const refreshed = await keycloak.updateToken(5);
+    if (refreshed) {
+      console.log('Refreshed token');
+    }
+    return keycloak.token;
+  },
+
+  getTokenParsed()  {
+    return keycloak.tokenParsed;
+  },
+
+  getIdTokenParsed()  {
+    return keycloak.idTokenParsed;
   },
 };

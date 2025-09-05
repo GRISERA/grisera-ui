@@ -159,7 +159,7 @@ export default {
     dialog(newValue) {
       if (newValue) {
         this.getParticipants();
-        this.resetForm();
+    this.resetForm();
       } else {
         this.close();
       }

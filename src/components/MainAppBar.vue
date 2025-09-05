@@ -46,7 +46,7 @@
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title>
-                  Tester Testowy
+                  {{ userName }}
                 </v-list-item-title>
                 <v-list-item-subtitle>
                   {{ user?.email }}
@@ -65,6 +65,12 @@
                 </v-icon>
               </template>
               <v-list>
+                <v-list-item @click="account()">
+                  <v-list-item-icon>
+                    <v-icon v-text="'mdi-account'" />
+                  </v-list-item-icon>
+                  <v-list-item-title>Account</v-list-item-title>
+                </v-list-item>
                 <v-list-item @click="logout()">
                   <v-list-item-icon>
                     <v-icon v-text="'mdi-logout'" />
@@ -92,16 +98,27 @@ export default {
       default: false,
     },
   },
+  data() {
+    return {
+      userName: 'Guest',
+    };
+  },
   computed: {
     ...mapState({
       dataset: state => state.dataset,
       user: state => state.user,
     }),
   },
+  mounted() {
+    this.userName = AuthService.getIdTokenParsed()?.preferred_username || 'Guest';
+  },
   methods: {
     logout() {
       AuthService.logout();
       this.$router.push('/login');
+    },
+    account() {
+      AuthService.accountManagement();
     },
   },
 };

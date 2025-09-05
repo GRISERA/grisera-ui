@@ -6,5 +6,5 @@ test('Użytkownik może się zarejestrować', async ({ page }) => {
     const username = generateRandomEmail();
     const registrationPage = new RegistrationPage(page);
     await registrationPage.visit();
-    await registrationPage.register(username, username);
+    await registrationPage.register(username, username, username, username, username);
 });

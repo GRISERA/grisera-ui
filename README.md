@@ -28,3 +28,5 @@ npm install axios
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
+### Deployment
+For security reasons it is required for OAuth client to regenerate client secrets and update them in configuration.

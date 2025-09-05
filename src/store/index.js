@@ -10,6 +10,7 @@ const store = new Vuex.Store({
     datasets: [],
     dataset: undefined,
     user: undefined,
+    permissions: undefined,
     data: undefined,
     imports: [],
   },
@@ -23,12 +24,8 @@ const store = new Vuex.Store({
     setUser(state, value) {
       state.user = { ...value };
     },
-    setScopes(state, { permissions } = {}) {
-      if (!Array.isArray(permissions)) {
-        console.error('Permissions should be an array of { datasetId, role } objects');
-      }
-
-      permissions.forEach(({ datasetId, role }) => state.scopes[datasetId] = roles[role] || []);
+    setPermissions(state, value) {
+      state.permissions = value;
     },
     setData(state, value) {
       state.data = { ...value };
@@ -73,12 +70,7 @@ const store = new Vuex.Store({
   getters: {
     getUser: state => state.user,
     getDataset: state => state.dataset,
-    getPermission: state => {
-      if (!state.user || !state.user.permissions || !state.dataset) {
-        return null;
-      }
-      return state.user.permissions.filter(permission => permission.datasetId == state.dataset.id)[0];
-    },
+    getPermission: state => state.permissions.filter(permission => permission.datasetId == state.dataset.id)[0],
     getActiveImports: state => {
       const activeImports = state.imports.filter(imp =>
         imp.status === 'pending' || imp.status === 'processing',
