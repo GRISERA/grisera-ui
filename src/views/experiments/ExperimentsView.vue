@@ -5,7 +5,7 @@
         <info-tool-tip-component :info-message="$route.meta.infoMessage" />
         <app-breadcrumbs />
       </v-col>
-      <v-col 
+      <v-col
         v-if="!isReadOnly"
         class="text-right"
       >
@@ -13,7 +13,7 @@
           :outlined="true"
           @click.prevent.stop="$router.push({ name: 'experiment-creation' })"
         >
-          Create
+          Create New Experiment
         </v-btn>
       </v-col>
       <v-col class="col-12">
@@ -24,10 +24,10 @@
 </template>
 
 <script>
-import ExperimentsTable from '@/views/experiments/components/ExperimentsTable.vue';
-import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
+import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 import AccessRoles from '@/const/AccessRoles';
+import ExperimentsTable from '@/views/experiments/components/ExperimentsTable.vue';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -39,7 +39,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      getPermission: 'getPermission', 
+      getPermission: 'getPermission',
     }),
     isReadOnly() {
       return this.getPermission.role == AccessRoles.READER;
