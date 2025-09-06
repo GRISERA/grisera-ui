@@ -11,6 +11,19 @@ Vue.config.productionTip = false;
 
 LocalStorageService.init();
 
+keycloak.onAuthSuccess = () => {
+    PermissionsService.getUserPermissions(keycloak.tokenParsed.sub).then(data =>
+        router.app.$store.commit('setPermissions', data.data));
+};
+
+keycloak.onAuthError = () => {
+    router.app.$store.commit('setPermissions', null);
+};
+
+keycloak.onAuthLogout = () => {
+    router.app.$store.commit('setPermissions', null);
+};
+
 keycloak.init({ onLoad: 'login-required' })
     .then(authenticated => {
       if (authenticated) {
@@ -32,15 +45,3 @@ keycloak.init({ onLoad: 'login-required' })
       console.error('Keycloak initialization failed:', err);
     });
 
-keycloak.onAuthSuccess = () => {
-    PermissionsService.getUserPermissions(keycloak.tokenParsed.sub).then(data =>
-        router.app.$store.commit('setPermissions', data.data));
-};
-
-keycloak.onAuthError = () => {
-    router.app.$store.commit('setPermissions', null);
-};
-
-keycloak.onAuthLogout = () => {
-    router.app.$store.commit('setPermissions', null);
-};

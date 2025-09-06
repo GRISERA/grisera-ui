@@ -15,6 +15,10 @@ export default {
     });
   },
 
+  accountManagement() {
+    return keycloak.accountManagement();
+  },
+
   isAuthenticated() {
     return keycloak.authenticated;
   },
@@ -29,5 +33,9 @@ export default {
 
   getTokenParsed()  {
     return keycloak.tokenParsed;
+  },
+
+  getIdTokenParsed()  {
+    return keycloak.idTokenParsed;
   },
 };
