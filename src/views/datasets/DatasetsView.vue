@@ -3,7 +3,7 @@
     <page-header
       :description="$route.meta.infoMessage"
       action-icon="mdi-plus"
-      action-text="Create Dataset"
+      action-text="Create New Dataset"
       data-testid="datasets-page-header"
       title="Datasets"
       @action="createDataset"
