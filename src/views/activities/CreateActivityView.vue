@@ -49,7 +49,7 @@
               label="Create new activity"
               type="submit"
             >
-              Create new activity
+              Create activity
             </v-btn>
           </v-container>
         </v-form>

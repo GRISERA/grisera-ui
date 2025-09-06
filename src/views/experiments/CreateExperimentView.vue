@@ -50,7 +50,7 @@
               color="primary"
               type="submit"
             >
-              Create new experiment
+              Create experiment
             </v-btn>
           </v-container>
         </v-form>
