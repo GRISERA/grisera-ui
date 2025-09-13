@@ -11,13 +11,11 @@
         <app-breadcrumbs />
       </v-col>
       <v-col class="text-right">
-        <v-btn
+        <create-button
           v-if="!isReadOnly"
-          :outlined="true"
+          text="Create New Time Series"
           @click="goToTimeSeriesCreation()"
-        >
-          Create
-        </v-btn>
+        />
       </v-col>
       <v-col class="col-12">
         <time-series-table @loading="handleLoading" />
@@ -32,6 +30,7 @@ import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 import LoadingOverlay from '@/components/LoadingOverlay.vue';
 import AccessRoles from '@/const/AccessRoles';
 import TimeSeriesTable from '@/views/time-series/components/TimeSeriesTable.vue';
+import CreateButton from '@/components/CreateButton.vue';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -41,6 +40,7 @@ export default {
     TimeSeriesTable,
     InfoToolTipComponent,
     LoadingOverlay,
+    CreateButton,
   },
   data() {
     return {

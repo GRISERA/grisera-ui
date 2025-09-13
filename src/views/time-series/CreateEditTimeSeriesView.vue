@@ -239,7 +239,7 @@
                 style="float: right;"
                 type="submit"
               >
-                {{ isEditMode ? 'Update' : 'Create' }}
+                {{ isEditMode ? 'Update' : 'Create Time Series' }}
               </v-btn>
             </v-card-actions>
           </v-container>

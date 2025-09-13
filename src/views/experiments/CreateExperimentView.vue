@@ -27,16 +27,20 @@
             />
             <v-textarea
               v-model="experiment.description"
+              :rules="descriptionRules"
               label="Description"
-              outlined
               no-resize
+              outlined
+              required
               rows="3"
             />
             <v-textarea
               v-model="experiment.footnote"
+              :rules="footnoteRules"
               label="Footnote"
-              outlined
               no-resize
+              outlined
+              required
               rows="3"
             />
             <v-btn
@@ -46,8 +50,8 @@
               Cancel
             </v-btn>
             <v-btn
-              style="float: right;"
               color="primary"
+              style="float: right;"
               type="submit"
             >
               Create experiment
@@ -84,6 +88,12 @@ export default {
       ],
       authorRules: [
         a => !!a || 'Author is required',
+      ],
+      footnoteRules: [
+        f => !!f || 'Footnote is required',
+      ],
+      descriptionRules: [
+        d => !!d || 'Description is required',
       ],
     };
   },

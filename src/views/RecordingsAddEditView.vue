@@ -186,7 +186,7 @@
               color="primary"
               @click="performAction"
             >
-              {{ isEditMode ? 'Update' : 'Create' }}
+              {{ isEditMode ? 'Update' : 'Create Recording' }}
             </v-btn>
           </v-card-actions>
         </v-card>

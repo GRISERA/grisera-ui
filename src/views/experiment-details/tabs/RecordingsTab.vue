@@ -7,13 +7,11 @@
           class="col-12 text-right"
         >
           <v-row justify="end">
-            <v-btn
-              :outlined="true"
+            <create-button
+              text="Create New Recording"
               class="ma-4"
               @click="$router.push({ name: 'experiment-recording-add', params: { experiment: experiment.id } })"
-            >
-              Create
-            </v-btn>
+            />
           </v-row>
         </v-col>
         <v-col
@@ -46,6 +44,7 @@
 import DeleteConfirmDialog from '@/components/dialog/DeleteConfirmDialog.vue';
 import RecordingsTable from './RecordingsTable.vue';
 import RecordingsAPI from '@/api/RecordingsAPI';
+import CreateButton from '@/components/CreateButton.vue';
 import AccessRoles from '@/const/AccessRoles';
 import { mapGetters } from 'vuex';
 
@@ -54,6 +53,7 @@ export default {
   components: {
     RecordingsTable,
     DeleteConfirmDialog,
+    CreateButton,
   },
   props: {
     experiment: {

@@ -33,13 +33,11 @@
               :outlined="true"
               :rules="validationRules"
             />
-            <v-btn
-              :outlined="true"
+            <create-button
+              text="Create New Scenario Execution"
               class="ma-4"
               @click="createScenarioExecution()"
-            >
-              Create
-            </v-btn>
+            />
           </v-row>
         </v-col>
         <v-col
@@ -80,6 +78,7 @@ import ExperimentsAPI from '@/api/ExperimentsAPI';
 import ScenarioExecutionsAPI from '@/api/ScenarioExecutionsAPI';
 import ScenarioExecutionsListingComponent from '@/components/ScenarioExecutionsListingComponent.vue';
 import DeleteConfirmDialog from '@/components/dialog/DeleteConfirmDialog.vue';
+import CreateButton from '@/components/CreateButton.vue';
 import AccessRoles from '@/const/AccessRoles';
 import { mapGetters } from 'vuex';
 
@@ -88,6 +87,7 @@ export default {
   components: {
     ScenarioExecutionsListingComponent,
     DeleteConfirmDialog,
+    CreateButton,
   },
   props: {
     scenarios: {

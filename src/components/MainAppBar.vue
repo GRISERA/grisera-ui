@@ -1,8 +1,8 @@
 <template>
   <v-app-bar
+    :class="mobile ? 'mobile-app-bar' : 'ma-2 rounded-xl'"
     :elevation="8"
     app
-    :class="mobile ? 'mobile-app-bar' : 'ma-2 rounded-xl'"
   >
     <template #default>
       <v-container class="container--fluid pa-0">
@@ -17,7 +17,7 @@
                   mdi-menu
                 </v-icon>
               </v-list-item-avatar>
-              <v-list-item-avatar v-if="!mobile && !$route.meta.disableNavigation">
+              <v-list-item-avatar v-if="!$route.meta.disableNavigation">
                 <v-icon
                   color="primary"
                   @click="$router.push({name: 'datasets'})"
