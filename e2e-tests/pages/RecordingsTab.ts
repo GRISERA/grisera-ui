@@ -27,5 +27,6 @@ export class RecordingsTab extends BasePage {
         await this.page.locator('div[role="option"]').filter({ hasText: participant }).first().click();
 
         await this.page.getByRole('button', { name: 'Create Recording' }).click();
+        await this.page.waitForURL('/experiments/**');
     }
 }

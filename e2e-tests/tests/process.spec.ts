@@ -15,6 +15,7 @@ import { RegistrationPage } from '../pages/RegistrationPage';
 import {SettingsPage} from "../pages/SettingsPage";
 import {AccessPermissionsTab} from "../pages/AccessPermissionsTab";
 import generateDate from '../utils/generate-date-util';
+import { TimeSeriesCreatePage } from '../pages/TimeSeriesCreatePage';
 
 const hash = Math.random().toString(36).substring(2);
 
@@ -43,18 +44,18 @@ const newParticipants = [
         birthDate: '1992-07-01',
         sex: 'Male',
     },
-    {
-        name: 'Emma',
-        surname: 'Carter',
-        birthDate: '1987-03-01',
-        sex: 'Female',
-    },
-    {
-        name: 'Caroline',
-        surname: 'Kane',
-        birthDate: '1999-01-01',
-        sex: 'Female',
-    },
+    // {
+    //     name: 'Emma',
+    //     surname: 'Carter',
+    //     birthDate: '1987-03-01',
+    //     sex: 'Female',
+    // },
+    // {
+    //     name: 'Caroline',
+    //     surname: 'Kane',
+    //     birthDate: '1999-01-01',
+    //     sex: 'Female',
+    // },
 ];
 
 const newActivities = [
@@ -64,36 +65,36 @@ const newActivities = [
         type: 'Individual',
         participants: ['James Anderson'],
     },
-    {
-        name: 'Logging into the Learning Platform',
-        description: 'Participants perform a task involving logging into the Moodle e-learning platform.',
-        type: 'Individual',
-        participants: ['James Anderson'],
-    },
-    {
-        name: 'Locating a Course',
-        description: 'Participants search for and locate a specific course on the Moodle platform.',
-        type: 'Individual',
-        participants: ['James Anderson'],
-    },
-    {
-        name: 'Completing an Emotional State Questionnaire',
-        description: 'Participants fill out questionnaires regarding their emotional state at different points during the experiment.',
-        type: 'Individual',
-        participants: ['James Anderson'],
-    },
-    {
-        name: 'Listening to a Lecture',
-        description: 'Participants listen to a pre-recorded lecture on an assigned topic.',
-        type: 'Individual',
-        participants: ['James Anderson'],
-    },
-    {
-        name: 'Completing a Quiz',
-        description: 'Participants answer questions related to the material presented in the lecture.',
-        type: 'Individual',
-        participants: ['James Anderson'],
-    },
+    // {
+    //     name: 'Logging into the Learning Platform',
+    //     description: 'Participants perform a task involving logging into the Moodle e-learning platform.',
+    //     type: 'Individual',
+    //     participants: ['James Anderson'],
+    // },
+    // {
+    //     name: 'Locating a Course',
+    //     description: 'Participants search for and locate a specific course on the Moodle platform.',
+    //     type: 'Individual',
+    //     participants: ['James Anderson'],
+    // },
+    // {
+    //     name: 'Completing an Emotional State Questionnaire',
+    //     description: 'Participants fill out questionnaires regarding their emotional state at different points during the experiment.',
+    //     type: 'Individual',
+    //     participants: ['James Anderson'],
+    // },
+    // {
+    //     name: 'Listening to a Lecture',
+    //     description: 'Participants listen to a pre-recorded lecture on an assigned topic.',
+    //     type: 'Individual',
+    //     participants: ['James Anderson'],
+    // },
+    // {
+    //     name: 'Completing a Quiz',
+    //     description: 'Participants answer questions related to the material presented in the lecture.',
+    //     type: 'Individual',
+    //     participants: ['James Anderson'],
+    // },
     // {
     //     name: 'Listening to a Lecture',
     //     description: 'Participants listen to a lecture on an assigned topic.',
@@ -119,10 +120,10 @@ const newScenarioExecutions = [
         scenarioName: newScenario.name,
         executionName: 'ex-01',
     },
-    {
-        scenarioName: newScenario.name,
-        executionName: 'ex-02',
-    },
+    // {
+    //     scenarioName: newScenario.name,
+    //     executionName: 'ex-02',
+    // },
 ];
 
 
@@ -136,33 +137,48 @@ const newRecordings = [
         channel: 'Audio',
         participant: 'James Anderson',
     },
-    {
-        scenarioExecutionName: 'ex-01',
-        activityExecutionName: 'Activity Execution: 2',
-        name: 'BVP Recording 2',
-        description: 'BVP recording for individual activity execution 2.',
-        filePath: path.join(__dirname, '../test-files/data_sample.csv'),
-        channel: 'BVP',
-        participant: 'James Anderson',
-    },
-    {
-        scenarioExecutionName: 'ex-01',
-        activityExecutionName: 'Activity Execution: 3',
-        name: 'ECG Recording 3',
-        description: 'ECG recording for individual activity execution 3.',
-        filePath: path.join(__dirname, '../test-files/text_sample.txt'),
-        channel: 'ECG',
-        participant: 'James Anderson',
-    },
-    {
-        scenarioExecutionName: 'ex-01',
-        activityExecutionName: 'Activity Execution: 4',
-        name: 'EDA Recording 4',
-        description: 'EDA recording for individual activity execution 4.',
-        filePath: path.join(__dirname, '../test-files/video_sample.mp4'),
-        channel: 'EDA',
-        participant: 'James Anderson',
-    },
+    // {
+    //     scenarioExecutionName: 'ex-01',
+    //     activityExecutionName: 'Activity Execution: 2',
+    //     name: 'BVP Recording 2',
+    //     description: 'BVP recording for individual activity execution 2.',
+    //     filePath: path.join(__dirname, '../test-files/data_sample.csv'),
+    //     channel: 'BVP',
+    //     participant: 'James Anderson',
+    // },
+    // {
+    //     scenarioExecutionName: 'ex-01',
+    //     activityExecutionName: 'Activity Execution: 3',
+    //     name: 'ECG Recording 3',
+    //     description: 'ECG recording for individual activity execution 3.',
+    //     filePath: path.join(__dirname, '../test-files/text_sample.txt'),
+    //     channel: 'ECG',
+    //     participant: 'James Anderson',
+    // },
+    // {
+    //     scenarioExecutionName: 'ex-01',
+    //     activityExecutionName: 'Activity Execution: 4',
+    //     name: 'EDA Recording 4',
+    //     description: 'EDA recording for individual activity execution 4.',
+    //     filePath: path.join(__dirname, '../test-files/video_sample.mp4'),
+    //     channel: 'EDA',
+    //     participant: 'James Anderson',
+    // },
+];
+
+const newTimeSeries = [
+  {
+    scenarioExecution: 'ex-01',
+    activityExecution: 'Activity Execution: 1',
+    filePath: path.join(__dirname, '../test-files/audio_sample.wav'),
+    type: 'Epoch',
+    spacing: 'Regular',
+    measure: 'Sadness',
+    recording: 'Audio Recording 1',
+    channel: 'Audio',
+    modality: 'Prosody of speech',
+    liveActivity: 'Sound',
+  }
 ];
 
 const username = `${ hash }`;
@@ -316,7 +332,16 @@ test.describe.serial('Przejście całego procesu', () => {
     });
 
     test('[10] - Użytkownik tworzy szeregi czasowe', async ({ userPage }) => {
-        // TODO: przenieść testy z time-series.spec.ts
+        await selectDataset(userPage);
+        await (new ExperimentListPage(userPage)).useExperimentByName(newExperiment.name);
+
+        for (const timeSeries of newTimeSeries) {
+            await (new ScenariosExecutionsTab(userPage)).useTimeSeriesForAnyParticipant(timeSeries);
+            const timeSeriesCreatePage = new TimeSeriesCreatePage(userPage);
+            await timeSeriesCreatePage.openForm();
+            await timeSeriesCreatePage.fillForm(timeSeries);
+            await timeSeriesCreatePage.submitForm();
+        }
     });
 
     test('[11] - Inny użytkownik rejestruje konto', async ({ page }) => {

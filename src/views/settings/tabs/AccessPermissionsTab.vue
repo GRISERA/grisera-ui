@@ -70,6 +70,7 @@
                 outlined
                 prepend-inner-icon="mdi-account"
                 return-object
+                item-text="username"
               >
                 <template #item="{ item }">
                   <v-list-item-content>

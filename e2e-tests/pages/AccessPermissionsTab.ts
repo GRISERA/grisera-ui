@@ -20,6 +20,7 @@ export class AccessPermissionsTab extends BasePage {
 
     async addPermission(username: string, role: string) {
         await this.usernameInput.click();
+        await this.usernameInput.fill(username);
         await this.page.getByRole('option', { name: username }).click();
 
         await this.roleInput.click();

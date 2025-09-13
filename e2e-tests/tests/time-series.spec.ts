@@ -1,19 +1,22 @@
+import path from 'path';
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { DatasetListPage } from '../pages/DatasetListPage';
 import { TimeSeriesCreatePage } from '../pages/TimeSeriesCreatePage';
 import { ExperimentListPage } from '../pages/ExperimentListPage';
+import { ScenariosExecutionsTab } from '../pages/ScenariosExecutionsTab';
 
 test.beforeEach(async ({ page }) => {
     await new LoginPage(page).loggedInAsDefaultUser();
     await new DatasetListPage(page).usingAnyDataset();
-    await new ExperimentListPage(page).useExperimentByName('Nyssa Rivas');
+    await new ExperimentListPage(page).usingAnyExperiment();
+    await new ScenariosExecutionsTab(page).useAnyTimeSeriesView();
 });
 
 test('Użytkownik może utworzyć nowy szeregi czasowe', async ({ page }) => {
     const activityData = [
         {
-            link: 'https://www.test2.com',
+            filePath: path.join(__dirname, '../test-files/audio_sample.wav'),
             type: 'Epoch',
             spacing: 'Regular',
             measure: 'Sadness',
@@ -96,7 +99,7 @@ test('Użytkownik może utworzyć nowy szeregi czasowe', async ({ page }) => {
 
     for (const timeSeriesData of activityData) {
         const timeSeriesCreatePage = new TimeSeriesCreatePage(page);
-        await timeSeriesCreatePage.visit();
+        await timeSeriesCreatePage.openForm();
         await timeSeriesCreatePage.fillForm(timeSeriesData);
         await timeSeriesCreatePage.submitForm();
 
