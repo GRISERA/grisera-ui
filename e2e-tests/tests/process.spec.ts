@@ -369,7 +369,7 @@ test.describe.serial('Przejście całego procesu', () => {
         await accessPermissionsTab.addPermission(usernameOther, 'Reader');
     });
 
-    test('[13] - Inny użytkonik nie może tworzyć eksperymentu', async ({ otherUserPage }) => {
+    test('[13] - Inny użytkownik nie może tworzyć eksperymentu', async ({ otherUserPage }) => {
         await selectDataset(otherUserPage);
 
         const experimentPage = new ExperimentPage(otherUserPage);
@@ -377,7 +377,7 @@ test.describe.serial('Przejście całego procesu', () => {
         await expect(otherUserPage.getByRole('Button', { name: 'Create' }).first()).toHaveCount(0);
     });
 
-    test('[14] - Inny użytkonik nie może edytować składowych eksperymentu', async ({ otherUserPage }) => {
+    test('[14] - Inny użytkownik nie może edytować składowych eksperymentu', async ({ otherUserPage }) => {
         await selectDataset(otherUserPage);
 
         await (new ExperimentListPage(otherUserPage)).useExperimentByName(newExperiment.name);
