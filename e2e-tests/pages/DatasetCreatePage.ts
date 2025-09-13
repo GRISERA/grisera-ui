@@ -3,6 +3,7 @@ import { BasePage } from './BasePage';
 export class DatasetCreatePage extends BasePage {
     async visit(): Promise<void> {
         await this.page.goto('/datasets/create');
+        await this.page.waitForLoadState('networkidle');
         await this.waitForPageLoad();
     }
 

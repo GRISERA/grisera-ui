@@ -3,7 +3,7 @@ import { DatasetCreatePage } from '../pages/DatasetCreatePage';
 import { LoginPage } from '../pages/LoginPage';
 import { DatasetListPage } from '../pages/DatasetListPage';
 
-// test.beforeEach(async ({ page }) => new LoginPage(page).loggedInAsDefaultUser());
+test.beforeEach(async ({ page }) => new LoginPage(page).loggedInAsDefaultUser());
 
 test('Użytkownik może utworzyć nowy zbiór danych', async ({ page }) => {
     const newDataset = {

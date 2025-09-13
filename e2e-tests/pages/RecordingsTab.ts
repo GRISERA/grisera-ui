@@ -5,7 +5,7 @@ export class RecordingsTab extends BasePage {
         await this.page.getByRole('tab', { name: 'Recordings' }).click();
     }
 
-    async addRecording({ scenarioExecutionName, activityExecutionName, name, description, link, channel, participant }): Promise<void> {
+    async addRecording({ scenarioExecutionName, activityExecutionName, name, description, filePath, channel, participant }): Promise<void> {
         await this.page.getByRole('button', { name: 'Create' }).click();
 
         await this.page.getByLabel('Scenario Executions').click();
@@ -18,7 +18,7 @@ export class RecordingsTab extends BasePage {
 
         await this.page.getByLabel('Description').fill(description);
 
-        await this.page.getByLabel('Link').fill(link);
+        await this.page.getByLabel('File input').setInputFiles(filePath);
 
         await this.page.getByLabel('Channel').click();
         await this.page.locator('div[role="option"]').filter({ hasText: channel }).first().click();
@@ -26,6 +26,6 @@ export class RecordingsTab extends BasePage {
         await this.page.getByLabel('Participants').click();
         await this.page.locator('div[role="option"]').filter({ hasText: participant }).first().click();
 
-        await this.page.getByRole('button', { name: 'Create' }).click();
+        await this.page.getByRole('button', { name: 'Create Recording' }).click();
     }
 }
