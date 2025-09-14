@@ -103,6 +103,7 @@ import { mapState } from 'vuex';
 
 import PermissionsService from '@/services/PermissionsService';
 import Roles from '@/const/AccessRoles';
+import router from '@/router';
 
 export default {
   name: 'DatasetDetailedView',
@@ -131,9 +132,6 @@ export default {
     buttonText() {
       return this.editMode ? 'update' : 'create';
     },
-    tokenExpiration() {
-      return new Date().getTime() + config.sessionDurationMinutes * 60000;
-    },
   },
   watch: {
     '$route.params.id': {
@@ -160,13 +158,14 @@ export default {
       } else {
         DatasetAPI.store(this.dataset)
           .then(({ data }) => {
-            PermissionsService.add({
+            return PermissionsService.add({
               userId: this.user.sub,
               datasetId: data.id,
               role: Roles.OWNER,
-            }).then(({ data }) => {
-              localStorage.setItem('token', data.token);
-              localStorage.setItem('tokenExpiration', this.tokenExpiration);
+            }).then(_ => {
+              PermissionsService.getUserPermissions(this.user.sub).then(data =>
+                  router.app.$store.commit('setPermissions', data.data));
+            }).then(_ => {
               this.$router.push('/datasets');
             });
           });
