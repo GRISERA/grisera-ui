@@ -98,7 +98,6 @@
 import DatasetAPI from '@/api/DatasetAPI';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
 import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
-import config from '../../../config.js';
 import { mapState } from 'vuex';
 
 import PermissionsService from '@/services/PermissionsService';
@@ -131,7 +130,7 @@ export default {
     }),
     buttonText() {
       return this.editMode ? 'update' : 'create';
-    }
+    },
   },
   watch: {
     '$route.params.id': {
