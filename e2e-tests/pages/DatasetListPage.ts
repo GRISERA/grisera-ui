@@ -26,6 +26,15 @@ export class DatasetListPage extends BasePage {
         await expect(card).toContainText(dataset.description);
     }
 
+    async verifyDatasetEditable(dataset: {
+        name: string;
+    }): Promise<void> {
+        const card = this.datasetCardWithName(dataset.name);
+        await expect(card
+            .locator('[data-testid^="edit-button"]')
+            .first()).toBeVisible();
+    }
+
     async useAnyDataset(): Promise<void> {
         const card = this.page.locator('.dataset-card').first();
         await card.locator('button:has-text("Select and proceed")').click();

@@ -18,6 +18,10 @@ export class AccessPermissionsTab extends BasePage {
         return this.page.getByRole('Button', {name: 'add'});
     }
 
+    private get confirmButton() {
+        return this.page.getByRole('Button', {name: 'confirm'});
+    }
+
     async addPermission(username: string, role: string) {
         await this.usernameInput.fill(username);
         await this.page.getByRole('option', { name: username }).click();
@@ -27,6 +31,11 @@ export class AccessPermissionsTab extends BasePage {
 
 
         await this.addButton.click();
+
+        if (await this.confirmButton.count() > 0) {
+            await this.confirmButton.click();
+        }
+
         await expect(this.page.getByRole("cell", {name: username})).toBeVisible();
         await expect(this.page.getByRole("cell", {name: role})).toBeVisible();
 

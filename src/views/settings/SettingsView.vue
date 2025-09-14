@@ -26,6 +26,7 @@
           v-for="taba in tabs"
           :key="taba.id"
           ripple
+          :disabled="taba.disabled"
         >
           {{ taba.name }}
         </v-tab>
@@ -43,6 +44,8 @@ import LocalStorageService from '@/storage/LocalStorageService';
 import ParametersTab from '@/views/settings/tabs/ParametersTab';
 import AccessPermissionsTab from '@/views/settings/tabs/AccessPermissionsTab.vue';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
+import AccessRoles from '@/const/AccessRoles';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'SettingsView',
@@ -54,11 +57,21 @@ export default {
   data() {
     return {
       tab: 0,
-      tabs: [
-        { id: 1, name: 'Parameters' },
-        { id: 2, name: 'Access permissions' },
-      ],
     };
+  },
+  computed: {
+    ...mapGetters({
+      getPermission: 'getPermission',
+    }),
+    isOwner() {
+      return this.getPermission.role === AccessRoles.OWNER;
+    },
+    tabs() {
+      return [
+        { id: 1, name: 'Parameters', disabled: false },
+        { id: 2, name: 'Access permissions', disabled: !this.isOwner },
+      ];
+    },
   },
   methods: {
     resetStorage() {

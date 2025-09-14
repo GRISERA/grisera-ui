@@ -14,6 +14,7 @@ import { RegistrationPage } from '../pages/RegistrationPage';
 import {SettingsPage} from "../pages/SettingsPage";
 import {AccessPermissionsTab} from "../pages/AccessPermissionsTab";
 import generateDate from '../utils/generate-date-util';
+import {MeasurePage} from "../pages/MeasurePage";
 
 const hash = Math.random().toString(36).substring(2);
 
@@ -360,7 +361,7 @@ test.describe.serial('Przejście całego procesu', () => {
         await registrationPage.register(usernameOther, emailOther, emailOther, firstNameOther, lastNameOther);
     });
 
-    test('[12] - Użytkownik dodaje uprawnienia dostępu', async ({ userPage }) => {
+    test('[12] - Użytkownik dodaje uprawnienia dostępu do odczytu', async ({ userPage }) => {
         await selectDataset(userPage);
         await new SettingsPage(userPage).visit();
         const accessPermissionsTab = new AccessPermissionsTab(userPage);
@@ -368,7 +369,7 @@ test.describe.serial('Przejście całego procesu', () => {
         await accessPermissionsTab.addPermission(usernameOther, 'Reader');
     });
 
-    test('[13] - Inny użytkonik nie może tworzyć eksperymentu', async ({ otherUserPage }) => {
+    test('[13] - Inny użytkonik [Reader] nie może tworzyć eksperymentu', async ({ otherUserPage }) => {
         await selectDataset(otherUserPage);
 
         const experimentPage = new ExperimentPage(otherUserPage);
@@ -376,7 +377,8 @@ test.describe.serial('Przejście całego procesu', () => {
         await expect(otherUserPage.getByRole('Button', { name: 'Create' }).first()).toHaveCount(0);
     });
 
-    test('[14] - Inny użytkonik nie może edytować składowych eksperymentu', async ({ otherUserPage }) => {
+    test('[14] - Inny użytkonik [Reader] nie może edytować składowych eksperymentu', async ({ otherUserPage }) => {
+
         await selectDataset(otherUserPage);
 
         await (new ExperimentListPage(otherUserPage)).useExperimentByName(newExperiment.name);
@@ -397,6 +399,95 @@ test.describe.serial('Przejście całego procesu', () => {
         await recordingsTab.visit();
         await expect(otherUserPage.getByRole('Button', { name: 'Create' }).first()).toHaveCount(0);
     });
+
+    test('[15] - Inny użytkonik [Reader] nie może tworzyć aktywności', async ({ otherUserPage }) => {
+        await selectDataset(otherUserPage);
+
+        const activityPage = new ActivityPage(otherUserPage);
+        await activityPage.visit();
+        await otherUserPage.waitForTimeout(3000);
+        await expect(otherUserPage.getByRole('Button', { name: 'Create' }).first()).toHaveCount(0);
+    });
+
+    test('[16] - Inny użytkonik [Reader] nie może tworzyć uczestników', async ({ otherUserPage }) => {
+        await selectDataset(otherUserPage);
+
+        const measurePage = new MeasurePage(otherUserPage);
+        await measurePage.visit();
+        await otherUserPage.waitForTimeout(3000);
+        await expect(otherUserPage.getByRole('Button', { name: 'Create' }).first()).toHaveCount(0);
+    });
+
+    test('[17] - Inny użytkonik [Reader] nie może odwiedzić ustawień', async ({ otherUserPage }) => {
+        await selectDataset(otherUserPage);
+
+        const settingsPage = new SettingsPage(otherUserPage);
+        await settingsPage.visit();
+        await expect(otherUserPage).toHaveURL(/.*\/access-denied/);
+    });
+
+    test('[18] - Użytkownik dodaje uprawnienia dostępu do edycji', async ({ userPage }) => {
+        await selectDataset(userPage);
+        await new SettingsPage(userPage).visit();
+        const accessPermissionsTab = new AccessPermissionsTab(userPage);
+        await accessPermissionsTab.visit();
+        await accessPermissionsTab.addPermission(usernameOther, 'Editor');
+    });
+
+    test('[19] - Inny użytkonik [Editor] może tworzyć eksperyment', async ({ otherUserPage }) => {
+        await selectDataset(otherUserPage);
+
+        const experimentPage = new ExperimentPage(otherUserPage);
+        await experimentPage.visit();
+        await expect(otherUserPage.getByRole('Button', { name: 'Create' }).first()).toHaveCount(0);
+    });
+
+    test('[20] - Inny użytkonik [Editor] może edytować składowe eksperymentu', async ({ otherUserPage }) => {
+
+        await selectDataset(otherUserPage);
+
+        await (new ExperimentListPage(otherUserPage)).useExperimentByName(newExperiment.name);
+
+        const participantsTab = new ParticipantsTab(otherUserPage);
+        await participantsTab.visit();
+        await expect(otherUserPage.getByRole('Button', { name: 'Add' }).first()).toHaveCount(1);
+
+        const scenariosTab = new ScenariosTab(otherUserPage);
+        await scenariosTab.visit();
+        await expect(otherUserPage.getByRole('Button', { name: 'Create' }).first()).toHaveCount(1);
+
+        const scenariosExecutionTab = new ScenariosExecutionsTab(otherUserPage);
+        await scenariosExecutionTab.visit();
+        await expect(otherUserPage.getByRole('Button', { name: 'Create' }).first()).toHaveCount(1);
+
+        const recordingsTab = new RecordingsTab(otherUserPage);
+        await recordingsTab.visit();
+        await expect(otherUserPage.getByRole('Button', { name: 'Create' }).first()).toHaveCount(1);
+    });
+
+    test('[21] - Inny użytkonik [Editor] może tworzyć aktywności', async ({ otherUserPage }) => {
+        await selectDataset(otherUserPage);
+
+        const activityPage = new ActivityPage(otherUserPage);
+        await activityPage.visit();
+        await otherUserPage.waitForTimeout(3000);
+        await expect(otherUserPage.getByRole('Button', { name: 'Create' }).first()).toHaveCount(1);
+    });
+
+    test('[22] - Inny użytkonik [Editor] może tworzyć uczestników', async ({ otherUserPage }) => {
+        await selectDataset(otherUserPage);
+
+        const measurePage = new MeasurePage(otherUserPage);
+        await measurePage.visit();
+        await otherUserPage.waitForTimeout(3000);
+        await expect(otherUserPage.getByRole('Button', { name: 'Create' }).first()).toHaveCount(1);
+    });
+
+    test('[23] - Inny użytkonik [Editor] widzi ustawień', async ({ userPage }) => {
+        await selectDataset(userPage);
+        await expect(userPage.getByRole('link', { name: 'Settings' })).toHaveCount(1);
+    });
+
 });
 
 async function selectDataset(page: Page) {

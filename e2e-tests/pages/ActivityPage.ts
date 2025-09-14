@@ -29,6 +29,7 @@ export class ActivityPage extends BasePage {
 
     async createActivity(name: string, description: string, type: string): Promise<void> {
         await this.createButton.click();
+        await this.waitForPageLoad();
         await this.nameInput.fill(name);
         await this.descriptionInput.fill(description);
         await this.typeDropdown.click();

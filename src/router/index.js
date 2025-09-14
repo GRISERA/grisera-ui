@@ -11,6 +11,7 @@ import datasetRoutes from '@/router/datasetRoutes';
 import ClassesDescriptions from '@/const/ClassesDescriptions';
 import AuthService from '@/services/AuthService';
 import store from '@/store/index';
+import AccessRoles from '@/const/AccessRoles';
 
 Vue.use(VueRouter);
 
@@ -56,6 +57,7 @@ const routes = [
     name: 'settings',
     component: () => import('@/views/settings/SettingsView.vue'),
     meta: {
+      canEnterRoles: [AccessRoles.EDITOR, AccessRoles.OWNER],
       icon: 'mdi-cog',
       order: 20,
       name: 'Settings',
