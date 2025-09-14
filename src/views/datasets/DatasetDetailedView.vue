@@ -131,7 +131,7 @@ export default {
     }),
     buttonText() {
       return this.editMode ? 'update' : 'create';
-    },
+    }
   },
   watch: {
     '$route.params.id': {
