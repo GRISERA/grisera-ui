@@ -76,6 +76,7 @@
                 <v-card-actions>
                   <v-icon
                     color="primary"
+                    data-testid="edit-button"
                     @click="() => {
                       selectCurrentDataset(dataset);
                       $router.push({

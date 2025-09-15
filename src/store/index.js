@@ -33,7 +33,7 @@ const store = new Vuex.Store({
   getters: {
     getUser: state => state.user,
     getDataset: state => state.dataset,
-    getPermission: state => state.permissions.filter(permission => permission.datasetId == state.dataset.id)[0],
+    getPermission: state => state.permissions.filter(permission => permission.datasetId === state.dataset.id)[0],
   },
   plugins: [createPersistedState()],
 });

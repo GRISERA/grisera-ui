@@ -80,10 +80,10 @@ export default {
     onCreation() {
       const filteredData = [];
       if (this.experiment.scenarioExecutions) {
-        this.experiment.scenarioExecutions.forEach(obj => {
-          obj.activityExecutions.forEach(obj2 => {
+        this.experiment.scenarioExecutions?.forEach(obj => {
+          obj.activityExecutions?.forEach(obj2 => {
             if (obj2.recordings)
-              obj2.recordings.forEach(obj3 => {
+              obj2.recordings?.forEach(obj3 => {
                 filteredData.push({
                   ...obj3, activityExecution: obj2, scenarioExecution: obj,
                   scenarioExecution_name: obj.name, activityExecution_name: obj2.name,
