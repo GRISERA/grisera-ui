@@ -121,5 +121,6 @@ export class TimeSeriesCreatePage extends BasePage {
 
     async submitForm() {
         await this.createButton.click();
+        await this.page.waitForURL('/experiments/**');
     }
 }
