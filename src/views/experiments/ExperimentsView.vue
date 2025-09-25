@@ -42,7 +42,7 @@ export default {
       getPermission: 'getPermission',
     }),
     isReadOnly() {
-      return this.getPermission.role == AccessRoles.READER;
+      return this.getPermission?.role === AccessRoles.READER;
     },
   },
 };
