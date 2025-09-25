@@ -6,13 +6,14 @@ export default class extends BaseAPI2 {
     return DatabaseName.LIFE_ACTIVITIES;
   }
 
-  static dTOFrontToAPI(data){
+  static dTOFrontToAPI(data) {
     return {
       life_activity: data.name,
+      external_id: data.external_id,
     };
   }
 
-  static dTOAPIToFront(data){
+  static dTOAPIToFront(data) {
     const formated = data.life_activity.charAt(0).toUpperCase() + data.life_activity.slice(1) || '';
     return {
       id: data.id,

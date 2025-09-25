@@ -1,6 +1,6 @@
 <template>
-  <v-dialog 
-    v-model="dialog" 
+  <v-dialog
+    v-model="dialog"
     max-width="800"
     @close="$emit('close')"
   >
@@ -23,8 +23,8 @@
         >
           <v-row>
             <v-col
-              cols="12"
               class="pa-2"
+              cols="12"
             >
               <v-text-field
                 v-model="lifeActivity.name"
@@ -32,10 +32,10 @@
                 prepend-icon="mdi-text"
               />
             </v-col>
-            
+
             <v-col
-              cols="12"
               class="pa-2"
+              cols="12"
             >
               <v-text-field
                 v-model="lifeActivity.description"
