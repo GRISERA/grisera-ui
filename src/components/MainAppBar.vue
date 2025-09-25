@@ -30,7 +30,17 @@
                   Current dataset:
                 </v-list-item-title>
                 <v-list-item-subtitle class="font-weight-bold subtitle-1">
-                  {{ dataset?.name }}
+                  <v-tooltip>
+                    <template #activator="{ on, attrs }">
+                      <span
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        {{ dataset?.name }}
+                      </span>
+                    </template>
+                    <span>ID: {{ dataset?.id }}</span>
+                  </v-tooltip>
                 </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
