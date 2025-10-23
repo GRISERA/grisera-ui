@@ -7,7 +7,10 @@
     </template>
     <template #panel-header="{ item }">
       <div class="my-auto font-weight-bold d-flex">
-        <div test-data="scenario-execution-title" class="my-auto">
+        <div
+          test-data="scenario-execution-title"
+          class="my-auto"
+        >
           {{ item.name }}
         </div>
         <v-spacer />

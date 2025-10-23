@@ -32,10 +32,10 @@ keycloak.init({ onLoad: 'login-required' })
           vuetify,
           router,
           keycloak,
-          render: h => h(App),
           created() {
             Vue.prototype.$keycloak = keycloak; // Make Keycloak instance available globally
           },
+          render: h => h(App),
         }).$mount('#app');
       } else {
         console.warn('User is not authenticated!');

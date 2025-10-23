@@ -110,6 +110,14 @@
             prepend-inner-icon="mdi-text"
             rows="4"
           />
+
+          <v-checkbox
+            v-model="dataset.create_default_entities"
+            class="mb-4"
+            hint="When enabled, automatically creates standard channels, modalities, life activities, and measures. Arrangements are always created regardless of this setting."
+            label="Create default entities (channels, modalities, life activities, measures)"
+            persistent-hint
+          />
         </v-form>
       </v-card-text>
 
@@ -210,6 +218,7 @@ export default {
         rights: '',
         date: new Date().toISOString().substr(0, 10),
         description: '',
+        create_default_entities: true,
       },
       dateModal: false,
       loading: false,
@@ -300,6 +309,11 @@ export default {
 
           localStorage.setItem('token', permissionResponse.data.token);
           localStorage.setItem('tokenExpiration', this.tokenExpiration);
+
+          // Refresh permissions in store
+          const permissionsResponse = await PermissionsService.getUserPermissions(this.user.sub);
+          this.$store.commit('setPermissions', permissionsResponse.data);
+
           this.$emit('dataset-created', data);
         }
 
@@ -333,7 +347,8 @@ export default {
           this.dataset.creator !== this.originalDataset.creator ||
           this.dataset.rights !== this.originalDataset.rights ||
           this.dataset.date !== this.originalDataset.date ||
-          this.dataset.description !== this.originalDataset.description
+          this.dataset.description !== this.originalDataset.description ||
+          this.dataset.create_default_entities !== this.originalDataset.create_default_entities
         );
       } else {
         // In create mode, check if any field has content
@@ -354,6 +369,7 @@ export default {
           rights: '',
           date: new Date().toISOString().substr(0, 10),
           description: '',
+          create_default_entities: true,
         };
         this.originalDataset = null;
       }
