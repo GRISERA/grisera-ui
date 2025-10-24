@@ -2,14 +2,14 @@
   <v-tab-item>
     <v-container class="container--fluid">
       <v-row>
-        <v-col 
+        <v-col
           v-if="!isReadOnly"
           class="col-12 text-right"
         >
           <v-row justify="end">
             <create-button
-              text="Create New Recording"
               class="ma-4"
+              text="Create New Recording"
               @click="$router.push({ name: 'experiment-recording-add', params: { experiment: experiment.id } })"
             />
           </v-row>
@@ -19,9 +19,9 @@
           class="col-12 pa-6"
         >
           <recordings-table
+            :can-edit-and-delete="!isReadOnly"
             :data-to-display="dataToDisplay"
             :experiment="experiment"
-            :can-edit-and-delete="!isReadOnly"
             @recordings:delete="openDeleteConfirmDialog"
           />
         </v-col>
@@ -41,12 +41,13 @@
 </template>
 
 <script>
-import DeleteConfirmDialog from '@/components/dialog/DeleteConfirmDialog.vue';
-import RecordingsTable from './RecordingsTable.vue';
 import RecordingsAPI from '@/api/RecordingsAPI';
 import CreateButton from '@/components/CreateButton.vue';
+import DeleteConfirmDialog from '@/components/dialog/DeleteConfirmDialog.vue';
 import AccessRoles from '@/const/AccessRoles';
+import randomHash from '@/procedures/random-hash';
 import { mapGetters } from 'vuex';
+import RecordingsTable from './RecordingsTable.vue';
 
 export default {
   name: 'RecordingsTab',
@@ -58,7 +59,9 @@ export default {
   props: {
     experiment: {
       type: Object,
-      default: () => ({}),
+      default: () => (
+        {}
+      ),
     },
   },
   data() {
@@ -82,13 +85,17 @@ export default {
       if (this.experiment.scenarioExecutions) {
         this.experiment.scenarioExecutions.forEach(obj => {
           obj.activityExecutions.forEach(obj2 => {
-            if (obj2.recordings)
+            if (obj2.recordings) {
               obj2.recordings.forEach(obj3 => {
                 filteredData.push({
-                  ...obj3, activityExecution: obj2, scenarioExecution: obj,
+                  ...obj3,
+                  id: obj3.id?.[0] || randomHash(),
+                  activityExecution: obj2,
+                  scenarioExecution: obj,
                   scenarioExecution_name: obj.name, activityExecution_name: obj2.name,
                 });
               });
+            }
           });
         });
       }
@@ -104,11 +111,11 @@ export default {
     },
     deleteRecord() {
       RecordingsAPI.delete(this.currentRecording.id)
-          .then(async () => {
-            this.$emit('recordings:delete');
-            this.onCreation();
-            this.closeDeleteConfirmDialog();
-          });
+        .then(async () => {
+          this.$emit('recordings:delete');
+          this.onCreation();
+          this.closeDeleteConfirmDialog();
+        });
     },
   },
   computed: {
