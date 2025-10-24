@@ -3,7 +3,7 @@
     <v-row>
       <v-col class="headline font-weight-bold my-auto d-flex">
         <info-tool-tip-component :info-message="$route.meta.infoMessage" />
-        <app-breadcrumbs :items="{ experiment }" />
+        <app-breadcrumbs />
       </v-col>
       <v-col class="col-12 headline font-weight-bold">
         {{ getTitleOfForm }}
@@ -18,33 +18,33 @@
             >
               <v-text-field
                 v-model="item.name"
-                label="Name"
                 :outlined="true"
                 :rules="[
                   v => !!v || 'This field is required'
                 ]"
+                label="Name"
               />
               <v-textarea
                 v-model="item.description"
                 :outlined="true"
-                label="Description"
                 :rules="[
                   v => !!v || 'This field is required'
                 ]"
+                label="Description"
               />
               <v-row>
                 <v-autocomplete
                   v-model="item.activity"
-                  class="ma-2 pa-2"
-                  :items="activities"
-                  label="Activity"
-                  item-text="name"
-                  item-value="id"
-                  :return-object="true"
                   :disabled="isEditMode"
+                  :items="activities"
+                  :return-object="true"
                   :rules="[
                     v => !!v || 'This field is required'
                   ]"
+                  class="ma-2 pa-2"
+                  item-text="name"
+                  item-value="id"
+                  label="Activity"
                 >
                   <template #selection="{ item }">
                     {{ item.name }}
@@ -55,27 +55,23 @@
                 </v-autocomplete>
               </v-row>
               <horizontal-text-divider
-                text="Participants"
                 class="mb-2"
+                text="Participants"
               />
               <v-autocomplete
                 ref="participantsAutocomplete"
                 v-model="item.participants"
-                class="ma-2 pa-2"
-                :items="participants"
-                label="Participants"
                 :item-text="item => `${item.name} ${item.surname}`"
-                item-value="id"
-                :return-object="true"
+                :items="participants"
                 :multiple="!isIndividualActivity"
-                required
+                :return-object="true"
                 :rules="[
                   v => !!(Array.isArray(v) && v.length) || !!(!Array.isArray(v) && v) || 'This field is required',
                   v => {
                     if(!isIndividualActivity && item.activity) {
                       if(item.activity.type == 'Two persons activity' && v.length && v.length != 2) {
                         return 'Select exactly two participants';
-                      } 
+                      }
                       else if(item.activity.type == 'Group activity' && v.length && v.length < 2) {
                         return 'Select at least two participants';
                       }
@@ -83,6 +79,10 @@
                     return true;
                   },
                 ]"
+                class="ma-2 pa-2"
+                item-value="id"
+                label="Participants"
+                required
               >
                 <template #selection="{ item }">
                   <v-chip>
@@ -94,17 +94,16 @@
                 </template>
               </v-autocomplete>
               <horizontal-text-divider
-                text="Arrangement models"
                 class="mb-2"
+                text="Arrangement models"
               />
               <v-autocomplete
                 ref="arrangementAutocomplete"
                 v-model="item.arrangement"
-                class="ml-2 pl-2"
-                :items="arrangementDistanceValues"
-                label="Arrangement Distance"
+                :disabled="isArrangementsDisabled"
                 :item-text="'arrangementDistance'"
                 :item-value="'id'"
+                :items="arrangementDistanceValues"
                 :rules="[
                   v => {
                     if(isArrangementsDisabled || v) {
@@ -113,11 +112,12 @@
                     return 'This field is required';
                   },
                 ]"
-                :disabled="isArrangementsDisabled"
+                class="ml-2 pl-2"
+                label="Arrangement Distance"
               />
               <horizontal-text-divider
-                text="Additional parameters"
                 class="mb-2"
+                text="Additional parameters"
               />
               <CustomParametersComponent
                 ref="apc"
@@ -148,15 +148,15 @@
 </template>
 
 <script>
-import ActivityExecutionsAPI from '@/api/ActivityExecutionsAPI';
 import ActivitiesAPI from '@/api/ActivitiesAPI';
-import ParticipantsAPI from '@/api/ParticipantsAPI';
-import HorizontalTextDivider from '@/components/divider/HorizontalTextDivider.vue';
-import CustomParametersComponent from '../components/CustomParametersComponent.vue';
-import ActivityTypes from '@/const/ActivityTypes';
-import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
-import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
+import ActivityExecutionsAPI from '@/api/ActivityExecutionsAPI';
 import ArrangementsAPI from '@/api/ArrangementsAPI';
+import ParticipantsAPI from '@/api/ParticipantsAPI';
+import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
+import HorizontalTextDivider from '@/components/divider/HorizontalTextDivider.vue';
+import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
+import ActivityTypes from '@/const/ActivityTypes';
+import CustomParametersComponent from '../components/CustomParametersComponent.vue';
 
 export default {
   name: 'ActivityExecutionAddEditView',
@@ -201,10 +201,14 @@ export default {
         }
 
         ActivityExecutionsAPI.show(newValue)
-            .then(({ data }) => {
-              this.item = data;
-              this.isEditMode = true;
-            });
+          .then(({ data }) => {
+            if (data?.activity?.type === ActivityTypes.INDIVIDUAL) {
+              data.participants = data.participants?.[0] || null;
+            }
+
+            this.item = data;
+            this.isEditMode = true;
+          });
       },
       immediate: true,
     },
@@ -214,7 +218,9 @@ export default {
           if (this.isArrangementsDisabled) {
             this.$refs.arrangementAutocomplete.resetValidation();
           }
-          if (!oldValue || (newValue && oldValue.type != newValue.type)) {
+          if (!oldValue || (
+            newValue && oldValue.type != newValue.type
+          )) {
             this.$refs.participantsAutocomplete.reset();
             this.item.participants = [];
           }
@@ -224,13 +230,13 @@ export default {
   },
   created() {
     ActivitiesAPI.index()
-        .then(({ data }) => {
-          this.activities = data;
-        });
+      .then(({ data }) => {
+        this.activities = data;
+      });
 
     ArrangementsAPI.index().then(({ data }) => {
-          this.arrangementDistanceValues = data.filter(e => e.arrangementDistance);
-        });
+      this.arrangementDistanceValues = data.filter(e => e.arrangementDistance);
+    });
     this.getParticipants();
   },
   methods: {
@@ -242,9 +248,9 @@ export default {
       const method = this.isEditMode ? 'update' : 'store';
       this.setItemParticipantsAsArray();
       ActivityExecutionsAPI[method]({ ...this.item })
-          .then(() => {
-            this.$router.go(-1);
-          });
+        .then(() => {
+          this.$router.go(-1);
+        });
     },
     getParticipants() {
       ParticipantsAPI.index().then(({ data }) => {
