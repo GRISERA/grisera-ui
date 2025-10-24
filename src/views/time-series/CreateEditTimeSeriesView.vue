@@ -70,7 +70,9 @@
             <v-divider />
             <v-autocomplete
               v-model="timeSeries.measure"
+              :item-value="e => e.id"
               :items="measures"
+              :return-object="true"
               :rules="[
                 v => !!v || 'This field is required',
               ]"
