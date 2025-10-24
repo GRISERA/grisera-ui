@@ -75,6 +75,7 @@
                 v => !!v || 'This field is required',
               ]"
               clearable
+              item-text="name"
               label="Measure"
               required
             >
@@ -170,6 +171,7 @@
                       v => !!v || 'This field is required',
                     ]"
                     clearable
+                    item-text="name"
                     item-value="id"
                     label="Modality"
                     required
@@ -198,6 +200,7 @@
                       v => !!v || 'This field is required',
                     ]"
                     clearable
+                    item-text="name"
                     item-value="id"
                     label="Live activity"
                     required
