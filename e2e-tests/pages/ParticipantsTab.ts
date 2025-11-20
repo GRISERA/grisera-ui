@@ -9,6 +9,6 @@ export class ParticipantsTab extends BasePage {
         await this.page.getByTestId('experiment-participant-add-button').click();
         await this.page.getByLabel('Participant').click();
         await this.page.locator(`div[role="option"]:has-text("${ participantName }")`).first().click();
-        await this.page.getByRole('dialog').getByRole('button', { name: 'Add' }).click();
+        await this.page.getByRole('dialog').getByRole('button', { name: 'Assign to experiment' }).click();
     }
 }

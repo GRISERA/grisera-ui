@@ -45,6 +45,20 @@
           <span>Click to preview</span>
         </v-tooltip>
       </td>
+      <td v-else>
+        <v-tooltip top>
+          <template #activator="{ on, attrs }">
+            <v-icon
+              color="warning"
+              v-bind="attrs"
+              v-on="on"
+            >
+              mdi-alert
+            </v-icon>
+          </template>
+          <span>No file assigned</span>
+        </v-tooltip>
+      </td>
     </template>
     <template #actions="{ item }">
       <v-icon

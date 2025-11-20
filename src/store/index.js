@@ -11,6 +11,7 @@ const store = new Vuex.Store({
     dataset: undefined,
     user: undefined,
     permissions: undefined,
+    scopes: {},
     data: undefined,
     imports: [],
   },
@@ -26,6 +27,12 @@ const store = new Vuex.Store({
     },
     setPermissions(state, value) {
       state.permissions = value;
+
+      if (!Array.isArray(value)) {
+        console.error('Permissions should be an array of { datasetId, role } objects');
+      }
+
+      value.forEach(({ datasetId, role }) => state.scopes[datasetId] = roles[role] || []);
     },
     setData(state, value) {
       state.data = { ...value };

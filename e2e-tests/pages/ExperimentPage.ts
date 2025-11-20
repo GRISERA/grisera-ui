@@ -29,7 +29,7 @@ export class ExperimentPage extends BasePage {
     }
 
     private get createExperimentButton() {
-        return this.page.getByRole('button', { name: 'Create new experiment' });
+        return this.page.getByRole('button', { name: 'Create experiment' });
     }
 
     async visit(): Promise<void> {

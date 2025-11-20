@@ -4,7 +4,8 @@ import { BasePage } from './BasePage';
 export class RegistrationPage extends BasePage {
     async visit(): Promise<void> {
         await this.page.goto('/');
-        await this.createAccountButton.click();
+        await this.page.waitForLoadState('networkidle');
+        await this.page.getByRole('link', { name: 'Create Account' }).click();
         await this.waitForPageLoad();
     }
 

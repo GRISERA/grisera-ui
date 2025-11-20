@@ -1,4 +1,5 @@
 import {expect, Page, test as base} from '@playwright/test';
+import path from 'path';
 import { LoginPage } from '../pages/LoginPage';
 import { DatasetCreatePage } from '../pages/DatasetCreatePage';
 import { DatasetListPage } from '../pages/DatasetListPage';
@@ -14,6 +15,7 @@ import { RegistrationPage } from '../pages/RegistrationPage';
 import {SettingsPage} from "../pages/SettingsPage";
 import {AccessPermissionsTab} from "../pages/AccessPermissionsTab";
 import generateDate from '../utils/generate-date-util';
+import { TimeSeriesCreatePage } from '../pages/TimeSeriesCreatePage';
 
 const hash = Math.random().toString(36).substring(2);
 
@@ -42,18 +44,18 @@ const newParticipants = [
         birthDate: '1992-07-01',
         sex: 'Male',
     },
-    {
-        name: 'Emma',
-        surname: 'Carter',
-        birthDate: '1987-03-01',
-        sex: 'Female',
-    },
-    {
-        name: 'Caroline',
-        surname: 'Kane',
-        birthDate: '1999-01-01',
-        sex: 'Female',
-    },
+    // {
+    //     name: 'Emma',
+    //     surname: 'Carter',
+    //     birthDate: '1987-03-01',
+    //     sex: 'Female',
+    // },
+    // {
+    //     name: 'Caroline',
+    //     surname: 'Kane',
+    //     birthDate: '1999-01-01',
+    //     sex: 'Female',
+    // },
 ];
 
 const newActivities = [
@@ -63,36 +65,36 @@ const newActivities = [
         type: 'Individual',
         participants: ['James Anderson'],
     },
-    {
-        name: 'Logging into the Learning Platform',
-        description: 'Participants perform a task involving logging into the Moodle e-learning platform.',
-        type: 'Individual',
-        participants: ['James Anderson'],
-    },
-    {
-        name: 'Locating a Course',
-        description: 'Participants search for and locate a specific course on the Moodle platform.',
-        type: 'Individual',
-        participants: ['James Anderson'],
-    },
-    {
-        name: 'Completing an Emotional State Questionnaire',
-        description: 'Participants fill out questionnaires regarding their emotional state at different points during the experiment.',
-        type: 'Individual',
-        participants: ['James Anderson'],
-    },
-    {
-        name: 'Listening to a Lecture',
-        description: 'Participants listen to a pre-recorded lecture on an assigned topic.',
-        type: 'Individual',
-        participants: ['James Anderson'],
-    },
-    {
-        name: 'Completing a Quiz',
-        description: 'Participants answer questions related to the material presented in the lecture.',
-        type: 'Individual',
-        participants: ['James Anderson'],
-    },
+    // {
+    //     name: 'Logging into the Learning Platform',
+    //     description: 'Participants perform a task involving logging into the Moodle e-learning platform.',
+    //     type: 'Individual',
+    //     participants: ['James Anderson'],
+    // },
+    // {
+    //     name: 'Locating a Course',
+    //     description: 'Participants search for and locate a specific course on the Moodle platform.',
+    //     type: 'Individual',
+    //     participants: ['James Anderson'],
+    // },
+    // {
+    //     name: 'Completing an Emotional State Questionnaire',
+    //     description: 'Participants fill out questionnaires regarding their emotional state at different points during the experiment.',
+    //     type: 'Individual',
+    //     participants: ['James Anderson'],
+    // },
+    // {
+    //     name: 'Listening to a Lecture',
+    //     description: 'Participants listen to a pre-recorded lecture on an assigned topic.',
+    //     type: 'Individual',
+    //     participants: ['James Anderson'],
+    // },
+    // {
+    //     name: 'Completing a Quiz',
+    //     description: 'Participants answer questions related to the material presented in the lecture.',
+    //     type: 'Individual',
+    //     participants: ['James Anderson'],
+    // },
     // {
     //     name: 'Listening to a Lecture',
     //     description: 'Participants listen to a lecture on an assigned topic.',
@@ -118,10 +120,10 @@ const newScenarioExecutions = [
         scenarioName: newScenario.name,
         executionName: 'ex-01',
     },
-    {
-        scenarioName: newScenario.name,
-        executionName: 'ex-02',
-    },
+    // {
+    //     scenarioName: newScenario.name,
+    //     executionName: 'ex-02',
+    // },
 ];
 
 
@@ -131,73 +133,52 @@ const newRecordings = [
         activityExecutionName: 'Activity Execution: 1',
         name: 'Audio Recording 1',
         description: 'Audio recording for individual activity execution 1.',
-        link: 'https://www.test.com',
+        filePath: path.join(__dirname, '../test-files/audio_sample.wav'),
         channel: 'Audio',
         participant: 'James Anderson',
     },
-    {
-        scenarioExecutionName: 'ex-01',
-        activityExecutionName: 'Activity Execution: 2',
-        name: 'BVP Recording 2',
-        description: 'BVP recording for individual activity execution 2.',
-        link: 'https://www.test.com',
-        channel: 'BVP',
-        participant: 'James Anderson',
-    },
-    {
-        scenarioExecutionName: 'ex-01',
-        activityExecutionName: 'Activity Execution: 3',
-        name: 'ECG Recording 3',
-        description: 'ECG recording for individual activity execution 3.',
-        link: 'https://www.test.com',
-        channel: 'ECG',
-        participant: 'James Anderson',
-    },
-    {
-        scenarioExecutionName: 'ex-01',
-        activityExecutionName: 'Activity Execution: 4',
-        name: 'EDA Recording 4',
-        description: 'EDA recording for individual activity execution 4.',
-        link: 'https://www.test.com',
-        channel: 'EDA',
-        participant: 'James Anderson',
-    },
-    {
-        scenarioExecutionName: 'ex-01',
-        activityExecutionName: 'Activity Execution: 5',
-        name: 'Depth Video 5',
-        description: 'Depth video recording for individual activity 5.',
-        link: 'https://www.test.com',
-        channel: 'Depth video',
-        participant: 'James Anderson',
-    },
-    {
-        scenarioExecutionName: 'ex-01',
-        activityExecutionName: 'Activity Execution: 6',
-        name: 'RGB Video 6',
-        description: 'RGB video recording for individual activity 6.',
-        link: 'https://www.test.com',
-        channel: 'RGB video',
-        participant: 'James Anderson',
-    },
     // {
     //     scenarioExecutionName: 'ex-01',
-    //     activityExecutionName: 'Activity Execution: 7',
-    //     name: 'Group EEG Recording 7',
-    //     description: 'EEG recording for group activity with three participants.',
-    //     link: 'https://www.test.com',
-    //     channel: 'EEG',
-    //     participant: 'James Anderson, Emma Carter, Caroline Kane',
+    //     activityExecutionName: 'Activity Execution: 2',
+    //     name: 'BVP Recording 2',
+    //     description: 'BVP recording for individual activity execution 2.',
+    //     filePath: path.join(__dirname, '../test-files/data_sample.csv'),
+    //     channel: 'BVP',
+    //     participant: 'James Anderson',
     // },
     // {
     //     scenarioExecutionName: 'ex-01',
-    //     activityExecutionName: 'Activity Execution: 8',
-    //     name: 'Temperature Recording 8',
-    //     description: 'Temperature recording for two-person activity.',
-    //     link: 'https://www.test.com',
-    //     channel: 'Temperature',
-    //     participant: 'James Anderson, Emma Carter',
+    //     activityExecutionName: 'Activity Execution: 3',
+    //     name: 'ECG Recording 3',
+    //     description: 'ECG recording for individual activity execution 3.',
+    //     filePath: path.join(__dirname, '../test-files/text_sample.txt'),
+    //     channel: 'ECG',
+    //     participant: 'James Anderson',
     // },
+    // {
+    //     scenarioExecutionName: 'ex-01',
+    //     activityExecutionName: 'Activity Execution: 4',
+    //     name: 'EDA Recording 4',
+    //     description: 'EDA recording for individual activity execution 4.',
+    //     filePath: path.join(__dirname, '../test-files/video_sample.mp4'),
+    //     channel: 'EDA',
+    //     participant: 'James Anderson',
+    // },
+];
+
+const newTimeSeries = [
+  {
+    scenarioExecution: 'ex-01',
+    activityExecution: 'Activity Execution: 1',
+    filePath: path.join(__dirname, '../test-files/audio_sample.wav'),
+    type: 'Epoch',
+    spacing: 'Regular',
+    measure: 'Sadness',
+    recording: 'Audio Recording 1',
+    channel: 'Audio',
+    modality: 'Prosody of speech',
+    liveActivity: 'Sound',
+  }
 ];
 
 const username = `${ hash }`;
@@ -288,7 +269,7 @@ test.describe.serial('Przejście całego procesu', () => {
         for (const newParticipant of newParticipants) {
             const participantsTab = new ParticipantsTab(userPage);
             await participantsTab.visit();
-            await participantsTab.addParticipant(`${ newParticipant.surname } ${ newParticipant.name }`);
+            await participantsTab.addParticipant(`${ newParticipant.name } ${ newParticipant.surname }`);
             await expect(userPage.getByRole('cell', { name: newParticipant.name }).first()).toBeVisible();
         }
     });
@@ -351,7 +332,16 @@ test.describe.serial('Przejście całego procesu', () => {
     });
 
     test('[10] - Użytkownik tworzy szeregi czasowe', async ({ userPage }) => {
-        // TODO: przenieść testy z time-series.spec.ts
+        await selectDataset(userPage);
+        await (new ExperimentListPage(userPage)).useExperimentByName(newExperiment.name);
+
+        for (const timeSeries of newTimeSeries) {
+            await (new ScenariosExecutionsTab(userPage)).useTimeSeriesForAnyParticipant(timeSeries);
+            const timeSeriesCreatePage = new TimeSeriesCreatePage(userPage);
+            await timeSeriesCreatePage.openForm();
+            await timeSeriesCreatePage.fillForm(timeSeries);
+            await timeSeriesCreatePage.submitForm();
+        }
     });
 
     test('[11] - Inny użytkownik rejestruje konto', async ({ page }) => {
@@ -368,7 +358,7 @@ test.describe.serial('Przejście całego procesu', () => {
         await accessPermissionsTab.addPermission(usernameOther, 'Reader');
     });
 
-    test('[13] - Inny użytkonik nie może tworzyć eksperymentu', async ({ otherUserPage }) => {
+    test('[13] - Inny użytkownik nie może tworzyć eksperymentu', async ({ otherUserPage }) => {
         await selectDataset(otherUserPage);
 
         const experimentPage = new ExperimentPage(otherUserPage);
@@ -376,7 +366,7 @@ test.describe.serial('Przejście całego procesu', () => {
         await expect(otherUserPage.getByRole('Button', { name: 'Create' }).first()).toHaveCount(0);
     });
 
-    test('[14] - Inny użytkonik nie może edytować składowych eksperymentu', async ({ otherUserPage }) => {
+    test('[14] - Inny użytkownik nie może edytować składowych eksperymentu', async ({ otherUserPage }) => {
         await selectDataset(otherUserPage);
 
         await (new ExperimentListPage(otherUserPage)).useExperimentByName(newExperiment.name);

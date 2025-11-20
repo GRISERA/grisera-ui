@@ -67,7 +67,7 @@
           LOG OUT
         </v-btn>
         <div class="pt-8 navbar-copyrights">
-          &copy; PARDS 2022
+          &copy; GRISERA 2025
         </div>
       </div>
     </template>

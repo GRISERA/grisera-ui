@@ -20,6 +20,7 @@
         <h3
           class="dataset-title"
           data-testid="dataset-name"
+          :test-data="dataset.name"
         >
           {{ dataset.name }}
         </h3>

@@ -7,7 +7,10 @@
     </template>
     <template #panel-header="{ item }">
       <div class="my-auto font-weight-bold d-flex">
-        <div class="my-auto">
+        <div
+          test-data="scenario-execution-title"
+          class="my-auto"
+        >
           {{ item.name }}
         </div>
         <v-spacer />
@@ -32,15 +35,15 @@
         :activity-executions="item.activityExecutions"
         :can-edit-activity-execution="canPerformActions"
         @activity-execution:edit="editActivityExecution"
-      />           
+      />
     </template>
   </collapse-listing>
 </template>
-    
+
     <script>
     import CollapseListing from '@/components/CollapseListing.vue';
     import ActivityExecutionsListingComponent from '@/components/ActivityExecutionsListingComponent.vue';
-    
+
     export default {
       name: 'ScenarioExecutionsListingComponent',
       components: {
@@ -61,7 +64,7 @@
       },
     };
     </script>
-    
+
     <style scoped>
     ::v-deep .v-timeline-item__body {
       margin: auto;

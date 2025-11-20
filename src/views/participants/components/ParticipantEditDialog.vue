@@ -1,6 +1,6 @@
 <template>
-  <v-dialog 
-    v-model="dialog" 
+  <v-dialog
+    v-model="dialog"
     max-width="800"
     @close="$emit('close')"
   >
@@ -23,9 +23,9 @@
         >
           <v-row>
             <v-col
+              class="pa-2"
               cols="12"
               md="6"
-              class="pa-2"
             >
               <v-text-field
                 v-model="participant.name"
@@ -33,26 +33,26 @@
                 prepend-icon="mdi-account"
               />
             </v-col>
-            
-            
+
+
             <v-col
+              class="pa-2"
               cols="12"
               md="6"
-              class="pa-2"
             >
               <v-select
                 v-model="participant.sex"
                 :items="sexOptions"
+                clearable
                 label="Sex"
                 prepend-icon="mdi-gender-male-female"
-                clearable
               />
             </v-col>
             
             <v-col
+              class="pa-2"
               cols="12"
               md="6"
-              class="pa-2"
             >
               <v-menu
                 v-model="birthDateMenu"
@@ -64,13 +64,13 @@
                 <template #activator="{ on, attrs }">
                   <v-text-field
                     v-model="participant.birthDate"
+                    clearable
                     label="Birth Date"
                     prepend-icon="mdi-calendar"
                     readonly
-                    clearable
                     v-bind="attrs"
-                    @click:clear="participant.birthDate = null"
                     v-on="on"
+                    @click:clear="participant.birthDate = null"
                   />
                 </template>
                 <v-date-picker
@@ -80,10 +80,11 @@
                 />
               </v-menu>
             </v-col>
-            
+
             <v-col
-              cols="12"
               class="pa-2"
+              cols="12"
+              md="6"
             >
               <v-text-field
                 v-model="participant.disorder"
@@ -93,8 +94,8 @@
             </v-col>
           </v-row>
 
-          <v-row 
-            v-if="participant.additionalParameters && participant.additionalParameters.length > 0" 
+          <v-row
+            v-if="participant.additionalParameters && participant.additionalParameters.length > 0"
             class="mt-2"
           >
             <v-col cols="12">
@@ -104,9 +105,9 @@
             <v-col
               v-for="(param, index) in participant.additionalParameters"
               :key="index"
+              class="pa-2"
               cols="12"
               md="6"
-              class="pa-2"
             >
               <v-text-field
                 v-model="param.value"

@@ -117,7 +117,7 @@
                   color="primary"
                   type="submit"
                 >
-                  {{ isEditMode ? 'Update' : 'Create' }}
+                  {{ isEditMode ? 'Update' : 'Create Scenario' }}
                 </v-btn>
               </v-card-actions>
             </v-form>

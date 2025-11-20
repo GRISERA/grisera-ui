@@ -7,11 +7,11 @@ name: Docker deploy
 
 on:
   push:
-    branches: [ "development_2.1" ]
+    branches: [ "development_2.1", "release/2.x-fixes" ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
   pull_request:
-    branches: [ "development_2.1" ]
+    branches: [ "development_2.1", "release/2.x-fixes" ]
 
 env:
   REGISTRY: ghcr.io

@@ -28,13 +28,15 @@
 // });
 
 import { BasePage } from './BasePage';
-import { Locator } from '@playwright/test';
+import { expect, Locator } from '@playwright/test';
 
 export class TimeSeriesCreatePage extends BasePage {
     async visit(): Promise<void> {
-        await this.page.goto('/experiments/67d6ff5e3075786c4f00bc00/activity-executions/67d7025913cc6dc06528d475/participants/67d6fdc14a5301c720455c97/time-series');
-        await this.page.goto('/experiments/67d6ff5e3075786c4f00bc00/activity-executions/67d7025913cc6dc06528d475/participants/67d6fdc14a5301c720455c97/time-series/create');
         await this.waitForPageLoad();
+    }
+
+    async openForm(): Promise<void> {
+        await this.page.getByRole('button', { name: 'Create New Time Series' }).click();
     }
 
     private get linkInput(): Locator {
@@ -103,11 +105,11 @@ export class TimeSeriesCreatePage extends BasePage {
     }
 
     private get createButton(): Locator {
-        return this.page.getByRole('button', { name: 'Create' });
+        return this.page.getByRole('button', { name: 'Create time series' });
     }
 
-    async fillForm({ link, type, spacing, measure, recording, channel, modality, liveActivity }): Promise<void> {
-        await this.linkInput.fill(link);
+    async fillForm({ filePath, type, spacing, measure, recording, channel, modality, liveActivity }): Promise<void> {
+        await this.page.getByLabel('File input').setInputFiles(filePath);
         await this.selectType(type);
         await this.selectSpacing(spacing);
         await this.selectMeasure(measure);
@@ -119,6 +121,6 @@ export class TimeSeriesCreatePage extends BasePage {
 
     async submitForm() {
         await this.createButton.click();
-        await this.page.waitForURL('/experiments/67d6ff5e3075786c4f00bc00/activity-executions/67d7025913cc6dc06528d475/participants/67d6fdc14a5301c720455c97/time-series');
+        await this.page.waitForURL('/experiments/**');
     }
 }

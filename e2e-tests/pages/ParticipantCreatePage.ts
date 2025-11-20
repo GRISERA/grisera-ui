@@ -40,7 +40,7 @@ export class ParticipantCreatePage extends BasePage {
     }
 
     async fillParticipantForm({ name, surname, birthDate, sex }) {
-        await this.nameInput.fill(name);
+        await this.nameInput.fill(`${ name } ${ surname }`);
         await this.surnameInput.fill(surname);
         await this.selectDate(birthDate);
         await this.selectSex(sex);

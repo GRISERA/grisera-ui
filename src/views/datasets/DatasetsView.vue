@@ -3,7 +3,7 @@
     <page-header
       :description="$route.meta.infoMessage"
       action-icon="mdi-plus"
-      action-text="Create Dataset"
+      action-text="Create New Dataset"
       data-testid="datasets-page-header"
       title="Datasets"
       @action="createDataset"
@@ -184,6 +184,7 @@ export default {
 
         this.datasets = datasetsResponse.data;
         this.permissions = permissionsResponse.data;
+        this.$store.commit('setPermissions', permissionsResponse.data);
       } catch (error) {
         console.error('Error refreshing data:', error);
       }
@@ -200,6 +201,7 @@ export default {
 
         this.datasets = datasetsResponse.data;
         this.permissions = permissionsResponse.data;
+        this.$store.commit('setPermissions', permissionsResponse.data);
       } catch (error) {
         console.error('Error refreshing data:', error);
       }
@@ -238,6 +240,7 @@ export default {
 
         this.datasets = datasetsResponse.data;
         this.permissions = permissionsResponse.data;
+        this.$store.commit('setPermissions', permissionsResponse.data);
       } catch (error) {
         console.error('Error deleting dataset:', error);
         this.showSnackbar(

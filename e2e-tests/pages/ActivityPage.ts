@@ -7,7 +7,7 @@ export class ActivityPage extends BasePage {
     }
 
     private get createButton() {
-        return this.page.getByRole('button', { name: 'Create' });
+        return this.page.getByRole('button', { name: 'Create new activity' });
     }
 
     private get nameInput() {
@@ -23,7 +23,7 @@ export class ActivityPage extends BasePage {
     }
 
     private get createActivityButton() {
-        return this.page.getByRole('button', { name: 'Create new activity' });
+        return this.page.getByRole('button', { name: 'Create activity' });
     }
 
 

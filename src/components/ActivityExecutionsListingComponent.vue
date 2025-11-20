@@ -5,7 +5,10 @@
     :show-expand="true"
   >
     <template #[`item.name`]="{ item }">
-      <div :test-data="item.name">
+      <div
+        :test-data="item.name"
+        test-title-data="activity-execution-title"
+      >
         {{ item.name }}
       </div>
     </template>
@@ -17,6 +20,14 @@
         >
           {{ item.activity.type }}
         </v-chip>
+      </td>
+    </template>
+    <template #[`item._participants_count`]="{ item }">
+      <td>
+        <v-badge
+          :content="item?.participants?.length || '0'"
+          inline
+        />
       </td>
     </template>
     <template #expanded-item="{ item }">
@@ -104,6 +115,7 @@ export default {
       headers: [
         { text: 'Name', value: 'name', sortable: true },
         { text: 'Type', value: 'type', sortable: true },
+        { text: 'Participants', value: '_participants_count', sortable: true },
       ],
     };
   },

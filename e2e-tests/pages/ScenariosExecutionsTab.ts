@@ -36,4 +36,20 @@ export class ScenariosExecutionsTab extends BasePage {
         await this.page.locator(`div[role="option"]:has-text("${ participantName }")`).first().click();
         await this.page.getByRole('button', { name: 'Update' }).click();
     }
+
+    async useTimeSeriesForAnyParticipant({ scenarioExecution, activityExecution }): Promise<void> {
+        await this.visit();
+        await this.waitForPageLoad();
+        await this.page.getByRole('button').filter({ hasText: scenarioExecution }).first().click();
+        await this.page.getByText(activityExecution).first().click();
+        await this.page.getByRole('button', { name: 'Time Series' }).click();
+    }
+
+    async useAnyTimeSeriesView(): Promise<void> {
+        await this.visit();
+        await this.waitForPageLoad();
+        await this.page.locator('[test-data="scenario-execution-title"]').first().click();
+        await this.page.locator('[test-title-data="activity-execution-title"]').first().click();
+        await this.page.getByRole('button', { name: 'Time Series' }).click();
+    }
 }

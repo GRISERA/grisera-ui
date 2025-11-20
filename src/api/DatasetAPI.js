@@ -18,6 +18,7 @@ export default class extends BaseAPI2 {
       rights: data.rights,
       date: data.date,
       description: data.description,
+      create_default_entities: data.create_default_entities,
       additional_properties: data.additional_properties,
     };
   }
@@ -30,6 +31,7 @@ export default class extends BaseAPI2 {
       rights: data.rights,
       date: data.date,
       description: data.description,
+      create_default_entities: data.create_default_entities,
       additional_properties: data.additional_properties,
       parameters: data.parameters,
     };

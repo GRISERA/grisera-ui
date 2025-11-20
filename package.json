@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "dockerize": "VUE_APP_API_URL=__VUE_APP_API_URL__ VUE_APP_AUTH_MS_URL=__VUE_APP_AUTH_MS_URL__ VUE_APP_KEYCLOAK_URL=__VUE_APP_KEYCLOAK_URL__ VUE_APP_KEYCLOAK_CLIENT_ID=__VUE_APP_KEYCLOAK_CLIENT_ID__ VUE_APP_KEYCLOAK_REALM=__VUE_APP_KEYCLOAK_REALM__ vue-cli-service build",
     "lint": "vue-cli-service lint",
     "test": "npx playwright test"
   },

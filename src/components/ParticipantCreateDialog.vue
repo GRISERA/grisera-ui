@@ -97,6 +97,11 @@
             placeholder="Enter disorder (optional)"
             prepend-inner-icon="mdi-medical-bag"
           />
+
+          <CustomParametersComponent
+            ref="apc"
+            :type="'participant'"
+          />
         </v-form>
       </v-card-text>
 
@@ -171,9 +176,13 @@
 
 <script>
 import ParticipantsAPI from '@/api/ParticipantsAPI';
+import CustomParametersComponent from '@/components/CustomParametersComponent.vue';
 
 export default {
   name: 'ParticipantCreateDialog',
+  components: {
+    CustomParametersComponent,
+  },
   props: {
     value: {
       type: Boolean,
@@ -187,6 +196,7 @@ export default {
         sex: '',
         birthDate: null,
         disorder: '',
+        additionalParameters: [],
       },
       dateModal: false,
       loading: false,
@@ -243,6 +253,21 @@ export default {
         return;
       }
 
+      // Handle additional parameters
+      this.participant.additionalParameters = [];
+      if (this.$refs.apc && this.$refs.apc.parameters) {
+        this.$refs.apc.parameters.forEach(param => {
+          if (param.selected) {
+            this.participant.additionalParameters.push({
+              key: param.properties.key,
+              name: param.properties.name,
+              value: param.value,
+            });
+            this.$refs.apc.updateParameter(param);
+          }
+        });
+      }
+
       this.loading = true;
 
       try {
@@ -268,10 +293,12 @@ export default {
       this.dialog = false;
     },
     hasUnsavedChanges() {
-      const { name, sex, birthDate, disorder } = this.participant;
-      return !!(
+      const { name, sex, birthDate, disorder, additionalParameters } = this.participant;
+      const hasBasicFields = !!(
         name || sex || birthDate || disorder
       );
+      const hasAdditionalParams = additionalParameters && additionalParameters.length > 0;
+      return hasBasicFields || hasAdditionalParams;
     },
     resetForm() {
       this.participant = {
@@ -279,10 +306,15 @@ export default {
         sex: '',
         birthDate: null,
         disorder: '',
+        additionalParameters: [],
       };
       this.formValid = false;
       if (this.$refs.form) {
         this.$refs.form.resetValidation();
+      }
+      // Reset additional parameters component if it exists
+      if (this.$refs.apc) {
+        // The component will reset itself when the dialog opens again
       }
     },
   },

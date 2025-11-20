@@ -1,11 +1,11 @@
-<template>    
+<template>
   <base-table
     :headers="headers"
+    :hide-footer="true"
     :items="usefulData"
     :show-expand="false"
-    :hide-footer="true"
-  >  
-    <template #participants="{ item }">            
+  >
+    <template #participants="{ item }">
       <v-chip-group column>
         <v-chip
           v-for="(person, index) in item.participants"
@@ -13,33 +13,35 @@
         >
           {{ person.name }} {{ person.surname }}
         </v-chip>
-      </v-chip-group>   
+      </v-chip-group>
     </template>
   </base-table>
 </template>
-      
+
 <script>
 import BaseTable from '@/components/base/BaseTable.vue';
-import IndexedDB from '@/storage/IndexedDB';
+import randomHash from '@/procedures/random-hash';
 
 export default {
-  name: 'ModalitiesTable',
+  name: 'RecordingsSubTable',
   components: {
     BaseTable,
   },
-  props: {            
+  props: {
     dataToDisplay: {
       type: Object,
-      default: () => ({}),
+      default: () => (
+        {}
+      ),
     },
-  },            
+  },
   data() {
     return {
       usefulData: [],
       headers: [
-        { text: 'Channel', value: 'channel_name', sortable: false },                                                  
+        { text: 'Channel', value: 'channel_name', sortable: false },
         { text: 'Participants', value: 'participants', sortable: false },
-      ],          
+      ],
     };
   },
   watch: {
@@ -51,16 +53,20 @@ export default {
     },
   },
   created() {
-      this.onCreation();
-  },     
+    this.onCreation();
+  },
   methods: {
-      onCreation() {                
-          var filteredData = [];  
-          this.dataToDisplay.data.forEach(obj =>{
-              filteredData.push({ ...obj, id: this.dataToDisplay.id, channel_name: obj.channel.name });
-          });    
-          this.usefulData = filteredData;                 
-      },             
-  },      
+    onCreation() {
+      var filteredData = [];
+      this.dataToDisplay.data.forEach(obj => {
+        filteredData.push({
+          ...obj,
+          id: this.dataToDisplay.id?.[0] || randomHash(),
+          channel_name: obj.channel.name,
+        });
+      });
+      this.usefulData = filteredData;
+    },
+  },
 };
 </script>

@@ -4,14 +4,12 @@
       <v-row>
         <v-col class="col-12 text-right">
           <v-row justify="end">
-            <v-btn
+            <create-button
               v-if="!isReadOnly"
-              :outlined="true"
+              text="Create New Scenario"
               class="ma-4"
               @click="$router.push({ name: 'experiment-scenario-add', params: { experiment: experiment.id } })"
-            >
-              Create
-            </v-btn>
+            />
           </v-row>
         </v-col>
         <v-col
@@ -44,6 +42,7 @@
 import ScenariosListingComponent from '@/components/ScenariosListingComponent.vue';
 import ScenariosAPI from '@/api/ScenariosAPI';
 import DeleteConfirmDialog from '@/components/dialog/DeleteConfirmDialog.vue';
+import CreateButton from '@/components/CreateButton.vue';
 import AccessRoles from '@/const/AccessRoles';
 import { mapGetters } from 'vuex';
 
@@ -52,6 +51,7 @@ export default {
   components: {
     DeleteConfirmDialog,
     ScenariosListingComponent,
+    CreateButton,
   },
   props: {
     scenarios: {

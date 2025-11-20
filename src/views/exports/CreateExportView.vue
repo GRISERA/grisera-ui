@@ -10,7 +10,10 @@
       <v-col class="col-12">
         <v-card>
           <v-card-text>
-            <v-form ref="exportForm" v-model="isExportFormValid">
+            <v-form
+              ref="exportForm"
+              v-model="isExportFormValid"
+            >
               <!-- Export Format -->
               <v-select
                 v-model="selectedFormat"
@@ -25,7 +28,7 @@
                 outlined
                 prepend-icon="mdi-file-export-outline"
               >
-                <template v-slot:item="{ item }">
+                <template #item="{ item }">
                   <v-list-item-icon>
                     <v-icon>{{ getFormatIcon(item.value) }}</v-icon>
                   </v-list-item-icon>
@@ -45,7 +48,7 @@
                 outlined
                 prepend-icon="mdi-text-box-outline"
                 rows="3"
-              ></v-textarea>
+              />
             </v-form>
           </v-card-text>
           <v-card-actions class="pa-4">
@@ -55,7 +58,7 @@
             >
               Cancel
             </v-btn>
-            <v-spacer></v-spacer>
+            <v-spacer />
             <v-btn
               :disabled="!isExportFormValid || isCreating || !currentDatasetId"
               :loading="isCreating"
@@ -72,7 +75,11 @@
     </v-row>
 
     <!-- Snackbar for notifications -->
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="snackbar.timeout">
+    <v-snackbar
+      v-model="snackbar.show"
+      :color="snackbar.color"
+      :timeout="snackbar.timeout"
+    >
       {{ snackbar.text }}
     </v-snackbar>
   </v-container>

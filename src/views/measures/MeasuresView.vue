@@ -5,9 +5,9 @@
         <info-tool-tip-component :info-message="$route.meta.infoMessage" />
         <app-breadcrumbs />
       </v-col>
-      <v-col 
+      <v-col
         v-if="!isReadOnly"
-        class="text-right"  
+        class="text-right"
       >
         <v-btn
           :outlined="true"
@@ -24,11 +24,11 @@
 </template>
 
 <script>
-import MeasuresTable from '@/views/measures/components/MeasuresTable.vue';
-import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 import AppBreadcrumbs from '@/components/AppBreadcrumbs.vue';
-import { mapGetters } from 'vuex';
+import InfoToolTipComponent from '@/components/InfoToolTipComponent.vue';
 import AccessRoles from '@/const/AccessRoles';
+import MeasuresTable from '@/views/measures/components/MeasuresTable.vue';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'MeasuresView',
@@ -42,7 +42,7 @@ export default {
       getPermission: 'getPermission',
     }),
     isReadOnly() {
-      return this.getPermission.role == AccessRoles.READER;
+      return this.getPermission?.role === AccessRoles.READER;
     },
   },
 };

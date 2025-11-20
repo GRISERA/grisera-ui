@@ -3,11 +3,11 @@ import { BasePage } from './BasePage';
 
 export class LoginPage extends BasePage {
     private get loginInput() {
-        return this.page.getByLabel('Username or email');
+        return this.page.getByPlaceholder('Username or email');
     }
 
     private get passwordInput() {
-        return this.page.getByLabel('Password');
+        return this.page.getByPlaceholder('Password');
     }
 
     private get loginButton() {
@@ -16,6 +16,7 @@ export class LoginPage extends BasePage {
 
     async visit(): Promise<void> {
         await this.page.goto('/');
+        await this.page.waitForURL('http://localhost:8090/**');
         await this.waitForPageLoad();
     }
 

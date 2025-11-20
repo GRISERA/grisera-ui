@@ -1,3 +1,4 @@
+import AccessRoles from '@/const/AccessRoles';
 import ClassesDescriptions from '@/const/ClassesDescriptions';
 
 export default [
@@ -13,6 +14,19 @@ export default [
         { text: 'Participants', disabled: true },
       ],
       infoMessage: ClassesDescriptions.PARTICIPANT,
+    },
+  },
+  {
+    path: '/participants/create',
+    name: 'participant-creation',
+    component: () => import('@/views/participants/CreateParticipantView.vue'),
+    meta: {
+      breadcrumbs: [
+        { text: 'Participants', href: '/participants' },
+        { text: 'Create new', disabled: true },
+      ],
+      infoMessage: ClassesDescriptions.PARTICIPANT,
+      canEnterRoles: [AccessRoles.EDITOR, AccessRoles.OWNER],
     },
   },
 ];

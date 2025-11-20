@@ -70,11 +70,14 @@
             <v-divider />
             <v-autocomplete
               v-model="timeSeries.measure"
+              :item-value="e => e.id"
               :items="measures"
+              :return-object="true"
               :rules="[
                 v => !!v || 'This field is required',
               ]"
               clearable
+              item-text="name"
               label="Measure"
               required
             >
@@ -170,6 +173,7 @@
                       v => !!v || 'This field is required',
                     ]"
                     clearable
+                    item-text="name"
                     item-value="id"
                     label="Modality"
                     required
@@ -198,6 +202,7 @@
                       v => !!v || 'This field is required',
                     ]"
                     clearable
+                    item-text="name"
                     item-value="id"
                     label="Live activity"
                     required
@@ -239,7 +244,7 @@
                 style="float: right;"
                 type="submit"
               >
-                {{ isEditMode ? 'Update' : 'Create' }}
+                {{ isEditMode ? 'Update' : 'Create Time Series' }}
               </v-btn>
             </v-card-actions>
           </v-container>

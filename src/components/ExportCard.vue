@@ -137,7 +137,10 @@
             {{ exportJob.status }}
           </v-chip>
         </div>
-        <div v-if="exportJob.processed_records > 0" class="meta-item">
+        <div
+          v-if="exportJob.processed_records > 0"
+          class="meta-item"
+        >
           <div class="meta-label">
             <v-icon
               class="mr-1"

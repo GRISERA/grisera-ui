@@ -1,6 +1,6 @@
 #!/bin/sh
 
-npm run build &
+npm run dockerize &
 pid=$!
 sleep 90
 kill -9 $pid

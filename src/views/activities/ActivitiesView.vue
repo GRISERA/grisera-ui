@@ -13,7 +13,7 @@
           :outlined="true"
           @click.prevent.stop="$router.push({ name: 'activity-creation' })"
         >
-          Create
+          Create New Activity
         </v-btn>
       </v-col>
       <v-col class="col-12">

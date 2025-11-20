@@ -8,15 +8,13 @@
       v-if="canAddParticipant"
       #activator="{ on, attrs }"
     >
-      <v-btn
-        :outlined="true"
+      <create-button
         class="ma-4"
         data-testid="experiment-participant-add-button"
+        text="Add Participant"
         v-bind="attrs"
         v-on="on"
-      >
-        Add
-      </v-btn>
+      />
     </template>
     <v-card
       class="elevation-4"
@@ -126,7 +124,7 @@
           <v-icon left>
             mdi-plus
           </v-icon>
-          Add Participant
+          Assign to experiment
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -135,9 +133,13 @@
 <script>
 import ExperimentsAPI from '@/api/ExperimentsAPI';
 import ParticipantsAPI from '@/api/ParticipantsAPI';
+import CreateButton from '@/components/CreateButton.vue';
 
 export default {
   name: 'AddExistingParticipantDialog',
+  components: {
+    CreateButton,
+  },
   props: ['experiment', 'canAddParticipant'],
   data() {
     return {

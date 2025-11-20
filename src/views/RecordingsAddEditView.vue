@@ -143,7 +143,7 @@
                   <v-autocomplete
                     ref="participantsAutocomplete"
                     v-model="file.participants"
-                    :item-text="item => '${item.name} ${item.surname}'"
+                    :item-text="e => `${ e.name } ${ e.surname }`"
                     :items="participants"
                     :multiple="true"
                     :return-object="true"
@@ -186,7 +186,7 @@
               color="primary"
               @click="performAction"
             >
-              {{ isEditMode ? 'Update' : 'Create' }}
+              {{ isEditMode ? 'Update' : 'Create Recording' }}
             </v-btn>
           </v-card-actions>
         </v-card>
